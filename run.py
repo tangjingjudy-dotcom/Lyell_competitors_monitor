@@ -63,17 +63,22 @@ def run(args):
                       + (f"（已过滤{len(new_items) - len(kept)}条噪音）" if len(kept) != len(new_items) else ""))
                 all_new.extend(kept)
 
+    if first_run:
+        # 首次运行只建立“已见”基线：把当前存量条目全部记为已知，但【不写入展示库】，
+        # 避免上百条历史条目一次性刷屏。此后仅【新出现】的里程碑条目才会进入看板。
+        meta["initialized"] = True
+        meta["first_run_at"] = now_iso()
+        save_json(META_FILE, meta)
+        out_path = site.generate(SETTINGS)
+        print(f"\n站点已生成: {out_path}")
+        print(f"基线建立完成：已将当前 {len(all_new)} 条存量里程碑记为‘已见’（不展示）；"
+              f"后续运行仅呈现新增。")
+        return
+
     merge_into_items_db(all_new)
     out_path = site.generate(SETTINGS)
     print(f"\n站点已生成: {out_path}")
     print(f"本轮里程碑新增合计: {len(all_new)} 条（已过滤例行噪音 {filtered_total} 条）")
-
-    if first_run:
-        meta["initialized"] = True
-        meta["first_run_at"] = now_iso()
-        save_json(META_FILE, meta)
-        print("基线建立完成，后续运行才会触发邮件。")
-        return
 
     if not args.no_email:
         ok, info = email_digest.send_digest(SETTINGS["email"], all_new, args.site_url)

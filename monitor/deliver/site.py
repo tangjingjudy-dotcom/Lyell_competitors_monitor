@@ -68,7 +68,7 @@ def generate(settings):
         generated=html.escape(generated),
         highlight_days=highlight_days,
         cat_buttons=cat_buttons,
-        rows="".join(rows_html) or '<tr><td colspan="4" class="empty">暂无数据，请先运行一次抓取。</td></tr>',
+        rows="".join(rows_html) or '<tr><td colspan="4" class="empty">基线已建立，正在监控中——竞品一旦发布新的临床数据或监管进展，会自动出现在这里。</td></tr>',
     )
     out_path = os.path.join(out_dir, "index.html")
     with open(out_path, "w", encoding="utf-8") as f:
