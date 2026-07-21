@@ -42,6 +42,40 @@ SETTINGS = {
         "output_dir": "data/site",     # 生成的静态站点目录（可托管到 GitHub Pages / Netlify / S3）
         "recent_days_highlight": 14,    # 首页高亮“近 N 天”新增
     },
+
+    # —— 里程碑过滤（核心）——
+    # 目的：只保留“新临床数据 / 上市前进展 / 重大公司事件”，过滤例行噪音。
+    "milestone_filter": {
+        "enabled": True,
+        # ClinicalTrials.gov 的试验状态/分期变化本身即高信号，默认整体保留
+        "always_keep_clinicaltrials": True,
+        # SEC 只保留“重大事件/年报”类表单，丢弃 Form 4(高管持股)、季报、S-8 等例行文件
+        "meaningful_sec_forms": [
+            "8-K", "8-K/A", "6-K", "6-K/A", "20-F", "20-F/A", "10-K", "10-K/A", "F-1", "424B4",
+        ],
+        # PubMed / 新闻 / RSS：标题或摘要命中以下任一关键词才保留
+        "keywords": [
+            # —— 临床数据 ——
+            "phase 1", "phase 2", "phase 3", "phase i", "phase ii", "phase iii",
+            "1期", "2期", "3期", "一期", "二期", "三期", "临床数据", "临床结果",
+            "topline", "readout", "interim", "data", "results", "efficacy", "response rate",
+            "orr", "complete response", " cr ", "pfs", "overall survival", " os ", "duration of response",
+            "中期", "数据", "疗效", "缓解率", "完全缓解", "生存期", "随访",
+            "pivotal", "registrational", "关键性", "注册", "first patient", "首例", "dosed", "给药",
+            "cohort", "队列", "trial", "study", "试验", "enrollment", "入组",
+            # —— 会议 ——
+            "ash", "asco", "eha", "aacr", "esmo", "会议", "abstract", "presentation", "摘要", "poster", "oral",
+            # —— 监管/上市前进展 ——
+            "fda", "ema", "nmpa", "mhra", "pmda", "bla", "nda", "maa", "ind", "biologics license",
+            "approval", "approved", "clearance", "authoris", "authoriz", "获批", "批准", "上市许可", "递交", "提交", "受理",
+            "breakthrough", "fast track", "rmat", "orphan", "priority review", "accelerated",
+            "pdufa", "complete response letter", "crl", "designation", "认定", "突破性", "孤儿药", "优先审评",
+            "clinical hold", "临床暂停", "terminated", "discontinu", "终止", "暂停",
+            # —— 重大公司事件 ——
+            "acquire", "acquisition", "merger", "收购", "并购", "license", "licensing", "授权", "合作",
+            "partnership", "collaboration", "deal", "milestone", "里程碑",
+        ],
+    },
 }
 
 
@@ -100,6 +134,18 @@ COMPANIES = [
     {"name": "Immunocore", "category": "实体瘤CAR-T/TCR-T",
      "ct_sponsor": "Immunocore", "sec_ticker": "IMCR",
      "news_pages": ["https://ir.immunocore.com/news-releases"]},
+    {"name": "Adaptimmune Therapeutics", "category": "实体瘤CAR-T/TCR-T",
+     "ct_sponsor": "Adaptimmune",
+     "pubmed": ["afami-cel Tecelra", "Adaptimmune TCR"]},
+
+    # ————————————————— 失败/并购/转向案例（低优先级，仅跟踪残余资产/授权动向）—————————————————
+    {"name": "Atara Biotherapeutics", "category": "失败/退出案例",
+     "ct_sponsor": "Atara Biotherapeutics", "sec_ticker": "ATRA",
+     "pubmed": ["tabelecleucel Ebvallo"]},
+    {"name": "Precision Biosciences", "category": "失败/转向案例",
+     "ct_sponsor": "Precision Biosciences", "sec_ticker": "DTIL"},
+    {"name": "Sana Biotechnology", "category": "失败/转向案例",
+     "ct_sponsor": "Sana Biotechnology", "sec_ticker": "SANA"},
 
     # ————————————————— 四、已上市大型药企（在位者）—————————————————
     {"name": "Bristol Myers Squibb", "category": "在位者大药企",
@@ -155,6 +201,12 @@ COMPANIES = [
     {"name": "Sanofi", "category": "LYL273竞品(mCRC)",
      "ct_sponsor": "Sanofi", "sec_ticker": "SNY",
      "pubmed": ["tusamitamab CEACAM5"]},
+    {"name": "Pfizer", "category": "LYL273竞品(mCRC) / 10-K列示",
+     "ct_sponsor": "Pfizer", "sec_ticker": "PFE",
+     "pubmed": ["tusamitamab CEACAM5"]},
+    {"name": "Celyad Oncology", "category": "LYL273竞品(mCRC)",
+     "ct_sponsor": "Celyad Oncology",
+     "pubmed": ["CYAD-101 NKG2D colorectal"]},
 
     # ————————————————— 七、10-K 列示的其他潜在竞争对手 —————————————————
     {"name": "AstraZeneca (含EsoBiotec)", "category": "10-K潜在竞品",
@@ -162,6 +214,10 @@ COMPANIES = [
      "pubmed": ["in vivo CAR-T ENaBL"]},
     {"name": "Agenus", "category": "10-K潜在竞品",
      "ct_sponsor": "Agenus", "sec_ticker": "AGEN"},
+    {"name": "Akeso（康方生物）", "category": "10-K潜在竞品",
+     "ct_sponsor": "Akeso",
+     "news_pages": ["https://www.akesobio.com/en/media/akeso-news/"],
+     "pubmed": ["Akeso ivonescimab"]},
     {"name": "Summit Therapeutics", "category": "10-K潜在竞品",
      "ct_sponsor": "Summit Therapeutics", "sec_ticker": "SMMT"},
 ]

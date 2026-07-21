@@ -12,7 +12,7 @@ import argparse
 import sys
 
 from config import COMPANIES, SETTINGS
-from monitor.base import Http, StateStore, diff_new, merge_into_items_db, load_json, save_json, META_FILE, now_iso
+from monitor.base import Http, StateStore, diff_new, merge_into_items_db, is_milestone, load_json, save_json, META_FILE, now_iso
 from monitor.sources import clinicaltrials, sec_edgar, pubmed, webwatch
 from monitor.deliver import site, email_digest
 
@@ -30,7 +30,9 @@ def run(args):
     if args.only:
         companies = [c for c in COMPANIES if args.only.lower() in c["name"].lower()]
 
+    mfilter = SETTINGS.get("milestone_filter", {})
     all_new = []
+    filtered_total = 0
     for c in companies:
         print(f"[{c['name']}]")
         collected = []
@@ -52,14 +54,19 @@ def run(args):
 
         for source_id, items in collected:
             new_items = diff_new(store, source_id, items)
-            if new_items:
-                print(f"    + {len(new_items)} 条新增 <- {source_id.split(':')[-1]}")
-                all_new.extend(new_items)
+            if not new_items:
+                continue
+            kept = [it for it in new_items if is_milestone(it, mfilter)]
+            filtered_total += len(new_items) - len(kept)
+            if kept:
+                print(f"    + {len(kept)} 条里程碑新增 <- {source_id.split(':')[-1]}"
+                      + (f"（已过滤{len(new_items) - len(kept)}条噪音）" if len(kept) != len(new_items) else ""))
+                all_new.extend(kept)
 
     merge_into_items_db(all_new)
     out_path = site.generate(SETTINGS)
     print(f"\n站点已生成: {out_path}")
-    print(f"本轮新增合计: {len(all_new)} 条")
+    print(f"本轮里程碑新增合计: {len(all_new)} 条（已过滤例行噪音 {filtered_total} 条）")
 
     if first_run:
         meta["initialized"] = True

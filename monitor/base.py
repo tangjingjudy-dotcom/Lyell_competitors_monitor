@@ -109,6 +109,30 @@ def diff_new(store, source_id, items):
     return new_items
 
 
+def is_milestone(item, cfg):
+    """判断一条 Item 是否属于“关键里程碑”（新临床数据/上市前进展/重大公司事件）。
+
+    规则（可在 config.py 的 SETTINGS['milestone_filter'] 调整）：
+      - clinicaltrials : 试验状态/分期变化本身即高信号，默认整体保留
+      - sec            : 仅保留“重大事件/年报”类表单（8-K/6-K/20-F/10-K 等）
+      - pubmed/web     : 标题或补充说明命中里程碑关键词才保留
+    """
+    if not cfg or not cfg.get("enabled", True):
+        return True
+
+    if item.source == "clinicaltrials":
+        return cfg.get("always_keep_clinicaltrials", True)
+
+    if item.source == "sec":
+        forms = cfg.get("meaningful_sec_forms") or []
+        blob = f"{item.detail} {item.title}"
+        return any(f.lower() in blob.lower() for f in forms)
+
+    # pubmed / web / rss → 关键词匹配
+    text = f"{item.title} {item.detail}".lower()
+    return any(kw.lower() in text for kw in (cfg.get("keywords") or []))
+
+
 def merge_into_items_db(new_items):
     """把新增条目并入全量条目库（供站点渲染），带首次发现时间。"""
     db = load_json(ITEMS_DB, [])
