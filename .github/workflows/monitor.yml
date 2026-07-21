@@ -39,7 +39,21 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/
           git commit -m "chore: update monitoring snapshot [skip ci]" || echo "no changes to commit"
-          git push || echo "nothing to push"
+
+      - name: Push snapshot (retry on race with other pushes, avoid silently losing data)
+        run: |
+          for i in 1 2 3 4 5; do
+            if git push origin HEAD:main; then
+              echo "推送成功"
+              exit 0
+            fi
+            echo "第 ${i} 次推送被拒绝（远端在此期间有新提交），5秒后 rebase 重试..."
+            sleep 5
+            git fetch origin main
+            # data/ 是本次运行刚生成的快照，冲突时以本次结果为准（-X ours），避免用旧数据覆盖新抓取结果
+            git rebase origin/main -X ours || { git rebase --abort; echo "rebase 失败，跳过本次快照提交"; exit 0; }
+          done
+          echo "⚠️ 多次重试后仍推送失败，本次运行快照未能保存（不影响看板已部署，但下次运行会基于旧快照重新对比）"
 
       - name: Upload site as Pages artifact
         uses: actions/upload-pages-artifact@v3
