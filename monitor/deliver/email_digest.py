@@ -38,9 +38,12 @@ def _build_html(new_items, site_url=None):
         for it in items:
             label = SOURCE_LABELS.get(it.source, it.source)
             meta = " · ".join(x for x in [it.detail, it.date] if x)
+            meta_html = ""
+            if meta:
+                meta_html = f'<br><span style="color:#6e6e6e;font-size:11px">{html.escape(meta)}</span>'
             parts.append(
                 f'<li>[{html.escape(label)}] <a href="{html.escape(it.url)}">{html.escape(it.title)}</a>'
-                f'{f"<br><span style=\"color:#6e6e6e;font-size:11px\">{html.escape(meta)}</span>" if meta else ""}</li>'
+                f'{meta_html}</li>'
             )
         parts.append('</ul>')
     return "\n".join(parts)
