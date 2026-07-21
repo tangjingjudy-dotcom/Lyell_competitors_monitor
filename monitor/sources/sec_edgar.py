@@ -8,7 +8,7 @@ SUBMISSIONS = "https://data.sec.gov/submissions/CIK{cik10}.json"
 _ticker_cache = None
 
 
-def _load_ticker_map(http):
+def _load_ticker_map(http, stats=None):
     global _ticker_cache
     if _ticker_cache is not None:
         return _ticker_cache
@@ -16,20 +16,25 @@ def _load_ticker_map(http):
         data = http.get_json(TICKERS_URL)
     except Exception as e:  # noqa: BLE001
         print(f"  [sec] 加载 ticker 映射失败: {e}")
+        if stats:
+            # 这是全局性故障（会导致所有公司的 SEC 数据都拿不到），单独计入
+            stats.record("sec_ticker_map", ok=False)
         _ticker_cache = {}
         return _ticker_cache
     m = {}
     for row in data.values():
         m[row["ticker"].upper()] = str(row["cik_str"]).zfill(10)
     _ticker_cache = m
+    if stats:
+        stats.record("sec_ticker_map", ok=True, count=len(m))
     return m
 
 
-def fetch(http, company, recent_count=30):
+def fetch(http, company, recent_count=30, stats=None):
     ticker = company.get("sec_ticker")
     if not ticker:
         return []
-    cikmap = _load_ticker_map(http)
+    cikmap = _load_ticker_map(http, stats=stats)
     cik10 = cikmap.get(ticker.upper())
     if not cik10:
         return []
@@ -38,6 +43,8 @@ def fetch(http, company, recent_count=30):
                              headers={"Host": "data.sec.gov"})
     except Exception as e:  # noqa: BLE001
         print(f"  [sec] {company['name']} ({ticker}) 失败: {e}")
+        if stats:
+            stats.record("sec", ok=False)
         return []
 
     recent = (data.get("filings", {}) or {}).get("recent", {})
@@ -64,4 +71,6 @@ def fetch(http, company, recent_count=30):
             url=url, date=date, detail=f"表单 {form}",
             uid=f"sec-{accn}",
         ))
+    if stats:
+        stats.record("sec", ok=True, count=len(items))
     return items

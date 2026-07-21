@@ -9,7 +9,7 @@ FIELDS = ",".join([
 ])
 
 
-def fetch(http, company, page_size=30):
+def fetch(http, company, page_size=30, stats=None):
     sponsor = company.get("ct_sponsor")
     if not sponsor:
         return []
@@ -23,6 +23,8 @@ def fetch(http, company, page_size=30):
         data = http.get_json(API, params=params)
     except Exception as e:  # noqa: BLE001
         print(f"  [clinicaltrials] {company['name']} 失败: {e}")
+        if stats:
+            stats.record("clinicaltrials", ok=False)
         return []
 
     items = []
@@ -46,4 +48,6 @@ def fetch(http, company, page_size=30):
             date=updated, detail=detail,
             uid=f"ct-{nct}-{overall}-{updated}"[:64],
         ))
+    if stats:
+        stats.record("clinicaltrials", ok=True, count=len(items))
     return items

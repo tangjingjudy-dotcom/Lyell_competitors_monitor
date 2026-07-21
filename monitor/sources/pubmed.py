@@ -6,7 +6,7 @@ ESEARCH = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
 ESUMMARY = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi"
 
 
-def fetch(http, company, retmax=15):
+def fetch(http, company, retmax=15, stats=None):
     terms = company.get("pubmed") or []
     items = []
     for term in terms:
@@ -17,14 +17,20 @@ def fetch(http, company, retmax=15):
             })
             ids = sr.get("esearchresult", {}).get("idlist", [])
             if not ids:
+                if stats:
+                    stats.record("pubmed", ok=True, count=0)
                 continue
             summ = http.get_json(ESUMMARY, params={
                 "db": "pubmed", "id": ",".join(ids), "retmode": "json",
             })
         except Exception as e:  # noqa: BLE001
             print(f"  [pubmed] {company['name']} '{term}' 失败: {e}")
+            if stats:
+                stats.record("pubmed", ok=False)
             continue
 
+        if stats:
+            stats.record("pubmed", ok=True, count=len(ids))
         result = summ.get("result", {})
         for pmid in result.get("uids", []):
             rec = result.get(pmid, {})

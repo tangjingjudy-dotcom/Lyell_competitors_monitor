@@ -14,6 +14,8 @@ DATA_DIR = os.path.join(ROOT, "data")
 STATE_DIR = os.path.join(DATA_DIR, "state")
 ITEMS_DB = os.path.join(DATA_DIR, "items.json")
 META_FILE = os.path.join(DATA_DIR, "meta.json")
+RUN_LOG = os.path.join(DATA_DIR, "run_log.json")
+RUN_LOG_KEEP = 30  # 保留最近 N 次运行记录，供“系统健康检查”使用
 
 
 @dataclass
@@ -131,6 +133,38 @@ def is_milestone(item, cfg):
     # pubmed / web / rss → 关键词匹配
     text = f"{item.title} {item.detail}".lower()
     return any(kw.lower() in text for kw in (cfg.get("keywords") or []))
+
+
+class RunStats:
+    """记录本次运行中每类信息源的“成功/失败次数”与“原始抓取条数”。
+
+    目的：区分“真的没有新进展”与“爬虫本身出故障”——
+    例如某源本轮 error 次数骤增、或 raw 条数骤降为 0，即为故障信号，
+    即便本次“新增里程碑”仍是 0 也不代表系统正常。
+    """
+
+    def __init__(self):
+        self.sources = {}
+
+    def record(self, name, ok, count=0):
+        s = self.sources.setdefault(name, {"ok": 0, "error": 0, "raw": 0})
+        if ok:
+            s["ok"] += 1
+            s["raw"] += count
+        else:
+            s["error"] += 1
+
+    def summary(self):
+        return self.sources
+
+
+def append_run_log(entry, keep=RUN_LOG_KEEP):
+    """把一次运行的健康摘要追加进滚动日志（供站点渲染“系统运行状态”）。"""
+    log = load_json(RUN_LOG, [])
+    log.append(entry)
+    log = log[-keep:]
+    save_json(RUN_LOG, log)
+    return log
 
 
 def merge_into_items_db(new_items):

@@ -10,16 +10,22 @@
 """
 import argparse
 import sys
+import time
 
 from config import COMPANIES, SETTINGS
-from monitor.base import Http, StateStore, diff_new, merge_into_items_db, is_milestone, load_json, save_json, META_FILE, now_iso
+from monitor.base import (
+    Http, StateStore, RunStats, diff_new, merge_into_items_db, is_milestone,
+    append_run_log, load_json, save_json, META_FILE, now_iso,
+)
 from monitor.sources import clinicaltrials, sec_edgar, pubmed, webwatch
 from monitor.deliver import site, email_digest
 
 
 def run(args):
+    run_started = time.time()
     http = Http(SETTINGS["user_agent"], SETTINGS["request_timeout"], SETTINGS["request_delay_sec"])
     store = StateStore()
+    stats = RunStats()
 
     meta = load_json(META_FILE, {})
     first_run = not meta.get("initialized")
@@ -37,19 +43,19 @@ def run(args):
         print(f"[{c['name']}]")
         collected = []
 
-        ct_items = clinicaltrials.fetch(http, c, SETTINGS["clinicaltrials_page_size"])
+        ct_items = clinicaltrials.fetch(http, c, SETTINGS["clinicaltrials_page_size"], stats=stats)
         collected.append((f"{c['name']}:ct", ct_items))
 
-        sec_items = sec_edgar.fetch(http, c, SETTINGS["sec_recent_count"])
+        sec_items = sec_edgar.fetch(http, c, SETTINGS["sec_recent_count"], stats=stats)
         collected.append((f"{c['name']}:sec", sec_items))
 
-        pm_items = pubmed.fetch(http, c, SETTINGS["pubmed_retmax"])
+        pm_items = pubmed.fetch(http, c, SETTINGS["pubmed_retmax"], stats=stats)
         collected.append((f"{c['name']}:pubmed", pm_items))
 
-        rss_items = webwatch.fetch_rss(http, c)
+        rss_items = webwatch.fetch_rss(http, c, stats=stats)
         collected.append((f"{c['name']}:rss", rss_items))
 
-        web_items = webwatch.fetch_web(http, c)
+        web_items = webwatch.fetch_web(http, c, stats=stats)
         collected.append((f"{c['name']}:web", web_items))
 
         for source_id, items in collected:
@@ -62,6 +68,22 @@ def run(args):
                 print(f"    + {len(kept)} 条里程碑新增 <- {source_id.split(':')[-1]}"
                       + (f"（已过滤{len(new_items) - len(kept)}条噪音）" if len(kept) != len(new_items) else ""))
                 all_new.extend(kept)
+
+    # —— 记录本次运行的“健康摘要”（供看板判断“真的没进展”还是“爬虫故障”）——
+    src_summary = stats.summary()
+    error_sources = {name: s["error"] for name, s in src_summary.items() if s["error"] > 0}
+    run_record = {
+        "timestamp": now_iso(),
+        "duration_sec": round(time.time() - run_started, 1),
+        "companies": len(companies),
+        "first_run": first_run,
+        "kept_new": len(all_new),
+        "filtered_noise": filtered_total,
+        "sources": src_summary,
+    }
+    append_run_log(run_record)
+    if error_sources:
+        print(f"\n⚠️ 本轮存在信息源故障: {error_sources}（详见 run_log.json / 看板顶部“系统运行状态”）")
 
     if first_run:
         # 首次运行只建立“已见”基线：把当前存量条目全部记为已知，但【不写入展示库】，

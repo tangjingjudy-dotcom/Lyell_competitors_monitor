@@ -14,7 +14,7 @@ _SKIP_PREFIXES = ("javascript:", "mailto:", "tel:", "#")
 _MIN_LEN, _MAX_LEN = 20, 220
 
 
-def fetch_rss(http, company):
+def fetch_rss(http, company, stats=None):
     items = []
     for feed_url in company.get("rss") or []:
         try:
@@ -22,7 +22,10 @@ def fetch_rss(http, company):
             parsed = feedparser.parse(raw)
         except Exception as e:  # noqa: BLE001
             print(f"  [rss] {company['name']} {feed_url} 失败: {e}")
+            if stats:
+                stats.record("rss", ok=False)
             continue
+        n_before = len(items)
         for entry in parsed.entries[:40]:
             title = (entry.get("title") or "").strip()
             link = entry.get("link") or feed_url
@@ -33,10 +36,12 @@ def fetch_rss(http, company):
                 company=company["name"], category=company["category"], source="web",
                 title=title, url=link, date=date, detail="RSS",
             ))
+        if stats:
+            stats.record("rss", ok=True, count=len(items) - n_before)
     return items
 
 
-def fetch_web(http, company):
+def fetch_web(http, company, stats=None):
     items = []
     seen_local = set()
     for page in company.get("news_pages") or []:
@@ -44,7 +49,10 @@ def fetch_web(http, company):
             html = http.get(page).text
         except Exception as e:  # noqa: BLE001
             print(f"  [web] {company['name']} {page} 失败: {e}")
+            if stats:
+                stats.record("web", ok=False)
             continue
+        n_before = len(items)
         soup = BeautifulSoup(html, "html.parser")
         for a in soup.find_all("a"):
             href = (a.get("href") or "").strip()
@@ -62,4 +70,6 @@ def fetch_web(http, company):
                 company=company["name"], category=company["category"], source="web",
                 title=text, url=url, date="", detail=f"来源页: {page}",
             ))
+        if stats:
+            stats.record("web", ok=True, count=len(items) - n_before)
     return items
