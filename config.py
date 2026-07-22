@@ -146,7 +146,12 @@ COMPANIES = [
      "tier": "priority",            # Yescarta(axi-cel) 是 PiNACLE-H2H 头对头对照之一；PiNACLE-H2H 结果直接决定 ronde-cel 市场前景
      "diversified": True,           # 多元化大集团，网页新闻走关键词过滤
      "ct_sponsor": "Kite, A Gilead Company", "sec_ticker": "GILD",
-     "news_pages": ["https://www.gilead.com/news/news-details"]},
+     "news_pages": ["https://www.gilead.com/news/news-details"],
+     # 只保留 CAR-T/细胞治疗 相关试验（过滤HIV/HCV/肝病等大量无关管线）
+     "ct_keywords": ["yescarta", "axicabtagene", "axi-cel", "tecartus", "brexucabtagene",
+                     "kite-363", "kite-753", "duocore", "car-t", "car t",
+                     "chimeric antigen", "lymphoma", "dlbcl", "follicular",
+                     "leukemia", "all", "b-cell", "mantle cell"]},
     # Poseida 已被 Roche 收购 → 跟踪 Roche
     {"name": "Roche (含Poseida/Genentech)", "category": "自体下一代CAR-T / 在位者",
      "ct_sponsor": "Hoffmann-La Roche",
@@ -183,7 +188,12 @@ COMPANIES = [
      "tier": "priority",            # Breyanzi(liso-cel) 是 PiNACLE-H2H 头对头对照之一；ronde-cel上市后面临的直接竞争
      "diversified": True,           # 多元化大集团，网页新闻走关键词过滤
      "ct_sponsor": "Bristol-Myers Squibb", "sec_ticker": "BMY",
-     "news_pages": ["https://news.bms.com/news/corporate-financial.aspx"]},
+     "news_pages": ["https://news.bms.com/news/corporate-financial.aspx"],
+     # 只保留 CAR-T/细胞治疗/血液肿瘤 相关试验（过滤Opdivo/Eliquis/Pomalyst等大量无关管线）
+     "ct_keywords": ["breyanzi", "lisocabtagene", "liso-cel", "abecma", "idecabtagene",
+                     "ide-cel", "arlo-cel", "car-t", "car t", "chimeric antigen",
+                     "lymphoma", "dlbcl", "follicular", "myeloma", "gprc5d",
+                     "b-cell", "mantle cell", "leukemia"]},
     {"name": "Johnson & Johnson", "category": "在位者大药企",
      "ct_sponsor": "Janssen Research & Development, LLC", "sec_ticker": "JNJ"},
     {"name": "Legend Biotech", "category": "在位者大药企",
@@ -205,19 +215,26 @@ COMPANIES = [
      "tier": "priority",            # CD19/CD20双靶点最成熟竞品，已进入随机对照3期(DALY 2-EU, vs化疗)；ronde-cel最需要跟踪的直接竞争对手
      "ct_sponsor": "Miltenyi Biomedicine",
      "news_pages": ["https://www.miltenyibiomedicine.com/news-events/press-releases"],
-     "pubmed": ["zamtocabtagene", "zamto-cel", "MB-CART2019.1"]},
+     "pubmed": ["zamtocabtagene", "zamto-cel", "MB-CART2019.1"],
+     "ct_keywords": ["zamto", "mb-cart", "car-t", "car t", "lymphoma", "dlbcl",
+                     "cd19", "cd20", "b-cell"]},
     {"name": "CARsgen Therapeutics (科济药业)", "category": "Ronde-cel竞品(LBCL)",
      "tier": "priority",            # satri-cel：同为 CD19/CD20 双靶点 LBCL 直接竞品
      "ct_sponsor": "CARsgen Therapeutics",
      "news_pages": ["https://www.carsgen.com/en/media/news/"],
-     "pubmed": ["CARsgen satricabtagene", "satri-cel CT041"]},
+     "pubmed": ["CARsgen satricabtagene", "satri-cel CT041"],
+     "ct_keywords": ["satri", "ct041", "ct1190", "carsgen", "car-t", "car t",
+                     "lymphoma", "dlbcl", "cd19", "cd20", "cldn18", "gpc3",
+                     "claudin", "gastric", "hepatocellular", "b-cell"]},
 
     # ————————————————— 六、LYL273（mCRC）具体竞品 —————————————————
     {"name": "Innovative Cellular Therapeutics (ICT)", "category": "LYL273竞品(mCRC)",
      "tier": "priority",            # GCC19CART：GUCY2C 靶点 mCRC 进度最快的直接竞品
      "ct_sponsor": "Innovative Cellular Therapeutics",
      "news_pages": ["https://www.ictbio.com/news/"],
-     "pubmed": ["GCC19CART", "GCC CAR-T colorectal"]},
+     "pubmed": ["GCC19CART", "GCC CAR-T colorectal"],
+     "ct_keywords": ["gcc19cart", "gcc", "gucy2c", "car-t", "car t",
+                     "coupledcar", "colorectal", "mcrc", "crc"]},
     {"name": "北京艺妙神州 (Immunochina)", "category": "LYL273竞品(mCRC)",
      "ct_sponsor": "Beijing Immunochina Medical",
      "news_pages": ["http://www.immunochina.com/en/index.php/home/news/news_1.html"],
@@ -235,7 +252,10 @@ COMPANIES = [
      "diversified": True,           # 多元化大集团：网页新闻混杂大量无关业务，重点档下仍对网页做关键词过滤（临床/论文精确检索不受影响）
      "ct_sponsor": "Merck KGaA, Darmstadt, Germany",
      "news_pages": ["https://www.merckgroup.com/en/news.html"],
-     "pubmed": ["precemtabart tocentecan", "M9140 CEACAM5"]},
+     "pubmed": ["precemtabart tocentecan", "M9140 CEACAM5"],
+     # 只保留 CEACAM5 ADC / 结直肠癌 相关试验（过滤电子/生命科学等大量无关管线）
+     "ct_keywords": ["precemtabart", "m9140", "ceacam5", "colorectal", "mcrc",
+                     "car-t", "car t", "adc", "antibody-drug"]},
     {"name": "Sanofi", "category": "LYL273竞品(mCRC)",
      "ct_sponsor": "Sanofi", "sec_ticker": "SNY",
      "pubmed": ["tusamitamab CEACAM5"]},

@@ -28,15 +28,22 @@ def fetch(http, company, page_size=30, stats=None):
         return []
 
     items = []
+    ct_kw = company.get("ct_keywords", None)  # None=全部保留（Lyell等小biotech），list=按关键词过滤
     for study in data.get("studies", []):
         ps = study.get("protocolSection", {})
         ident = ps.get("identificationModule", {})
         status = ps.get("statusModule", {})
         design = ps.get("designModule", {})
+        conds = ps.get("conditionsModule", {})
         nct = ident.get("nctId", "")
         if not nct:
             continue
         title = ident.get("briefTitle", nct)
+
+        # 临床试验关键词过滤：只保留与我们关注的CAR-T/适应症相关的试验
+        if ct_kw is not None:
+            if not any(kw.lower() in title.lower() for kw in ct_kw):
+                continue
         overall = status.get("overallStatus", "")
         phase = ",".join(design.get("phases", []) or [])
         updated = (status.get("lastUpdatePostDateStruct", {}) or {}).get("date", "")
