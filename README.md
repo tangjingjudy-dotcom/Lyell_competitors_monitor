@@ -15,6 +15,29 @@
 
 关键词与表单清单均可在 `config.py` 中增删、放宽或收紧。
 
+## 分级监控（重点 / 常规）
+
+给公司分两档权重，在 `config.py` 里给某公司加 `"tier": "priority"` 即升为「重点」，不写则默认「常规」。两档差异（可在 `SETTINGS["tiers"]` 调整）：
+
+| | ★ 重点监控 | 常规监控 |
+|---|---|---|
+| 抓取频率 | 每天 | 每 3 天一次（降频降噪） |
+| 过滤宽松度 | **有新论文/新闻即保留**（临床、申报本就保留） | 维持严格里程碑关键词过滤 |
+| 邮件推送 | 纳入每日邮件 | 不进邮件，仅看板可查 |
+| 看板标记 | 公司名前带 ★，可用「只看重点监控对象」筛选 | 无 |
+
+**当前重点监控对象**（5 家，可随时在 `config.py` 增减）：
+
+- **Lyell Immunopharma** —— 监控主体本身
+- **Miltenyi Biomedicine（zamto-cel）** —— PiNACLE-H2H 头对头直接对照
+- **CARsgen 科济药业（satri-cel）** —— 同为 CD19/CD20 双靶点 LBCL 直接竞品
+- **Innovative Cellular Therapeutics（GCC19CART）** —— GUCY2C 靶点 mCRC 进度最快竞品
+- **Merck KGaA（M9140 CEACAM5 ADC）** —— mCRC 跨模态关键威胁
+
+> 关于「多元化大集团」：Merck KGaA 这类公司官网新闻混杂大量无关业务（电子/生命科学等），已标 `"diversified": True` —— 重点档下它的**临床试验与论文仍精确检索并全量保留**，但**网页新闻仍走关键词过滤**，避免无关新闻刷屏。若要放开，去掉该标记即可。
+
+**邮件推送开启方法**：邮件只推送★重点对象的新增。凭据从环境变量/GitHub Secrets 读取（不写进代码）：本地 `export MONITOR_SMTP_USER=你的Gmail MONITOR_SMTP_PASS=应用专用密码 MONITOR_MAIL_TO=收件人`；云端到 **仓库 Settings → Secrets** 配置同名 Secret（`MONITOR_SMTP_USER` / `MONITOR_SMTP_PASS` / `MONITOR_MAIL_TO`）。凭据齐全即自动开启，未配置则自动跳过发送。
+
 ## 如何判断“真的没有新进展” vs. “爬虫坏了”
 
 如果一两周看板都没有新增，别只靠“猜”，有三层由弱到强的检查方式：
@@ -78,13 +101,15 @@ pip install -r requirements.txt
 
 编辑 `config.py`：
 1. `SETTINGS["user_agent"]`：改成带你邮箱的字符串（SEC 要求）。
-2. 邮件：`SETTINGS["email"]` 里填 SMTP 账号、收件人、发送间隔（默认关闭）。
-3. 公司源钩子：已按报告预填；可增删 `rss` / `news_pages` / `pubmed` 等。
+2. 邮件：改用环境变量/Secrets 注入凭据（见上一节），凭据齐全即自动开启，只推★重点对象。
+3. 分级：给公司加 `"tier": "priority"` 升为重点；`SETTINGS["tiers"]` 里调频率/宽松度。
+4. 公司源钩子：已按报告预填；可增删 `rss` / `news_pages` / `pubmed` 等。
 
 ## 运行
 
 ```bash
-python run.py                       # 抓取一次（首次运行=静默建立基线，不发邮件）
+python run.py                       # 抓取一次（重点对象每天跑，常规对象每3天跑；首次运行=静默建立基线且不发邮件）
+python run.py --all                 # 强制全量扫描（忽略常规对象降频，手动全扫时用）
 python run.py --site-url https://你的看板地址   # 邮件中附看板链接
 python run.py --no-email            # 只更新站点，不发邮件
 python run.py --only LYEL           # 只跑某家（调试）
@@ -103,7 +128,9 @@ python run.py --only LYEL           # 只跑某家（调试）
 
 **方式 B：GitHub Actions + Pages（推荐，免服务器、云端常驻、公开可分享）**
 
-工作流已内置：`.github/workflows/monitor.yml`（每天北京时间约 09:00 自动跑，也可手动触发）。它会：抓取 → 里程碑过滤 → 生成看板 → 把 `data/` 状态快照提交回仓库（保留“已见”基线）→ 部署到 GitHub Pages。**日常无需手动点击 Run workflow**，仅在想立刻刷新时才用。
+工作流已内置：`.github/workflows/monitor.yml`（每天 UTC 01:17 ≈ 北京时间 09:17 自动跑，也可手动触发）。它会：抓取（重点对象每天/常规对象每3天）→ 里程碑过滤 → 生成看板 → 把 `data/` 状态快照提交回仓库（保留“已见”基线）→ 部署到 GitHub Pages。**日常无需手动点击 Run workflow**，仅在想立刻刷新时才用（手动触发默认勾选 `full_sweep`＝全量扫描一遍）。
+
+> 为什么定时时间是 09:17 而不是整点？GitHub 的定时任务在**整点(:00)最拥堵**，经常被延迟十几分钟甚至在高负载时被丢弃；错开到 :17 这类非整点能显著提高准时率。即便如此，GitHub 官方也说明定时任务**可能延迟几分钟到一两小时**——所以某天看板没在 9 点整刷新属正常，看顶部“系统运行状态”的“上次运行时间”只要在最近 24 小时内即可。
 
 > ⚠️ **务必把 `lyell_monitor/` 作为独立仓库单独推送，不要把上级目录 `/Desktop/lyell` 整个传上去** —— 那里有竞品分析报告的 docx/pptx，公开仓库会导致机密外泄。本目录只含爬虫代码与公开新闻链接，可安全公开。
 

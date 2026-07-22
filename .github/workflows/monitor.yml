@@ -1,10 +1,17 @@
 name: competitor-monitor
 
-# 每天 UTC 01:00（= 北京时间 09:00）自动运行；也可在 Actions 页面手动触发
+# 每天 UTC 01:17（≈ 北京时间 09:17）自动运行。
+# 注意：故意避开整点(:00) —— GitHub 定时任务在整点最拥堵、经常被延迟甚至丢弃，错开几分钟更可靠。
+# 也可在 Actions 页面手动触发（可勾选 full_sweep 强制全量扫描）。
 on:
   schedule:
-    - cron: "0 1 * * *"
+    - cron: "17 1 * * *"
   workflow_dispatch:
+    inputs:
+      full_sweep:
+        description: "强制全量扫描（忽略常规对象降频）"
+        type: boolean
+        default: true
 
 permissions:
   contents: write      # 把抓取到的状态快照提交回仓库（用于跨次运行保留“已见”基线）
@@ -30,8 +37,19 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run crawler (no email)
-        run: python run.py --no-email
+      - name: Run crawler
+        # 手动触发且勾选 full_sweep 时加 --all 全量扫描；定时运行按各档频率执行。
+        # 邮件开关由 config.py 的 email.enabled 决定；SMTP 账号密码从仓库 Secrets 注入（未配置则自动跳过发送）。
+        env:
+          MONITOR_SMTP_USER: ${{ secrets.MONITOR_SMTP_USER }}
+          MONITOR_SMTP_PASS: ${{ secrets.MONITOR_SMTP_PASS }}
+          MONITOR_MAIL_TO: ${{ secrets.MONITOR_MAIL_TO }}
+        run: |
+          if [ "${{ github.event.inputs.full_sweep }}" = "true" ]; then
+            python run.py --all
+          else
+            python run.py
+          fi
 
       - name: Commit state snapshot
         run: |

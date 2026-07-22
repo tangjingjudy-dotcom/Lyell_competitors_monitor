@@ -28,6 +28,7 @@ class Item:
     url: str
     date: str = ""         # ISO 日期字符串（尽量填）
     detail: str = ""       # 补充说明（状态、表单类型等）
+    tier: str = "standard" # 所属监控档位：priority(重点) / standard(常规)
     uid: str = field(default="")
 
     def __post_init__(self):
@@ -111,13 +112,19 @@ def diff_new(store, source_id, items):
     return new_items
 
 
-def is_milestone(item, cfg):
+def is_milestone(item, cfg, relaxed=False, diversified=False):
     """判断一条 Item 是否属于“关键里程碑”（新临床数据/上市前进展/重大公司事件）。
 
     规则（可在 config.py 的 SETTINGS['milestone_filter'] 调整）：
       - clinicaltrials : 试验状态/分期变化本身即高信号，默认整体保留
       - sec            : 仅保留“重大事件/年报”类表单（8-K/6-K/20-F/10-K 等）
       - pubmed/web     : 标题或补充说明命中里程碑关键词才保留
+
+    relaxed=True（重点监控档）：进一步放宽——
+      - pubmed         : 全部保留（论文检索词已按产品名精确限定，任何新论文都相关）
+      - web/rss 新闻   : 纯 biotech 公司全部保留（有新闻即推送）；
+                         若 diversified=True（多元化大集团，如 Merck KGaA），
+                         网页新闻仍走关键词过滤，避免无关业务新闻刷屏。
     """
     if not cfg or not cfg.get("enabled", True):
         return True
@@ -129,6 +136,13 @@ def is_milestone(item, cfg):
         forms = cfg.get("meaningful_sec_forms") or []
         blob = f"{item.detail} {item.title}"
         return any(f.lower() in blob.lower() for f in forms)
+
+    if relaxed:
+        if item.source == "pubmed":
+            return True
+        # web/rss：非多元化公司直接全保；多元化大集团继续走下方关键词过滤
+        if not diversified:
+            return True
 
     # pubmed / web / rss → 关键词匹配
     text = f"{item.title} {item.detail}".lower()

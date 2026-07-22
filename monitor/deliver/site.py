@@ -119,6 +119,7 @@ def generate(settings):
 
     categories = sorted({r["category"] for r in db})
     recent_count = 0
+    priority_count = 0
     rows_html = []
     for r in db:
         try:
@@ -127,11 +128,15 @@ def generate(settings):
             is_new = False
         if is_new:
             recent_count += 1
+        is_priority = r.get("tier") == "priority"
+        if is_priority:
+            priority_count += 1
         badge = '<span class="badge">NEW</span>' if is_new else ""
+        star = '<span class="star" title="重点监控对象">★</span> ' if is_priority else ""
         rows_html.append(
-            f'<tr data-cat="{html.escape(r["category"])}" data-src="{r["source"]}">'
+            f'<tr data-cat="{html.escape(r["category"])}" data-src="{r["source"]}" data-tier="{r.get("tier","standard")}">'
             f'<td class="c-date">{html.escape(_fmt_dt(r.get("first_seen","")))}{badge}</td>'
-            f'<td class="c-co">{html.escape(r["company"])}</td>'
+            f'<td class="c-co">{star}{html.escape(r["company"])}</td>'
             f'<td><span class="src src-{r["source"]}">{SOURCE_LABELS.get(r["source"], r["source"])}</span></td>'
             f'<td class="c-title"><a href="{html.escape(r["url"])}" target="_blank" rel="noopener">{html.escape(r["title"])}</a>'
             f'<div class="detail">{html.escape(r.get("detail",""))} · {html.escape(r.get("date",""))}</div></td>'
@@ -148,6 +153,7 @@ def generate(settings):
         title=html.escape(site_cfg["title"]),
         total=len(db),
         recent=recent_count,
+        priority=priority_count,
         ncat=len(categories),
         generated=html.escape(generated),
         highlight_days=highlight_days,
@@ -185,6 +191,9 @@ table{{width:calc(100% - 56px);margin:0 28px 40px;border-collapse:collapse;backg
 th,td{{text-align:left;padding:11px 14px;border-bottom:1px solid var(--border);font-size:13.5px;vertical-align:top}}
 th{{background:#eef1f5;color:var(--navy);font-size:12.5px;position:sticky;top:0}}
 .c-date{{white-space:nowrap;color:var(--gray);font-size:12px}}.c-co{{white-space:nowrap;font-weight:600;color:var(--navy)}}
+.star{{color:var(--gold)}}
+.toggle{{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--navy);cursor:pointer;user-select:none;white-space:nowrap}}
+.toggle input{{cursor:pointer}}
 .c-title a{{color:#1a1a1a;text-decoration:none}}.c-title a:hover{{color:var(--gold);text-decoration:underline}}
 .detail{{color:var(--gray);font-size:11.5px;margin-top:3px}}
 .badge{{background:var(--gold);color:#fff;font-size:10px;border-radius:4px;padding:1px 5px;margin-left:6px}}
@@ -210,24 +219,29 @@ table.mini th{{background:#f2f4f7;color:var(--navy)}}
 <div class="stats">
   <div class="stat"><div class="n">{total}</div><div class="l">累计条目</div></div>
   <div class="stat"><div class="n">{recent}</div><div class="l">近 {highlight_days} 天新增</div></div>
+  <div class="stat"><div class="n">★ {priority}</div><div class="l">重点对象条目</div></div>
   <div class="stat"><div class="n">{ncat}</div><div class="l">监控分类</div></div>
 </div>
-<div class="controls"><input id="q" placeholder="搜索公司 / 标题 / 关键词..."></div>
+<div class="controls"><input id="q" placeholder="搜索公司 / 标题 / 关键词...">
+  <label class="toggle"><input type="checkbox" id="onlyStar"> ★ 只看重点监控对象</label>
+</div>
 <div class="chips">{cat_buttons}</div>
 <table id="tbl"><thead><tr><th>首次发现</th><th>公司</th><th>类型</th><th>标题</th></tr></thead>
 <tbody>{rows}</tbody></table>
 <script>
-var q=document.getElementById('q'),tb=document.querySelector('#tbl tbody'),filter='all';
+var q=document.getElementById('q'),tb=document.querySelector('#tbl tbody'),filter='all',onlyStar=document.getElementById('onlyStar');
 function apply(){{
   var kw=q.value.trim().toLowerCase();
   Array.prototype.forEach.call(tb.rows,function(r){{
     if(r.cells.length<4){{return;}}
     var okCat=filter==='all'||r.getAttribute('data-cat')===filter;
     var okKw=!kw||r.innerText.toLowerCase().indexOf(kw)>=0;
-    r.style.display=(okCat&&okKw)?'':'none';
+    var okStar=!onlyStar.checked||r.getAttribute('data-tier')==='priority';
+    r.style.display=(okCat&&okKw&&okStar)?'':'none';
   }});
 }}
 q.addEventListener('input',apply);
+onlyStar.addEventListener('change',apply);
 Array.prototype.forEach.call(document.querySelectorAll('.chip'),function(b){{
   b.addEventListener('click',function(){{
     document.querySelector('.chip.active').classList.remove('active');

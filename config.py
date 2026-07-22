@@ -11,6 +11,12 @@
 
 分类 category 仅用于站点分组展示。
 """
+import os
+
+# 邮件凭据从环境变量/GitHub Secrets 读取（不要把密码写进代码提交到公开仓库）
+_SMTP_USER = os.environ.get("MONITOR_SMTP_USER", "")
+_SMTP_PASS = os.environ.get("MONITOR_SMTP_PASS", "")
+_MAIL_TO = os.environ.get("MONITOR_MAIL_TO", _SMTP_USER)
 
 # —— 全局设置 ——
 SETTINGS = {
@@ -22,18 +28,21 @@ SETTINGS = {
     "sec_recent_count": 30,            # 每家公司检查的最新申报数量
     "pubmed_retmax": 15,               # 每个关键词拉取的最新论文数量
 
-    # —— 邮件推送（可选）——
+    # —— 邮件推送（可选，仅推送“重点监控对象”的新增）——
+    # 凭据齐全（配置了 SMTP 用户名+密码）即自动开启；否则自动跳过发送。
+    # 本地测试可 export MONITOR_SMTP_USER / MONITOR_SMTP_PASS / MONITOR_MAIL_TO；
+    # 云端到 仓库 Settings → Secrets 里配同名 Secret 即可，切勿把密码写进本文件。
     "email": {
-        "enabled": False,              # 设为 True 才会发邮件
+        "enabled": bool(_SMTP_USER and _SMTP_PASS),
         "smtp_host": "smtp.gmail.com",
         "smtp_port": 587,
         "use_tls": True,
-        "username": "your-email@example.com",
-        "password": "your-app-password",   # 建议用应用专用密码 / 环境变量
-        "from_addr": "your-email@example.com",
-        "to_addrs": ["your-email@example.com"],  # 可填多个收件人
-        "min_hours_between_emails": 12,    # 两封邮件的最小间隔（防打扰）；0=有新消息即发
-        "subject_prefix": "[Lyell竞品监控]",
+        "username": _SMTP_USER,
+        "password": _SMTP_PASS,            # Gmail 需用「应用专用密码」，非登录密码
+        "from_addr": _SMTP_USER,
+        "to_addrs": [a.strip() for a in _MAIL_TO.split(",") if a.strip()],  # 逗号分隔可多收件人
+        "min_hours_between_emails": 0,     # 重点对象一有新消息即发；>0 可设最小间隔防打扰
+        "subject_prefix": "[Lyell竞品监控·重点]",
     },
 
     # —— 站点输出 ——
@@ -76,6 +85,25 @@ SETTINGS = {
             "partnership", "collaboration", "deal", "milestone", "里程碑",
         ],
     },
+
+    # —— 分级监控（权重）——
+    # 给公司分“重点/常规”两档：重点对象抓取更频繁、过滤更宽松、并纳入每日邮件；
+    # 常规对象降低频率、维持严格里程碑过滤，以压制噪音。
+    # 在 COMPANIES 中给某公司加 "tier": "priority" 即升为重点；不写则默认为 "standard"。
+    "tiers": {
+        "priority": {
+            "label": "重点监控",
+            "run_every_days": 1,     # 每天扫描
+            "relaxed_filter": True,  # 放宽：新论文/新闻即保留（临床、申报本就保留）
+            "email": True,           # 纳入每日邮件推送
+        },
+        "standard": {
+            "label": "常规监控",
+            "run_every_days": 3,     # 每 3 天扫描一次（降频降噪）
+            "relaxed_filter": False, # 维持严格里程碑关键词过滤
+            "email": False,          # 不进邮件，只在看板可查
+        },
+    },
 }
 
 
@@ -84,11 +112,12 @@ COMPANIES = [
     {
         "name": "Lyell Immunopharma",
         "category": "监控主体",
+        "tier": "priority",            # 监控主体：最高优先级
         "ct_sponsor": "Lyell Immunopharma",
         "sec_ticker": "LYEL",
         "rss": [],
         "news_pages": ["https://ir.lyell.com/news-events/news-releases"],
-        "pubmed": ["Lyell Immunopharma", "rondecabtagene", "ronde-cel"],
+        "pubmed": ["Lyell Immunopharma", "rondecabtagene", "ronde-cel", "LYL314", "LYL273", "LYL119"],
     },
 
     # ————————————————————— 一、异体/现货型 CAR-T —————————————————————
@@ -169,16 +198,19 @@ COMPANIES = [
     {"name": "Incyte", "category": "Ronde-cel竞品(LBCL)",
      "ct_sponsor": "Incyte Corporation", "sec_ticker": "INCY"},
     {"name": "Miltenyi Biomedicine (zamto-cel)", "category": "Ronde-cel竞品(LBCL)",
+     "tier": "priority",            # zamto-cel 是 PiNACLE-H2H 的头对头直接对照，最高优先
      "ct_sponsor": "Miltenyi Biomedicine",
      "news_pages": ["https://www.miltenyibiomedicine.com/news-events/press-releases"],
-     "pubmed": ["zamtocabtagene", "zamto-cel"]},
+     "pubmed": ["zamtocabtagene", "zamto-cel", "MB-CART2019.1"]},
     {"name": "CARsgen Therapeutics (科济药业)", "category": "Ronde-cel竞品(LBCL)",
+     "tier": "priority",            # satri-cel：同为 CD19/CD20 双靶点 LBCL 直接竞品
      "ct_sponsor": "CARsgen Therapeutics",
      "news_pages": ["https://www.carsgen.com/en/media/news/"],
      "pubmed": ["CARsgen satricabtagene", "satri-cel CT041"]},
 
     # ————————————————— 六、LYL273（mCRC）具体竞品 —————————————————
     {"name": "Innovative Cellular Therapeutics (ICT)", "category": "LYL273竞品(mCRC)",
+     "tier": "priority",            # GCC19CART：GUCY2C 靶点 mCRC 进度最快的直接竞品
      "ct_sponsor": "Innovative Cellular Therapeutics",
      "news_pages": ["https://www.ictbio.com/news/"],
      "pubmed": ["GCC19CART", "GCC CAR-T colorectal"]},
@@ -195,6 +227,8 @@ COMPANIES = [
      "news_pages": ["https://www.carinabiotech.com/news/"],
      "pubmed": ["CNA3103 LGR5 CAR-T"]},
     {"name": "Merck KGaA (M9140)", "category": "LYL273竞品(mCRC)",
+     "tier": "priority",            # M9140 CEACAM5 ADC：mCRC 跨模态关键威胁
+     "diversified": True,           # 多元化大集团：网页新闻混杂大量无关业务，重点档下仍对网页做关键词过滤（临床/论文精确检索不受影响）
      "ct_sponsor": "Merck KGaA, Darmstadt, Germany",
      "news_pages": ["https://www.merckgroup.com/en/news.html"],
      "pubmed": ["precemtabart tocentecan", "M9140 CEACAM5"]},
