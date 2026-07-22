@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 """SEC EDGAR：ticker→CIK 映射 + submissions API，监控最新申报（8-K/10-Q/10-K 等）。"""
-from ..base import Item
+import os
+
+from ..base import Item, DATA_DIR, load_json, save_json
 
 TICKERS_URL = "https://www.sec.gov/files/company_tickers.json"
 SUBMISSIONS = "https://data.sec.gov/submissions/CIK{cik10}.json"
+TICKER_CACHE_FILE = os.path.join(DATA_DIR, "sec_ticker_map.json")
 
 _ticker_cache = None
 
@@ -12,19 +15,35 @@ def _load_ticker_map(http, stats=None):
     global _ticker_cache
     if _ticker_cache is not None:
         return _ticker_cache
+
+    # 尝试从 API 拉取（SEC 要求 User-Agent 带真实联系方式）
     try:
-        data = http.get_json(TICKERS_URL)
+        data = http.get_json(TICKERS_URL,
+                             headers={"User-Agent": "LyellCompetitorMonitor/1.0 (contact: tangjingjudy@gmail.com)"})
     except Exception as e:  # noqa: BLE001
-        print(f"  [sec] 加载 ticker 映射失败: {e}")
+        print(f"  [sec] 加载 ticker 映射失败（API）: {e}")
+        # 回退：读取本地缓存（上一次成功拉取的版本）
+        cached = load_json(TICKER_CACHE_FILE, None)
+        if cached:
+            print(f"  [sec] 回退到本地缓存（{len(cached)} 家公司）")
+            _ticker_cache = cached
+            if stats:
+                stats.record("sec_ticker_map", ok=True, count=len(cached))
+            return _ticker_cache
+        # 没有任何缓存可用 → 记故障
         if stats:
-            # 这是全局性故障（会导致所有公司的 SEC 数据都拿不到），单独计入
             stats.record("sec_ticker_map", ok=False)
         _ticker_cache = {}
         return _ticker_cache
+
     m = {}
     for row in data.values():
         m[row["ticker"].upper()] = str(row["cik_str"]).zfill(10)
     _ticker_cache = m
+
+    # 成功后写入本地缓存，供后续故障时回退
+    save_json(TICKER_CACHE_FILE, m)
+
     if stats:
         stats.record("sec_ticker_map", ok=True, count=len(m))
     return m
@@ -40,7 +59,8 @@ def fetch(http, company, recent_count=30, stats=None):
         return []
     try:
         data = http.get_json(SUBMISSIONS.format(cik10=cik10),
-                             headers={"Host": "data.sec.gov"})
+                             headers={"Host": "data.sec.gov",
+                                      "User-Agent": "LyellCompetitorMonitor/1.0 (contact: tangjingjudy@gmail.com)"})
     except Exception as e:  # noqa: BLE001
         print(f"  [sec] {company['name']} ({ticker}) 失败: {e}")
         if stats:
