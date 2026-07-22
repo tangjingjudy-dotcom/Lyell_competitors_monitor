@@ -228,18 +228,6 @@
     "first_seen": "2026-07-22T03:05:54.149881+00:00"
   },
   {
-    "company": "Merck KGaA (M9140)",
-    "category": "LYL273竞品(mCRC)",
-    "source": "clinicaltrials",
-    "title": "Study of Anti-CEACAM5 ADC M9140 in Participants With Advanced Solid Tumors (PROCEADE PanTumor)",
-    "url": "https://clinicaltrials.gov/study/NCT06710132",
-    "date": "2026-05-28",
-    "detail": "状态: ACTIVE_NOT_RECRUITING · 分期: PHASE1,PHASE2 · 更新: 2026-05-28",
-    "tier": "priority",
-    "uid": "ct-NCT06710132-ACTIVE_NOT_RECRUITING-2026-05-28",
-    "first_seen": "2026-07-22T03:05:54.149881+00:00"
-  },
-  {
     "company": "Sanofi",
     "category": "LYL273竞品(mCRC)",
     "source": "clinicaltrials",
