@@ -1234,5 +1234,29 @@
     "tier": "priority",
     "uid": "2c21391fa5ccf846",
     "first_seen": "2026-07-22T05:57:29.168868+00:00"
+  },
+  {
+    "company": "Caribou Biosciences",
+    "category": "异体/现货型CAR-T",
+    "source": "web",
+    "title": "Caribou Biosciences: A Much Anticipated Data Readout Does Not Quite Get My Buy - Seeking Alpha",
+    "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxQenZjbERWV1dVS0N0Y3Z0aTlxbjV5NkRHX1RmRTc4eGllVjQyZ3VTQWM2dExlQ3BBTDdaRXBEckYtTktxbS1kX0JiUGxBMExPTEVsbWtOMWhjcmdRQWt1ZDhGLVZGYU1nRnUyWkdRNVpBSkxQWUEtWElEU2VfU1l3dnk0SzdDVHFiakNiTVRCMzVjNDFVS0lpZmFrMllseEQxTzZBbWk1ZHdkTjlST1dYaEJuUC1UMnFI?oc=5",
+    "date": "Mon, 03 Nov 2025 08:00:00 GMT",
+    "detail": "RSS",
+    "tier": "standard",
+    "uid": "d8560b518fc41e86",
+    "first_seen": "2026-07-22T06:07:16.731389+00:00"
+  },
+  {
+    "company": "CARsgen Therapeutics (科济药业)",
+    "category": "Ronde-cel竞品(LBCL)",
+    "source": "web",
+    "title": "CAR-T cell therapy for tumors approved - China Daily",
+    "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTE9UZDg4bmhWNDU5UG5EVkJiMkM5UERGNjhldVVVYkZWa1Y3X0V3NVQ4VllrUlF6cTJFZU9reEtmdHZVTk5CNVpmR3JKWTBHR01SdWc5elBqSXIxNV9jQ3hfTFYwcGxvUlRXVlRWN2F4MkZwTDdtaDk0OVpVNDZodw?oc=5",
+    "date": "Wed, 24 Jun 2026 07:00:00 GMT",
+    "detail": "RSS",
+    "tier": "priority",
+    "uid": "f7c469702b61e51d",
+    "first_seen": "2026-07-22T06:07:16.731389+00:00"
   }
 ]
