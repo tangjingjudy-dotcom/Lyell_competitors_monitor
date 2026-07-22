@@ -134,9 +134,12 @@ def run(args):
         return
 
     merge_into_items_db(all_new)
-    cleaned = _clean_stale_ct_items(companies)
-    if cleaned:
-        print(f"  已从 items.json 移除 {cleaned} 条过期临床试验（当前 ct_keywords 规则下不再保留）")
+    cleaned_ct = _clean_stale_ct_items(companies)
+    if cleaned_ct:
+        print(f"  已从 items.json 移除 {cleaned_ct} 条过期临床试验（当前 ct_keywords 规则下不再保留）")
+    cleaned_age = _clean_expired_items()
+    if cleaned_age:
+        print(f"  已从 items.json 移除 {cleaned_age} 条超过{_get_site_max_age()}天的旧条目")
     out_path = site.generate(SETTINGS)
     print(f"\n站点已生成: {out_path}")
     print(f"本轮里程碑新增合计: {len(all_new)} 条（其中重点对象 {len(priority_new)} 条；已过滤例行噪音 {filtered_total} 条）")
@@ -201,6 +204,40 @@ def _clean_stale_ct_items(companies):
                 pass
         keep.append(row)
 
+    if removed:
+        save_json(ITEMS_DB, keep)
+    return removed
+
+
+def _get_site_max_age():
+    """读取面板条目保留天数配置。"""
+    return SETTINGS.get("site", {}).get("items_max_age_days", 7)
+
+
+def _clean_expired_items():
+    """移除 items.json 中 first_seen 早于保留天数的条目。
+
+    目的：控制面板信息量，只展示最近 N 天的动态。
+    - 邮件已确保每次只推"真正新增"，历史条目不会重复发
+    - 面板通过此函数自动清理过期条目，保持可读性
+    """
+    from monitor.base import ITEMS_DB, load_json, save_json
+    from datetime import datetime, timezone
+
+    max_age = _get_site_max_age()
+    now_utc = datetime.now(timezone.utc)
+    db = load_json(ITEMS_DB, [])
+    keep = []
+    removed = 0
+    for row in db:
+        try:
+            fs = datetime.fromisoformat(row.get("first_seen", ""))
+            if (now_utc - fs).days > max_age:
+                removed += 1
+                continue
+        except (ValueError, TypeError):
+            pass
+        keep.append(row)
     if removed:
         save_json(ITEMS_DB, keep)
     return removed

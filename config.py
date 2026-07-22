@@ -50,7 +50,8 @@ SETTINGS = {
     "site": {
         "title": "Lyell 及下一代 CAR-T 竞品动态监控",
         "output_dir": "data/site",     # 生成的静态站点目录（可托管到 GitHub Pages / Netlify / S3）
-        "recent_days_highlight": 14,    # 首页高亮“近 N 天”新增
+        "recent_days_highlight": 7,     # 面板上"NEW"标记
+        "items_max_age_days": 7,        # 面板只保留最近 N 天的条目，超时自动清理
     },
 
     # —— 里程碑过滤（核心）——
