@@ -70,7 +70,9 @@ def run(args):
         print(f"[{c['name']}]{tag}")
         collected = []
 
-        ct_items = clinicaltrials.fetch(http, c, SETTINGS["clinicaltrials_page_size"], stats=stats)
+        ct_items = clinicaltrials.fetch(http, c, SETTINGS["clinicaltrials_page_size"],
+                                        max_age_days=SETTINGS["clinicaltrials_max_age_days"] if c.get("ct_keywords") else None,
+                                        stats=stats)
         collected.append((f"{c['name']}:ct", ct_items))
 
         sec_items = sec_edgar.fetch(http, c, SETTINGS["sec_recent_count"], stats=stats)

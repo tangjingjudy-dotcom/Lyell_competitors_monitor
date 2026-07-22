@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """ClinicalTrials.gov v2 API：按申办方拉取最新试验，追踪状态/更新日期变化。"""
+from datetime import datetime, timezone
 from ..base import Item
 
 API = "https://clinicaltrials.gov/api/v2/studies"
@@ -9,7 +10,10 @@ FIELDS = ",".join([
 ])
 
 
-def fetch(http, company, page_size=30, stats=None):
+def fetch(http, company, page_size=30, max_age_days=None, stats=None):
+    """
+    max_age_days: None=全保留, int=只保留最近N天内更新过的试验
+    """
     sponsor = company.get("ct_sponsor")
     if not sponsor:
         return []
@@ -40,15 +44,25 @@ def fetch(http, company, page_size=30, stats=None):
         if not nct:
             continue
         title = ident.get("briefTitle", nct)
+        updated = (status.get("lastUpdatePostDateStruct", {}) or {}).get("date", "")
 
         # 临床试验关键词过滤：只保留与我们关注的CAR-T/适应症相关的试验
         if ct_kw is not None:
             if not any(kw.lower() in title.lower() for kw in ct_kw):
                 filtered_out += 1
                 continue
+        # 时间窗口过滤：只保留最近 N 天内更新过的试验
+        if max_age_days is not None:
+            try:
+                td = (datetime.now(timezone.utc) -
+                      datetime.strptime(updated, "%Y-%m-%d").replace(tzinfo=timezone.utc)).days
+                if td > max_age_days:
+                    filtered_out += 1
+                    continue
+            except (ValueError, TypeError):
+                pass
         overall = status.get("overallStatus", "")
         phase = ",".join(design.get("phases", []) or [])
-        updated = (status.get("lastUpdatePostDateStruct", {}) or {}).get("date", "")
         # uid 含状态+更新日期 → 状态或更新变化时视为“新条目”，可被推送
         detail = f"状态: {overall}" + (f" · 分期: {phase}" if phase else "") + (f" · 更新: {updated}" if updated else "")
         items.append(Item(

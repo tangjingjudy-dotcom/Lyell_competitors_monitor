@@ -25,6 +25,7 @@ SETTINGS = {
     "request_timeout": 25,
     "request_delay_sec": 0.8,          # 每次请求之间的礼貌间隔
     "clinicaltrials_page_size": 30,    # 每家公司拉取的最新临床试验数量
+    "clinicaltrials_max_age_days": 14, # 只保留最近 N 天内更新过的试验（过滤陈旧回溯）
     "sec_recent_count": 30,            # 每家公司检查的最新申报数量
     "pubmed_retmax": 15,               # 每个关键词拉取的最新论文数量
 
@@ -254,8 +255,9 @@ COMPANIES = [
      "news_pages": ["https://www.merckgroup.com/en/news.html"],
      "pubmed": ["precemtabart tocentecan", "M9140 CEACAM5"],
      # 只保留 CEACAM5 ADC / 结直肠癌 相关试验（过滤电子/生命科学等大量无关管线）
-     "ct_keywords": ["precemtabart", "m9140", "ceacam5", "colorectal", "mcrc",
-                     "car-t", "car t", "adc", "antibody-drug"]},
+     "ct_keywords": ["precemtabart", "m9140", "ceacam5", "tocentecan"]},
+    # （注：不包含 "adc"/"antibody-drug"/"colorectal"/"crc" 等泛用词——
+    #  Merck KGaA 有数十条其他 ADC 管线与多条 CRC 药物，广义词会导致大量误命中）
     {"name": "Sanofi", "category": "LYL273竞品(mCRC)",
      "ct_sponsor": "Sanofi", "sec_ticker": "SNY",
      "pubmed": ["tusamitamab CEACAM5"]},
