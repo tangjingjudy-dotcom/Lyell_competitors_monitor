@@ -48,54 +48,6 @@
     "first_seen": "2026-07-22T03:05:54.149881+00:00"
   },
   {
-    "company": "Bristol Myers Squibb",
-    "category": "在位者大药企",
-    "source": "clinicaltrials",
-    "title": "Evaluation of Treatment Satisfaction and KarXT Utilization Registry (RESKU)",
-    "url": "https://clinicaltrials.gov/study/NCT07101094",
-    "date": "2026-07-21",
-    "detail": "状态: RECRUITING · 更新: 2026-07-21",
-    "tier": "priority",
-    "uid": "ct-NCT07101094-RECRUITING-2026-07-21",
-    "first_seen": "2026-07-22T03:05:54.149881+00:00"
-  },
-  {
-    "company": "Bristol Myers Squibb",
-    "category": "在位者大药企",
-    "source": "clinicaltrials",
-    "title": "A Study in Participants With Active Systemic Lupus Erythematosus With Inadequate Response to Glucocorticoids and ≥2 Immunosuppressants",
-    "url": "https://clinicaltrials.gov/study/NCT07175285",
-    "date": "2026-07-21",
-    "detail": "状态: RECRUITING · 更新: 2026-07-21",
-    "tier": "priority",
-    "uid": "ct-NCT07175285-RECRUITING-2026-07-21",
-    "first_seen": "2026-07-22T03:05:54.149881+00:00"
-  },
-  {
-    "company": "Bristol Myers Squibb",
-    "category": "在位者大药企",
-    "source": "clinicaltrials",
-    "title": "Patient Response to Immunotherapy Using Spliceosome Mutational Markers (PRISMM)",
-    "url": "https://clinicaltrials.gov/study/NCT04447651",
-    "date": "2026-07-21",
-    "detail": "状态: ACTIVE_NOT_RECRUITING · 更新: 2026-07-21",
-    "tier": "priority",
-    "uid": "ct-NCT04447651-ACTIVE_NOT_RECRUITING-2026-07-21",
-    "first_seen": "2026-07-22T03:05:54.149881+00:00"
-  },
-  {
-    "company": "Bristol Myers Squibb",
-    "category": "在位者大药企",
-    "source": "clinicaltrials",
-    "title": "Demographics, Clinical Characteristics and Outcomes in Resected Non-Small Cell Lung Cancer Patients Receiving Immunotherapy in Europe and Canada",
-    "url": "https://clinicaltrials.gov/study/NCT07718139",
-    "date": "2026-07-21",
-    "detail": "状态: ACTIVE_NOT_RECRUITING · 更新: 2026-07-21",
-    "tier": "priority",
-    "uid": "ct-NCT07718139-ACTIVE_NOT_RECRUITING-2026-07-21",
-    "first_seen": "2026-07-22T03:05:54.149881+00:00"
-  },
-  {
     "company": "Johnson & Johnson",
     "category": "在位者大药企",
     "source": "clinicaltrials",
@@ -273,18 +225,6 @@
     "detail": "状态: ACTIVE_NOT_RECRUITING · 分期: PHASE1 · 更新: 2026-07-21",
     "tier": "standard",
     "uid": "ct-NCT05238922-ACTIVE_NOT_RECRUITING-2026-07-21",
-    "first_seen": "2026-07-22T03:05:54.149881+00:00"
-  },
-  {
-    "company": "Miltenyi Biomedicine (zamto-cel)",
-    "category": "Ronde-cel竞品(LBCL)",
-    "source": "clinicaltrials",
-    "title": "The Rationale to Conduct This RWE Study is to Provide Data to Support the Safety of CD34 Selected Grafts Versus T Replete PBSC Transplants to Address Concerns About Increased TRM in CD34 Selected Graft Recipients.",
-    "url": "https://clinicaltrials.gov/study/NCT07717164",
-    "date": "2026-07-21",
-    "detail": "状态: NOT_YET_RECRUITING · 更新: 2026-07-21",
-    "tier": "priority",
-    "uid": "ct-NCT07717164-NOT_YET_RECRUITING-2026-07-21",
     "first_seen": "2026-07-22T03:05:54.149881+00:00"
   },
   {
