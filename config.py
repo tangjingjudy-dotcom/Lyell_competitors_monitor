@@ -273,7 +273,7 @@ COMPANIES = [
      "tier": "priority",            # M9140 CEACAM5 ADC：mCRC 跨模态关键威胁
      "diversified": True,           # 多元化大集团：网页新闻混杂大量无关业务，重点档下仍对网页做关键词过滤（临床/论文精确检索不受影响）
      "ct_sponsor": "Merck KGaA, Darmstadt, Germany",
-     "news_pages": ["https://www.merckgroup.com/en/news.html"],
+     "rss": ["https://news.google.com/rss/search?q=%22Merck+KGaA%22+ADC+cancer+colorectal&hl=en-US&gl=US&ceid=US:en"],
      "pubmed": ["precemtabart tocentecan", "M9140 CEACAM5"],
      # 只保留 CEACAM5 ADC / 结直肠癌 相关试验（过滤电子/生命科学等大量无关管线）
      "ct_keywords": ["precemtabart", "m9140", "ceacam5", "tocentecan"]},
