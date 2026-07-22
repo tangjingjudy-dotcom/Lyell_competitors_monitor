@@ -143,6 +143,8 @@ COMPANIES = [
      "news_pages": ["https://www.arsenalbio.com/news/"]},
     # Arcellx 已被 Gilead 收购 → 跟踪 Gilead
     {"name": "Gilead (含Arcellx/Kite)", "category": "自体下一代CAR-T / 在位者",
+     "tier": "priority",            # Yescarta(axi-cel) 是 PiNACLE-H2H 头对头对照之一；PiNACLE-H2H 结果直接决定 ronde-cel 市场前景
+     "diversified": True,           # 多元化大集团，网页新闻走关键词过滤
      "ct_sponsor": "Kite, A Gilead Company", "sec_ticker": "GILD",
      "news_pages": ["https://www.gilead.com/news/news-details"]},
     # Poseida 已被 Roche 收购 → 跟踪 Roche
@@ -178,6 +180,8 @@ COMPANIES = [
 
     # ————————————————— 四、已上市大型药企（在位者）—————————————————
     {"name": "Bristol Myers Squibb", "category": "在位者大药企",
+     "tier": "priority",            # Breyanzi(liso-cel) 是 PiNACLE-H2H 头对头对照之一；ronde-cel上市后面临的直接竞争
+     "diversified": True,           # 多元化大集团，网页新闻走关键词过滤
      "ct_sponsor": "Bristol-Myers Squibb", "sec_ticker": "BMY",
      "news_pages": ["https://news.bms.com/news/corporate-financial.aspx"]},
     {"name": "Johnson & Johnson", "category": "在位者大药企",
@@ -198,7 +202,7 @@ COMPANIES = [
     {"name": "Incyte", "category": "Ronde-cel竞品(LBCL)",
      "ct_sponsor": "Incyte Corporation", "sec_ticker": "INCY"},
     {"name": "Miltenyi Biomedicine (zamto-cel)", "category": "Ronde-cel竞品(LBCL)",
-     "tier": "priority",            # zamto-cel 是 PiNACLE-H2H 的头对头直接对照，最高优先
+     "tier": "priority",            # CD19/CD20双靶点最成熟竞品，已进入随机对照3期(DALY 2-EU, vs化疗)；ronde-cel最需要跟踪的直接竞争对手
      "ct_sponsor": "Miltenyi Biomedicine",
      "news_pages": ["https://www.miltenyibiomedicine.com/news-events/press-releases"],
      "pubmed": ["zamtocabtagene", "zamto-cel", "MB-CART2019.1"]},
