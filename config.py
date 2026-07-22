@@ -21,7 +21,7 @@ _MAIL_TO = os.environ.get("MONITOR_MAIL_TO", _SMTP_USER)
 # —— 全局设置 ——
 SETTINGS = {
     # SEC 要求 User-Agent 带真实联系方式（否则会被限流）
-    "user_agent": "LyellCompetitorMonitor/1.0 (contact: tangjingjudy@gmail.com)",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
     "request_timeout": 25,
     "request_delay_sec": 0.8,          # 每次请求之间的礼貌间隔
     "clinicaltrials_page_size": 30,    # 每家公司拉取的最新临床试验数量
@@ -116,29 +116,29 @@ COMPANIES = [
         "tier": "priority",            # 监控主体：最高优先级
         "ct_sponsor": "Lyell Immunopharma",
         "sec_ticker": "LYEL",
-        "rss": [],
-        "news_pages": ["https://ir.lyell.com/news-events/news-releases"],
+        "rss": ["https://ir.lyell.com/rss/news-releases.xml"],
         "pubmed": ["Lyell Immunopharma", "rondecabtagene", "ronde-cel", "LYL314", "LYL273", "LYL119"],
     },
 
     # ————————————————————— 一、异体/现货型 CAR-T —————————————————————
     {"name": "Allogene Therapeutics", "category": "异体/现货型CAR-T",
      "ct_sponsor": "Allogene Therapeutics", "sec_ticker": "ALLO",
-     "news_pages": ["https://ir.allogene.com/news-releases"], "pubmed": ["Allogene cema-cel"]},
+     "rss": ["https://ir.allogene.com/rss/news-releases.xml"], "pubmed": ["Allogene cema-cel"]},
     {"name": "Caribou Biosciences", "category": "异体/现货型CAR-T",
      "ct_sponsor": "Caribou Biosciences", "sec_ticker": "CRBU",
-     "news_pages": ["https://ir.cariboubio.com/news-releases"], "pubmed": ["Caribou CB-010 vispa-cel"]},
+     "rss": ["https://news.google.com/rss/search?q=%22Caribou+Biosciences%22+car-t&hl=en-US&gl=US&ceid=US:en"],
+     "pubmed": ["Caribou CB-010 vispa-cel"]},
     {"name": "CRISPR Therapeutics", "category": "异体/现货型CAR-T",
      "ct_sponsor": "CRISPR Therapeutics", "sec_ticker": "CRSP",
      "news_pages": ["https://www.crisprtx.com/about-us/press-releases-and-presentations"]},
     {"name": "Century Therapeutics", "category": "异体/现货型CAR-T",
      "ct_sponsor": "Century Therapeutics", "sec_ticker": "IPSC",
-     "news_pages": ["https://ir.centurytx.com/news-releases"]},
+     "rss": ["https://news.google.com/rss/search?q=%22Century+Therapeutics%22+car-t&hl=en-US&gl=US&ceid=US:en"]},
 
     # ——————————————— 二、自体下一代基因/表观增强型 CAR-T ———————————————
     {"name": "Autolus Therapeutics", "category": "自体下一代CAR-T",
      "ct_sponsor": "Autolus", "sec_ticker": "AUTL",
-     "news_pages": ["https://www.autolus.com/media/press-releases/"]},
+     "rss": ["https://news.google.com/rss/search?q=%22Autolus+Therapeutics%22+car-t&hl=en-US&gl=US&ceid=US:en"]},
     {"name": "Arsenal Biosciences", "category": "自体下一代CAR-T",
      "ct_sponsor": "Arsenal Biosciences",
      "news_pages": ["https://www.arsenalbio.com/news/"]},
@@ -172,10 +172,10 @@ COMPANIES = [
      "news_pages": ["https://www.affini-t.com/news"]},
     {"name": "Immatics", "category": "实体瘤CAR-T/TCR-T",
      "ct_sponsor": "Immatics", "sec_ticker": "IMTX",
-     "news_pages": ["https://investors.immatics.com/news-releases"]},
+     "rss": ["https://investors.immatics.com/rss/news-releases.xml"]},
     {"name": "Immunocore", "category": "实体瘤CAR-T/TCR-T",
      "ct_sponsor": "Immunocore", "sec_ticker": "IMCR",
-     "news_pages": ["https://ir.immunocore.com/news-releases"]},
+     "news_pages": ["https://www.immunocore.com/investors/news/press-releases"]},
     {"name": "Adaptimmune Therapeutics", "category": "实体瘤CAR-T/TCR-T",
      "ct_sponsor": "Adaptimmune",
      "pubmed": ["afami-cel Tecelra", "Adaptimmune TCR"]},
@@ -194,7 +194,7 @@ COMPANIES = [
      "tier": "priority",            # Breyanzi(liso-cel) 是 PiNACLE-H2H 头对头对照之一；ronde-cel上市后面临的直接竞争
      "diversified": True,           # 多元化大集团，网页新闻走关键词过滤
      "ct_sponsor": "Bristol-Myers Squibb", "sec_ticker": "BMY",
-     "news_pages": ["https://news.bms.com/news/corporate-financial.aspx"],
+     "rss": ["https://news.google.com/rss/search?q=%22Bristol+Myers+Squibb%22+car-t+cell+therapy&hl=en-US&gl=US&ceid=US:en"],
      # 只保留 CAR-T/细胞治疗/血液肿瘤 相关试验（过滤Opdivo/Eliquis/Pomalyst等大量无关管线）
      "ct_keywords": ["breyanzi", "lisocabtagene", "liso-cel", "abecma", "idecabtagene",
                      "ide-cel", "arlo-cel", "car-t", "car t", "chimeric antigen",
@@ -209,7 +209,7 @@ COMPANIES = [
                      "claudin", "gastric"]},
     {"name": "Legend Biotech", "category": "在位者大药企",
      "ct_sponsor": "Legend Biotech", "sec_ticker": "LEGN",
-     "news_pages": ["https://investors.legendbiotech.com/news-releases"]},
+     "rss": ["https://investors.legendbiotech.com/rss/news-releases.xml"]},
     {"name": "Novartis", "category": "在位者大药企",
      "ct_sponsor": "Novartis", "sec_ticker": "NVS",
      # 只保留 CAR-T/血液肿瘤 相关试验（过滤Novartis大量实体瘤/心血管/免疫管线）
@@ -220,7 +220,7 @@ COMPANIES = [
     # ————————————————— 五、Ronde-cel（LBCL）具体竞品 —————————————————
     {"name": "AbbVie / Genmab (epcoritamab)", "category": "Ronde-cel竞品(LBCL)",
      "ct_sponsor": "Genmab", "sec_ticker": "GMAB",
-     "news_pages": ["https://ir.genmab.com/news-releases"],
+     "rss": ["https://ir.genmab.com/rss/news-releases.xml"],
      # Genmab = epcoritamab 申办方，但 Genmab 也有其他抗体管线（实体瘤等）需过滤
      "ct_keywords": ["epcoritamab", "epkinly", "tepkinly", "car-t", "car t",
                      "lymphoma", "dlbcl", "follicular", "b-cell", "diffuse"]},
@@ -242,7 +242,7 @@ COMPANIES = [
     {"name": "CARsgen Therapeutics (科济药业)", "category": "Ronde-cel竞品(LBCL)",
      "tier": "priority",            # satri-cel：同为 CD19/CD20 双靶点 LBCL 直接竞品
      "ct_sponsor": "CARsgen Therapeutics",
-     "news_pages": ["https://www.carsgen.com/en/media/news/"],
+     "rss": ["https://news.google.com/rss/search?q=CARsgen+Therapeutics+car-t&hl=en-US&gl=US&ceid=US:en"],
      "pubmed": ["CARsgen satricabtagene", "satri-cel CT041"],
      "ct_keywords": ["satri", "ct041", "ct1190", "carsgen", "car-t", "car t",
                      "lymphoma", "dlbcl", "cd19", "cd20", "cldn18", "gpc3",
