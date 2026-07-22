@@ -188,7 +188,8 @@ def merge_into_items_db(new_items):
     不写入 items.json——防止换源时 Google News RSS 批量拉入陈年旧闻。
     """
     import re
-    MAX_HISTORIC_DAYS = 90
+    MAX_HISTORIC_DAYS = 7   # 爬虫每 1-3 天运行，真正"新增"的条目日期应在 7 天内
+                             # 超过 7 天的通常是 RSS 换源时批量拉入的历史文章，应过滤
     now = datetime.now(timezone.utc)
 
     db = load_json(ITEMS_DB, [])
