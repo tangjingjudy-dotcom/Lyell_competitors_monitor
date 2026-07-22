@@ -182,16 +182,62 @@ def append_run_log(entry, keep=RUN_LOG_KEEP):
 
 
 def merge_into_items_db(new_items):
-    """把新增条目并入全量条目库（供站点渲染），带首次发现时间。"""
+    """把新增条目并入全量条目库（供站点渲染），带首次发现时间。
+
+    自动过滤：条目的实际日期如果距今超过 MAX_HISTORIC_DAYS（默认90天），
+    不写入 items.json——防止换源时 Google News RSS 批量拉入陈年旧闻。
+    """
+    import re
+    MAX_HISTORIC_DAYS = 90
+    now = datetime.now(timezone.utc)
+
     db = load_json(ITEMS_DB, [])
     known = {row["uid"] for row in db}
     stamp = now_iso()
+    skipped_stale = 0
+
     for it in new_items:
         if it.uid in known:
             continue
+
+        # 检查条目实际日期是否过旧（防止 Google News RSS 拉入 N 年前的旧闻）
+        date_str = it.date or ""
+        is_too_old = False
+        # 尝试解析 RSS 日期: "Thu, 25 Jun 2026 08:00:44"
+        m = re.match(
+            r"\w{3},?\s+(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{4})",
+            date_str)
+        if m:
+            try:
+                d = datetime.strptime(f"{m.group(1)} {m.group(2)} {m.group(3)}",
+                                      "%d %b %Y").replace(tzinfo=timezone.utc)
+                if (now - d).days > MAX_HISTORIC_DAYS:
+                    is_too_old = True
+            except ValueError:
+                pass
+        # 尝试解析 ISO 日期: "2026-07-21"
+        if not is_too_old:
+            m2 = re.match(r"(\d{4})-(\d{2})-(\d{2})", date_str)
+            if m2:
+                try:
+                    d = datetime(int(m2.group(1)), int(m2.group(2)), int(m2.group(3)),
+                                 tzinfo=timezone.utc)
+                    if (now - d).days > MAX_HISTORIC_DAYS:
+                        is_too_old = True
+                except ValueError:
+                    pass
+
+        if is_too_old:
+            skipped_stale += 1
+            continue
+
         row = it.to_dict()
         row["first_seen"] = stamp
         db.append(row)
         known.add(it.uid)
+
+    if skipped_stale:
+        print(f"  [db] 跳过{skipped_stale}条过期旧闻（>{MAX_HISTORIC_DAYS}天），不写入数据库")
+
     save_json(ITEMS_DB, db)
     return db
