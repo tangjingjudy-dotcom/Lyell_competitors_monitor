@@ -156,7 +156,12 @@ COMPANIES = [
     # Poseida 已被 Roche 收购 → 跟踪 Roche
     {"name": "Roche (含Poseida/Genentech)", "category": "自体下一代CAR-T / 在位者",
      "ct_sponsor": "Hoffmann-La Roche",
-     "news_pages": ["https://www.roche.com/media/releases"]},
+     "news_pages": ["https://www.roche.com/media/releases"],
+     # 只保留 CAR-T/血液肿瘤/Poseida管线 相关试验（过滤罗氏数百条实体瘤/眼科/神经管线）
+     "ct_keywords": ["glofitamab", "columvi", "polivy", "mosunetuzumab", "lunsumio",
+                     "poseida", "p-bcma", "p-muc1c", "car-t", "car t",
+                     "chimeric antigen", "lymphoma", "dlbcl", "follicular",
+                     "leukemia", "b-cell", "cibisatamab", "ceacam5"]},
 
     # ————————————————— 三、实体瘤 CAR-T / TCR-T 专精 —————————————————
     {"name": "A2 Biotherapeutics", "category": "实体瘤CAR-T/TCR-T",
@@ -196,22 +201,37 @@ COMPANIES = [
                      "lymphoma", "dlbcl", "follicular", "myeloma", "gprc5d",
                      "b-cell", "mantle cell", "leukemia"]},
     {"name": "Johnson & Johnson", "category": "在位者大药企",
-     "ct_sponsor": "Janssen Research & Development, LLC", "sec_ticker": "JNJ"},
+     "ct_sponsor": "Janssen Research & Development, LLC", "sec_ticker": "JNJ",
+     # 只保留 CAR-T/骨髓瘤/淋巴瘤 相关试验（过滤Janssen数百条实体瘤/免疫/神经管线）
+     "ct_keywords": ["carvykti", "cilta-cel", "jnj-4496", "jnj-90014496", "c-car039",
+                     "lb2501", "lb1908", "car-t", "car t", "chimeric antigen",
+                     "lymphoma", "dlbcl", "myeloma", "b-cell", "bcma", "gprc5d",
+                     "claudin", "gastric"]},
     {"name": "Legend Biotech", "category": "在位者大药企",
      "ct_sponsor": "Legend Biotech", "sec_ticker": "LEGN",
      "news_pages": ["https://investors.legendbiotech.com/news-releases"]},
     {"name": "Novartis", "category": "在位者大药企",
-     "ct_sponsor": "Novartis", "sec_ticker": "NVS"},
+     "ct_sponsor": "Novartis", "sec_ticker": "NVS",
+     # 只保留 CAR-T/血液肿瘤 相关试验（过滤Novartis大量实体瘤/心血管/免疫管线）
+     "ct_keywords": ["kymriah", "tisa-cel", "tisagenlecleucel", "t-charge",
+                     "ytb323", "car-t", "car t", "chimeric antigen",
+                     "lymphoma", "dlbcl", "b-cell"]},
 
     # ————————————————— 五、Ronde-cel（LBCL）具体竞品 —————————————————
     {"name": "AbbVie / Genmab (epcoritamab)", "category": "Ronde-cel竞品(LBCL)",
      "ct_sponsor": "Genmab", "sec_ticker": "GMAB",
-     "news_pages": ["https://ir.genmab.com/news-releases"]},
+     "news_pages": ["https://ir.genmab.com/news-releases"],
+     # Genmab = epcoritamab 申办方，但 Genmab 也有其他抗体管线（实体瘤等）需过滤
+     "ct_keywords": ["epcoritamab", "epkinly", "tepkinly", "car-t", "car t",
+                     "lymphoma", "dlbcl", "follicular", "b-cell", "diffuse"]},
     {"name": "ADC Therapeutics", "category": "Ronde-cel竞品(LBCL)",
      "ct_sponsor": "ADC Therapeutics", "sec_ticker": "ADCT",
      "news_pages": ["https://ir.adctherapeutics.com/news-releases"]},
     {"name": "Incyte", "category": "Ronde-cel竞品(LBCL)",
-     "ct_sponsor": "Incyte Corporation", "sec_ticker": "INCY"},
+     "ct_sponsor": "Incyte Corporation", "sec_ticker": "INCY",
+     # Incyte 管线很广（JAK抑制剂等），只保留 CD19/淋巴瘤 相关
+     "ct_keywords": ["monjuvi", "tafasitamab", "car-t", "car t",
+                     "lymphoma", "dlbcl", "b-cell", "diffuse"]},
     {"name": "Miltenyi Biomedicine (zamto-cel)", "category": "Ronde-cel竞品(LBCL)",
      "tier": "priority",            # CD19/CD20双靶点最成熟竞品，已进入随机对照3期(DALY 2-EU, vs化疗)；ronde-cel最需要跟踪的直接竞争对手
      "ct_sponsor": "Miltenyi Biomedicine",
@@ -260,10 +280,14 @@ COMPANIES = [
     #  Merck KGaA 有数十条其他 ADC 管线与多条 CRC 药物，广义词会导致大量误命中）
     {"name": "Sanofi", "category": "LYL273竞品(mCRC)",
      "ct_sponsor": "Sanofi", "sec_ticker": "SNY",
-     "pubmed": ["tusamitamab CEACAM5"]},
+     "pubmed": ["tusamitamab CEACAM5"],
+     # 只保留 CEACAM5 / mCRC 相关（过滤Sanofi大量胰岛素/疫苗/特药管线）
+     "ct_keywords": ["tusamitamab", "ceacam5", "car-t", "car t"]},
     {"name": "Pfizer", "category": "LYL273竞品(mCRC) / 10-K列示",
      "ct_sponsor": "Pfizer", "sec_ticker": "PFE",
-     "pubmed": ["tusamitamab CEACAM5"]},
+     "pubmed": ["tusamitamab CEACAM5"],
+     # 只保留 CEACAM5 / CAR-T 相关（过滤Pfizer大量心血管/疫苗/特药管线）
+     "ct_keywords": ["tusamitamab", "ceacam5", "car-t", "car t"]},
     {"name": "Celyad Oncology", "category": "LYL273竞品(mCRC)",
      "ct_sponsor": "Celyad Oncology",
      "pubmed": ["CYAD-101 NKG2D colorectal"]},
@@ -271,13 +295,21 @@ COMPANIES = [
     # ————————————————— 七、10-K 列示的其他潜在竞争对手 —————————————————
     {"name": "AstraZeneca (含EsoBiotec)", "category": "10-K潜在竞品",
      "ct_sponsor": "AstraZeneca", "sec_ticker": "AZN",
-     "pubmed": ["in vivo CAR-T ENaBL"]},
+     "pubmed": ["in vivo CAR-T ENaBL"],
+     # 只保留体内CAR-T/EsoBiotec/血液肿瘤 相关（过滤AZ数百条实体瘤/呼吸/心血管管线）
+     "ct_keywords": ["enabl", "eso", "in vivo", "car-t", "car t",
+                     "chimeric antigen", "lymphoma", "dlbcl",
+                     "leukemia", "b-cell", "myeloma"]},
     {"name": "Agenus", "category": "10-K潜在竞品",
      "ct_sponsor": "Agenus", "sec_ticker": "AGEN"},
     {"name": "Akeso（康方生物）", "category": "10-K潜在竞品",
      "ct_sponsor": "Akeso",
      "news_pages": ["https://www.akesobio.com/en/media/akeso-news/"],
-     "pubmed": ["Akeso ivonescimab"]},
+     "pubmed": ["Akeso ivonescimab"],
+     # 康方主业双抗（PD-1×VEGF等），暂无CAR-T或LBCL/mCRC管线；
+     # 设极窄过滤器——仅当未来进入本赛道时才触发
+     "ct_keywords": ["car-t", "car t", "chimeric antigen",
+                     "lymphoma", "dlbcl", "colorectal", "mcrc"]},
     {"name": "Summit Therapeutics", "category": "10-K潜在竞品",
      "ct_sponsor": "Summit Therapeutics", "sec_ticker": "SMMT"},
 ]
