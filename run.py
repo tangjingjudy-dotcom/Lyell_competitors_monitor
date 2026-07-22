@@ -9,6 +9,7 @@
   python run.py --only LYEL     # 只跑名称包含该关键词的公司（调试用）
 """
 import argparse
+import re
 import sys
 import time
 from datetime import date
@@ -147,14 +148,16 @@ def run(args):
 
 
 def _clean_stale_ct_items(companies):
-    """将 items.json 中已被当前 ct_keywords 规则过滤掉的条目删除。
+    """将 items.json 中已被当前 ct_keywords/时间窗口 规则过滤掉的条目删除。
 
-    背景：ct_keywords 是后期加入的功能——早期运行(diff_new + 基线)已经把大量
-    不相关试验写入了 items.json；这些条目不会随时间“自动消失”，需要显式清理。
+    两次检查：
+    1. 关键词：有 ct_keywords 的公司，标题不匹配 → 删除
+    2. 时间窗口：有 ct_keywords 的公司，detail 中的更新时间超过 max_age → 删除
 
-    仅清理 source=="clinicaltrials" 的条目，且仅当该公司配置了 ct_keywords 时才检查。
+    不检查 source != "clinicaltrials" 的条目；不检查无 ct_keywords 的公司（如 Lyell）。
     """
     from monitor.base import ITEMS_DB, load_json, save_json
+    from datetime import datetime, timezone
 
     ctk_map = {}
     for c in companies:
@@ -165,6 +168,8 @@ def _clean_stale_ct_items(companies):
     if not ctk_map:
         return 0
 
+    max_age = SETTINGS.get("clinicaltrials_max_age_days", 14)
+    now = datetime.now(timezone.utc)
     db = load_json(ITEMS_DB, [])
     keep = []
     removed = 0
@@ -176,11 +181,25 @@ def _clean_stale_ct_items(companies):
         if kwlist is None:
             keep.append(row)
             continue
+
         title = (row.get("title", "") or "").lower()
-        if any(kw.lower() in title for kw in kwlist):
-            keep.append(row)
-        else:
+        if not any(kw.lower() in title for kw in kwlist):
             removed += 1
+            continue
+
+        # 时间窗口检查：从 detail 字段提取 更新: YYYY-MM-DD
+        detail = row.get("detail", "") or ""
+        import re
+        m = re.search(r'更新:\s*(\d{4}-\d{2}-\d{2})', detail)
+        if m:
+            try:
+                td = now - datetime.strptime(m.group(1), "%Y-%m-%d").replace(tzinfo=timezone.utc)
+                if td.days > max_age:
+                    removed += 1
+                    continue
+            except (ValueError, TypeError):
+                pass
+        keep.append(row)
 
     if removed:
         save_json(ITEMS_DB, keep)
