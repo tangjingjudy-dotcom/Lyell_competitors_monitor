@@ -29,6 +29,7 @@ def fetch(http, company, page_size=30, stats=None):
 
     items = []
     ct_kw = company.get("ct_keywords", None)  # None=全部保留（Lyell等小biotech），list=按关键词过滤
+    filtered_out = 0
     for study in data.get("studies", []):
         ps = study.get("protocolSection", {})
         ident = ps.get("identificationModule", {})
@@ -43,6 +44,7 @@ def fetch(http, company, page_size=30, stats=None):
         # 临床试验关键词过滤：只保留与我们关注的CAR-T/适应症相关的试验
         if ct_kw is not None:
             if not any(kw.lower() in title.lower() for kw in ct_kw):
+                filtered_out += 1
                 continue
         overall = status.get("overallStatus", "")
         phase = ",".join(design.get("phases", []) or [])
@@ -55,6 +57,8 @@ def fetch(http, company, page_size=30, stats=None):
             date=updated, detail=detail,
             uid=f"ct-{nct}-{overall}-{updated}"[:64],
         ))
+    if filtered_out:
+        print(f"  [ct filter] {company['name']}: {len(items) + filtered_out}条抓取, {len(items)}条保留（过滤{filtered_out}条）")
     if stats:
         stats.record("clinicaltrials", ok=True, count=len(items))
     return items

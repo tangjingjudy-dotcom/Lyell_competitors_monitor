@@ -131,6 +131,9 @@ def run(args):
         return
 
     merge_into_items_db(all_new)
+    cleaned = _clean_stale_ct_items(companies)
+    if cleaned:
+        print(f"  已从 items.json 移除 {cleaned} 条过期临床试验（当前 ct_keywords 规则下不再保留）")
     out_path = site.generate(SETTINGS)
     print(f"\n站点已生成: {out_path}")
     print(f"本轮里程碑新增合计: {len(all_new)} 条（其中重点对象 {len(priority_new)} 条；已过滤例行噪音 {filtered_total} 条）")
@@ -139,6 +142,47 @@ def run(args):
         # 邮件只推送“重点监控对象”的新增，避免常规对象刷屏
         ok, info = email_digest.send_digest(SETTINGS["email"], priority_new, args.site_url)
         print(f"邮件（仅重点对象 {len(priority_new)} 条）: {'已发送' if ok else '未发送'} ({info})")
+
+
+def _clean_stale_ct_items(companies):
+    """将 items.json 中已被当前 ct_keywords 规则过滤掉的条目删除。
+
+    背景：ct_keywords 是后期加入的功能——早期运行(diff_new + 基线)已经把大量
+    不相关试验写入了 items.json；这些条目不会随时间“自动消失”，需要显式清理。
+
+    仅清理 source=="clinicaltrials" 的条目，且仅当该公司配置了 ct_keywords 时才检查。
+    """
+    from monitor.base import ITEMS_DB, load_json, save_json
+
+    ctk_map = {}
+    for c in companies:
+        kw = c.get("ct_keywords")
+        if kw:
+            ctk_map[c["name"]] = kw
+
+    if not ctk_map:
+        return 0
+
+    db = load_json(ITEMS_DB, [])
+    keep = []
+    removed = 0
+    for row in db:
+        if row.get("source") != "clinicaltrials":
+            keep.append(row)
+            continue
+        kwlist = ctk_map.get(row.get("company", ""))
+        if kwlist is None:
+            keep.append(row)
+            continue
+        title = (row.get("title", "") or "").lower()
+        if any(kw.lower() in title for kw in kwlist):
+            keep.append(row)
+        else:
+            removed += 1
+
+    if removed:
+        save_json(ITEMS_DB, keep)
+    return removed
 
 
 def main():
