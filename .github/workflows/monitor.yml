@@ -14,6 +14,10 @@ on:
         description: "强制全量扫描（忽略常规对象降频）"
         type: boolean
         default: true
+      force_summary:
+        description: "强制生成本次摘要（忽略 --no-summary 限制）"
+        type: boolean
+        default: false
 
 permissions:
   contents: write      # 把抓取到的状态快照提交回仓库（用于跨次运行保留“已见”基线）
@@ -53,9 +57,9 @@ jobs:
           if [ "${{ github.event.inputs.full_sweep }}" = "true" ]; then
             FULL="--all"
           fi
-          # 周一生成摘要，其他日子跳过
+          # 周一生成摘要，其他日子跳过；手动勾选 force_summary 则强制生成
           SUMMARY_FLAG="--no-summary"
-          if [ "$(date +%u)" = "1" ]; then
+          if [ "$(date +%u)" = "1" ] || [ "${{ github.event.inputs.force_summary }}" = "true" ]; then
             SUMMARY_FLAG=""
           fi
           python run.py $FULL $SUMMARY_FLAG
