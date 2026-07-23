@@ -3,6 +3,7 @@
 import hashlib
 import json
 import os
+import re
 import time
 from dataclasses import dataclass, asdict, field
 from datetime import datetime, timezone
@@ -131,6 +132,8 @@ def is_milestone(item, cfg, relaxed=False, diversified=False, product_keywords=N
         return True
 
     text = f"{item.title} {item.detail}".lower()
+    # 剔除 URL（避免 product_keywords 因 URL 含公司名而误匹配所有条目）
+    text = re.sub(r'https?://\S+', '', text)
 
     # ——— 第1层：Lyell 监控主体 → 全保留 ———
     if item.company == "Lyell Immunopharma":
@@ -145,6 +148,8 @@ def is_milestone(item, cfg, relaxed=False, diversified=False, product_keywords=N
     if product_keywords:
         if not any(pk.lower() in text for pk in product_keywords):
             return False  # 未命中产品关键词且非财务事件 → 直接丢弃
+        # 命中产品关键词 → 直接放行（不再检查全局关键词）
+        return True
 
     # ——— 第4层：来源特定规则 ———
     if item.source == "clinicaltrials":
