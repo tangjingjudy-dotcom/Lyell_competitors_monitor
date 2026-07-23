@@ -172,7 +172,7 @@ def generate(settings, subjects=None):
             f'<hr>',
         ]
 
-        for co, co_items in sorted(by_co.items()):
+        for co, co_items in sorted(by_co.items(), key=lambda x: (not any(it.get("tier") == "priority" for it in x[1]), x[0])):
             star = "★ " if any(it.get("tier") == "priority" for it in co_items) else ""
             md_lines.append(f"## {star}{co}  ({len(co_items)} 条)")
             md_lines.append("")
