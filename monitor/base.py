@@ -112,23 +112,41 @@ def diff_new(store, source_id, items):
     return new_items
 
 
-def is_milestone(item, cfg, relaxed=False, diversified=False):
-    """判断一条 Item 是否属于“关键里程碑”（新临床数据/上市前进展/重大公司事件）。
+def is_milestone(item, cfg, relaxed=False, diversified=False, product_keywords=None):
+    """判断一条 Item 是否属于"关键里程碑"（新临床数据/上市前进展/重大公司事件）。
 
-    规则（可在 config.py 的 SETTINGS['milestone_filter'] 调整）：
-      - clinicaltrials : 试验状态/分期变化本身即高信号，默认整体保留
-      - sec            : 仅保留“重大事件/年报”类表单（8-K/6-K/20-F/10-K 等）
-      - pubmed/web     : 标题或补充说明命中里程碑关键词才保留
+    过滤层次（按优先级从高到低）：
+      1. Lyell Immunopharma（监控主体） → 全保留
+      2. 财务困境关键词（破产/退市/重组等） → 全保留（不论公司）
+      3. 产品关键词（product_keywords）→ 命中才继续，否则直接丢弃
+      4. clinicaltrials → 默认保留（上游已按 ct_keywords 过滤）
+      5. sec → 仅保留重大表单（8-K/10-K 等）
+      6. relaxed（重点档放宽）→ PubMed 全保留；非多元化公司新闻全保留
+      7. 兜底 → 全局 milestone_keywords 关键词匹配
 
-    relaxed=True（重点监控档）：进一步放宽——
-      - pubmed         : 全部保留（论文检索词已按产品名精确限定，任何新论文都相关）
-      - web/rss 新闻   : 纯 biotech 公司全部保留（有新闻即推送）；
-                         若 diversified=True（多元化大集团，如 Merck KGaA），
-                         网页新闻仍走关键词过滤，避免无关业务新闻刷屏。
+    关键变更：非 Lyell 公司必须命中 product_keywords（或财务困境关键词），
+    否则即使 relaxed=True 也不会保留。这确保了所有来源只推送与关注产品相关的信息。
     """
     if not cfg or not cfg.get("enabled", True):
         return True
 
+    text = f"{item.title} {item.detail}".lower()
+
+    # ——— 第1层：Lyell 监控主体 → 全保留 ———
+    if item.company == "Lyell Immunopharma":
+        return True
+
+    # ——— 第2层：财务困境关键词（破产/退市/重组等）→ 必须保留 ———
+    fin_kw = cfg.get("financial_distress_keywords") or []
+    if any(kw.lower() in text for kw in fin_kw):
+        return True
+
+    # ——— 第3层：产品关键词过滤（非 Lyell 公司核心规则）———
+    if product_keywords:
+        if not any(pk.lower() in text for pk in product_keywords):
+            return False  # 未命中产品关键词且非财务事件 → 直接丢弃
+
+    # ——— 第4层：来源特定规则 ———
     if item.source == "clinicaltrials":
         return cfg.get("always_keep_clinicaltrials", True)
 
@@ -140,12 +158,10 @@ def is_milestone(item, cfg, relaxed=False, diversified=False):
     if relaxed:
         if item.source == "pubmed":
             return True
-        # web/rss：非多元化公司直接全保；多元化大集团继续走下方关键词过滤
         if not diversified:
             return True
 
-    # pubmed / web / rss → 关键词匹配
-    text = f"{item.title} {item.detail}".lower()
+    # ——— 第5层（兜底）：全局里程碑关键词 ———
     return any(kw.lower() in text for kw in (cfg.get("keywords") or []))
 
 

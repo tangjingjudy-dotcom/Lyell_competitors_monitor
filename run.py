@@ -67,6 +67,7 @@ def run(args):
         tcfg = tiers_cfg.get(tier, {})
         relaxed = tcfg.get("relaxed_filter", False)
         diversified = c.get("diversified", False)
+        pk = c.get("product_keywords")  # 非 Lyell 公司必须命中此列表才保留（Lyell 无此字段）
         tag = "★重点" if tier == "priority" else ""
         print(f"[{c['name']}]{tag}")
         collected = []
@@ -94,7 +95,7 @@ def run(args):
             new_items = diff_new(store, source_id, items)
             if not new_items:
                 continue
-            kept = [it for it in new_items if is_milestone(it, mfilter, relaxed=relaxed, diversified=diversified)]
+            kept = [it for it in new_items if is_milestone(it, mfilter, relaxed=relaxed, diversified=diversified, product_keywords=pk)]
             filtered_total += len(new_items) - len(kept)
             if kept:
                 print(f"    + {len(kept)} 条里程碑新增 <- {source_id.split(':')[-1]}"
