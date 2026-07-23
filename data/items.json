@@ -190,5 +190,113 @@
     "tier": "priority",
     "uid": "fc713560c564c5da",
     "first_seen": "2026-07-22T05:57:29.168868+00:00"
+  },
+  {
+    "company": "CRISPR Therapeutics",
+    "category": "异体/现货型CAR-T",
+    "source": "clinicaltrials",
+    "title": "Safety and Preliminary Efficacy of CTX112 in Adult Participants With Relapsed/Refractory Hematologic Autoimmune Disease",
+    "url": "https://clinicaltrials.gov/study/NCT07549698",
+    "date": "2026-07-22",
+    "detail": "状态: RECRUITING · 分期: PHASE1,PHASE2 · 更新: 2026-07-22",
+    "tier": "standard",
+    "uid": "ct-NCT07549698-RECRUITING-2026-07-22",
+    "first_seen": "2026-07-23T01:55:56.359773+00:00"
+  },
+  {
+    "company": "CRISPR Therapeutics",
+    "category": "异体/现货型CAR-T",
+    "source": "clinicaltrials",
+    "title": "A Safety and Efficacy Study Evaluating CTX112 in Adult Subjects With Refractory Autoimmune Disease",
+    "url": "https://clinicaltrials.gov/study/NCT06925542",
+    "date": "2026-07-22",
+    "detail": "状态: RECRUITING · 分期: PHASE1 · 更新: 2026-07-22",
+    "tier": "standard",
+    "uid": "ct-NCT06925542-RECRUITING-2026-07-22",
+    "first_seen": "2026-07-23T01:55:56.359773+00:00"
+  },
+  {
+    "company": "Century Therapeutics",
+    "category": "异体/现货型CAR-T",
+    "source": "web",
+    "title": "IPSC stock trades steadily as Century Therapeutics updates its pipeline and cash runway - Ad-hoc-news.de",
+    "url": "https://news.google.com/rss/articles/CBMiygFBVV95cUxQWmtsa2pOend3dndZTVphRGVQblJVMV9vdy04RG1lSkpsU2p5ejNfZjllcGNhYWVDODhqVkN0VktTZ1UtRWs3NjZUbC1oaUdUck00WTYwMDJ1SVVpa05jbGtDeVliYkhPVXhtb1FHanBjd1dadzVOWWh0TDBQQ0RtSGM0OU1QdkxxNW9hR2o5Mk9QZE5GM3dlRTA1NlVZMDZzd2ZKcGhIZkYxUFhVbzdWWkxDeU04S0Nac1NXV3FTR3Fsc0lxOFRCQUl3?oc=5",
+    "date": "Wed, 22 Jul 2026 17:44:08 GMT",
+    "detail": "RSS",
+    "tier": "standard",
+    "uid": "c4dbcb0f56430e1b",
+    "first_seen": "2026-07-23T01:55:56.359773+00:00"
+  },
+  {
+    "company": "Bristol Myers Squibb",
+    "category": "在位者大药企",
+    "source": "web",
+    "title": "CAR T-Cell Therapy for Non-Hodgkin Lymphoma Market Set for Robust Growth at a CAGR of ~7% Through 2036, Driven by Expanding Indications and Clinical Adoption | DelveInsight - PR Newswire UK",
+    "url": "https://news.google.com/rss/articles/CBMiygJBVV95cUxQNmRvWEpMM2xONHZPWnRsM0NQc2lhaW9TRVpObU93YWV4ZzJ5bEhBRXpKWUpzTGEyOFdxYmN3eW9CWHNIaTRnQjNkUWpEZndQTXVrcU9Sd1hWWVdmY0Y0MVVJNS02QXVaNHZfSXZZZDAyNDEzZ1M0M0ZrcDQ5U1V2M0o1UjlDQTFUcDVSNUtQM1VBV3FsME1uRldwRVBWRm5HUG5reHRjZGNIZzZadGhFTDUwRVRFWW5lV09LX0RrWWZXQmpnQzlvY2VjRU00QnZyMUZXVEF2ckxPR0FrOGxYUmJKck1UZUZJY1VoWU9HQ0JCc013eWFaYXNHQnVKTTB0bURzVmZvR3hlVWoyczVjdGtZeVQ1Qno4RmVZV3VlaktEalJQazdrbEt4Z3k1dXBlUEc3WEtlTm1yR2FiX1FsNFdQbGlqek5OMFE?oc=5",
+    "date": "Wed, 22 Jul 2026 14:31:00 GMT",
+    "detail": "RSS",
+    "tier": "priority",
+    "uid": "30ee66928da42bab",
+    "first_seen": "2026-07-23T01:55:56.359773+00:00"
+  },
+  {
+    "company": "Johnson & Johnson",
+    "category": "在位者大药企",
+    "source": "clinicaltrials",
+    "title": "A Study of Teclistamab in Combination With Daratumumab Subcutaneously (SC) (Tec-Dara) Versus Daratumumab SC, Pomalidomide, and Dexamethasone (DPd) or Daratumumab SC, Bortezomib, and Dexamethasone (DVd) in Participants With Relapsed or Refractory Multiple Myeloma",
+    "url": "https://clinicaltrials.gov/study/NCT05083169",
+    "date": "2026-07-22",
+    "detail": "状态: ACTIVE_NOT_RECRUITING · 分期: PHASE3 · 更新: 2026-07-22",
+    "tier": "standard",
+    "uid": "ct-NCT05083169-ACTIVE_NOT_RECRUITING-2026-07-22",
+    "first_seen": "2026-07-23T01:55:56.359773+00:00"
+  },
+  {
+    "company": "Incyte",
+    "category": "Ronde-cel竞品(LBCL)",
+    "source": "clinicaltrials",
+    "title": "Study to Assess the Safety and Tolerability of Tafasitamab in Adult Participants With Primary Autoimmune Blood Cell Disorders",
+    "url": "https://clinicaltrials.gov/study/NCT07104565",
+    "date": "2026-07-22",
+    "detail": "状态: RECRUITING · 分期: PHASE2 · 更新: 2026-07-22",
+    "tier": "standard",
+    "uid": "ct-NCT07104565-RECRUITING-2026-07-22",
+    "first_seen": "2026-07-23T01:55:56.359773+00:00"
+  },
+  {
+    "company": "Sanofi",
+    "category": "LYL273竞品(mCRC)",
+    "source": "clinicaltrials",
+    "title": "A Study of SGN-CEACAM5C in Adults With Advanced Solid Tumors",
+    "url": "https://clinicaltrials.gov/study/NCT06131840",
+    "date": "2026-07-22",
+    "detail": "状态: RECRUITING · 分期: PHASE1 · 更新: 2026-07-22",
+    "tier": "standard",
+    "uid": "ct-NCT06131840-RECRUITING-2026-07-22",
+    "first_seen": "2026-07-23T01:55:56.359773+00:00"
+  },
+  {
+    "company": "AstraZeneca (含EsoBiotec)",
+    "category": "10-K潜在竞品",
+    "source": "clinicaltrials",
+    "title": "Pooled Analysis of Single-arm Studies of Budesonide/Glycopyrronium/Formoterol (BGF) in Routine Care Setting",
+    "url": "https://clinicaltrials.gov/study/NCT06712563",
+    "date": "2026-07-22",
+    "detail": "状态: ACTIVE_NOT_RECRUITING · 更新: 2026-07-22",
+    "tier": "standard",
+    "uid": "ct-NCT06712563-ACTIVE_NOT_RECRUITING-2026-07-22",
+    "first_seen": "2026-07-23T01:55:56.359773+00:00"
+  },
+  {
+    "company": "Summit Therapeutics",
+    "category": "10-K潜在竞品",
+    "source": "sec",
+    "title": "8-K 申报：8-K",
+    "url": "https://www.sec.gov/Archives/edgar/data/1599298/000159929826000058/smmt-20260722.htm",
+    "date": "2026-07-22",
+    "detail": "表单 8-K",
+    "tier": "standard",
+    "uid": "sec-0001599298-26-000058",
+    "first_seen": "2026-07-23T01:55:56.359773+00:00"
   }
 ]
