@@ -145,7 +145,6 @@ COMPANIES = [
      "news_pages": ["https://www.arsenalbio.com/news/"]},
     # Arcellx 已被 Gilead 收购 → 跟踪 Gilead
     {"name": "Gilead (含Arcellx/Kite)", "category": "自体下一代CAR-T / 在位者",
-     "tier": "priority",            # Yescarta(axi-cel) 是 PiNACLE-H2H 头对头对照之一；PiNACLE-H2H 结果直接决定 ronde-cel 市场前景
      "diversified": True,           # 多元化大集团，网页新闻走关键词过滤
      "ct_sponsor": "Kite, A Gilead Company", "sec_ticker": "GILD",
      "news_pages": ["https://www.gilead.com/news/news-details"],
@@ -182,9 +181,6 @@ COMPANIES = [
      "pubmed": ["afami-cel Tecelra", "Adaptimmune TCR"]},
 
     # ————————————————— 失败/并购/转向案例（低优先级，仅跟踪残余资产/授权动向）—————————————————
-    {"name": "Atara Biotherapeutics", "category": "失败/退出案例",
-     "ct_sponsor": "Atara Biotherapeutics", "sec_ticker": "ATRA",
-     "pubmed": ["tabelecleucel Ebvallo"]},
     {"name": "Precision Biosciences", "category": "失败/转向案例",
      "ct_sponsor": "Precision Biosciences", "sec_ticker": "DTIL"},
     {"name": "Sana Biotechnology", "category": "失败/转向案例",
@@ -192,7 +188,6 @@ COMPANIES = [
 
     # ————————————————— 四、已上市大型药企（在位者）—————————————————
     {"name": "Bristol Myers Squibb", "category": "在位者大药企",
-     "tier": "priority",            # Breyanzi(liso-cel) 是 PiNACLE-H2H 头对头对照之一；ronde-cel上市后面临的直接竞争
      "diversified": True,           # 多元化大集团，网页新闻走关键词过滤
      "ct_sponsor": "Bristol-Myers Squibb", "sec_ticker": "BMY",
      "rss": ["https://news.google.com/rss/search?q=%22Bristol+Myers+Squibb%22+car-t+cell+therapy&hl=en-US&gl=US&ceid=US:en"],
@@ -289,10 +284,6 @@ COMPANIES = [
      "pubmed": ["tusamitamab CEACAM5"],
      # 只保留 CEACAM5 / CAR-T 相关（过滤Pfizer大量心血管/疫苗/特药管线）
      "ct_keywords": ["tusamitamab", "ceacam5", "car-t", "car t"]},
-    {"name": "Celyad Oncology", "category": "LYL273竞品(mCRC)",
-     "ct_sponsor": "Celyad Oncology",
-     "pubmed": ["CYAD-101 NKG2D colorectal"]},
-
     # ————————————————— 七、10-K 列示的其他潜在竞争对手 —————————————————
     {"name": "AstraZeneca (含EsoBiotec)", "category": "10-K潜在竞品",
      "ct_sponsor": "AstraZeneca", "sec_ticker": "AZN",
