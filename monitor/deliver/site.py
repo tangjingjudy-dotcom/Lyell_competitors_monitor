@@ -37,13 +37,27 @@ STALE_HOURS = 36
 SUMMARY_MAX_LEN = 200
 
 _GARBAGE = ("we use cookies", "this website uses", "we and our ", "click here to",
-            "please enable javascript", "your browser does not support")
+            "please enable javascript", "your browser does not support",
+            "comprehensive up-to-date news coverage",  # Google News 通用描述
+            "comprehensive up-to-date news",)
 
 # ─── 摘要生成（内联） ───────────────────────────────────────────
 
 def _is_garbage(text):
-    """过滤 cookie 横幅等无用文本。"""
-    return any(text.lower().lstrip().startswith(g) for g in _GARBAGE)
+    """过滤 cookie 横幅、Google News 通用描述等无用文本。"""
+    t = text.lower().strip()
+    return any(t.startswith(g) for g in _GARBAGE)
+
+def _similar_to_title(text, title, threshold=0.85):
+    """标题和摘要是否过于相似（重复比例>threshold）。"""
+    if not text or not title:
+        return False
+    # 简化为：标题是否完整出现在摘要开头
+    clean_title = re.sub(r'\s+', ' ', title).strip().lower()
+    clean_text = re.sub(r'\s+', ' ', text).strip().lower()
+    if len(clean_title) < 20:
+        return False
+    return clean_text.startswith(clean_title[:min(len(clean_title), len(clean_text))])
 
 def _generate_summary(item):
     """为单条 item 生成摘要文本。不抛异常。"""
@@ -52,11 +66,13 @@ def _generate_summary(item):
     detail = item.get("detail", "")
     url = item.get("url", "")
 
-    # clinicaltrials: 用 detail 格式化
+    # clinicaltrials: 人性化格式化（含药品名/适应症简短描述）
     if src == "clinicaltrials":
-        if detail:
-            return _fmt_ct(detail)
-        return "临床试验更新"
+        ct_short = _fmt_ct(detail)
+        drug_hint = _extract_drug_hint(title)
+        if drug_hint:
+            return f"{drug_hint} —— {ct_short}"
+        return ct_short
 
     # SEC: 跳过
     if src == "sec":
@@ -64,11 +80,57 @@ def _generate_summary(item):
 
     # pubmed/web/rss: 抓取网页提取
     text = _try_fetch_extract(url, title)
-    if text and not _is_garbage(text):
+    if text and not _is_garbage(text) and not _similar_to_title(text, title):
         return _truncate(text)
 
-    # 垃圾文本则回退到标题
-    return title
+    # 垃圾文本/标题重复 → 尝试更深层提取
+    text2 = _deep_extract(url)
+    if text2 and not _is_garbage(text2) and not _similar_to_title(text2, title):
+        return _truncate(text2)
+
+    # 最终兜底（仅保留有意义的一两句话，避免纯标题重复）
+    return _title_summary(title)
+
+def _title_summary(title):
+    """从标题提取有意义摘要（去 URL 后缀、去重复短语）。"""
+    t = title.strip()
+    t = re.sub(r'\s*[-–|]\s*(Ad-hoc-news|Google News|RSS|PR Newswire|Business Wire).*$', '', t, flags=re.I)
+    if len(t) > 120:
+        t = t[:120]
+    return t
+
+def _extract_drug_hint(title):
+    """从临床试验标题中提取药品名和适应症简短提示。
+    如: 'A Study to Evaluate AZD5492, a T Cell-engaging Antibody...
+    → 'AZD5492 (抗CD20 T细胞衔接双抗)'"""
+    t = title.strip()
+    # 抓大写字母+数字组合（药品代码）
+    codes = re.findall(r'\b([A-Z]{2,}\d{2,})\b', t)
+    # 抓常见药品名模式
+    names = re.findall(r'\b([A-Z][a-z]+-?cel|[A-Z][a-z]+-?mab|[A-Z][a-z]+-?cept|[A-Z][a-z]+-?nib|[A-Z][a-z]+-?stat)\b', t, re.I)
+    product = codes[0] if codes else (names[0] if names else "")
+    if not product:
+        return ""
+    # 适应症关键词
+    indications = {
+        "multiple myeloma": "多发性骨髓瘤", "myeloma": "多发性骨髓瘤",
+        "lymphoma": "淋巴瘤", "dlbcl": "弥漫大B细胞淋巴瘤",
+        "leukemia": "白血病", "melanoma": "黑色素瘤",
+        "nsclc": "非小细胞肺癌", "lung": "肺癌",
+        "breast": "乳腺癌", "ovarian": "卵巢癌",
+        "colorectal": "结直肠癌", "mCRC": "转移性结直肠癌",
+        "solid tumor": "实体瘤", "glioblastoma": "胶质母细胞瘤",
+        "autoimmune": "自身免疫病", "diabetes": "糖尿病",
+    }
+    indication = ""
+    tlower = t.lower()
+    for eng, cn in indications.items():
+        if eng in tlower:
+            indication = cn
+            break
+    if indication:
+        return f"{product}（{indication}）"
+    return product
 
 _PHASE_CN = {"PHASE1": "I", "PHASE2": "II", "PHASE3": "III", "PHASE4": "IV"}
 _STATUS_CN = {"RECRUITING": "招募中", "ACTIVE_NOT_RECRUITING": "进行中",
@@ -76,9 +138,7 @@ _STATUS_CN = {"RECRUITING": "招募中", "ACTIVE_NOT_RECRUITING": "进行中",
               "TERMINATED": "已终止", "WITHDRAWN": "已撤回", "SUSPENDED": "暂停中"}
 
 def _fmt_ct(detail):
-    """格式化临床试验 detail 字段。如:
-    '状态: RECRUITING · 分期: PHASE1,PHASE2 · 更新: 2026-07-21'
-    → 'I/II期，招募中（2026-07-21）'"""
+    """格式化临床试验 detail 字段。"""
     status = re.search(r'状态:\s*(\S+)', detail)
     phase = re.search(r'分期:\s*(.+?)(?:\s*·|$)', detail)
     update = re.search(r'更新:\s*(\d{4}-\d{2}-\d{2})', detail)
@@ -95,7 +155,8 @@ def _fmt_ct(detail):
 _USER_AGENT = "Mozilla/5.0 (compatible; LyellMonitor/1.1)"
 
 def _try_fetch_extract(url, title=""):
-    """尝试从 URL 抓取正文片段。返回 None 或文本字符串。"""
+    """第一层提取：meta og:description / description / 首段 <p>。
+    优先 og:description（新闻页面常见），其次普通 meta description。"""
     if not url:
         return None
     try:
@@ -105,23 +166,58 @@ def _try_fetch_extract(url, title=""):
     except Exception:
         return None
 
-    # 1) meta description
-    m = re.search(r'<meta[^>]+name=["\']description["\'][^>]+content=["\']([^"\']{20,})["\']', body, re.I)
-    if not m:
-        m = re.search(r'<meta[^>]+content=["\']([^"\']{20,})["\'][^>]+name=["\']description["\']', body, re.I)
+    # 1) og:description
+    m = re.search(r'<meta[^>]+property=["\']og:description["\'][^>]+content=["\']([^"\']{30,})["\']', body, re.I)
     if m:
-        text = m.group(1).strip()
-        text = re.sub(r'\s+', ' ', text)
-        return text
+        return re.sub(r'\s+', ' ', m.group(1).strip())
 
-    # 2) 正文首段 <p>
+    # 2) 普通 meta description
+    m = re.search(r'<meta[^>]+name=["\']description["\'][^>]+content=["\']([^"\']{30,})["\']', body, re.I)
+    if not m:
+        m = re.search(r'<meta[^>]+content=["\']([^"\']{30,})["\'][^>]+name=["\']description["\']', body, re.I)
+    if m:
+        return re.sub(r'\s+', ' ', m.group(1).strip())
+
+    # 3) 正文首段 <p>
     ps = re.findall(r'<p[^>]*>(.*?)</p>', body, re.DOTALL | re.I)
     for p in ps:
         clean = re.sub(r'<[^>]+>', '', p).strip()
         clean = re.sub(r'\s+', ' ', clean)
-        if len(clean) > 25:
+        if len(clean) > 30:
             return clean
 
+    return None
+
+def _deep_extract(url):
+    """第二层提取：找页面正文主体（article/main/新闻稿内容区），跳过 meta。
+    用于 meta description 与标题重复时兜底。"""
+    if not url:
+        return None
+    try:
+        r = requests.get(url, timeout=8, headers={"User-Agent": _USER_AGENT})
+        r.raise_for_status()
+        body = r.text
+    except Exception:
+        return None
+
+    # 找内容区：article > main > div[class含content/release/body/news] > body
+    for pat in (r'<article[^>]*>(.*?)</article>',
+                r'<main[^>]*>(.*?)</main>',
+                r'<div[^>]*class="[^"]*(?:content|release|body|news|press)[^"]*"[^>]*>(.*?)(?:</div>)',
+                r'<body[^>]*>(.*?)</body>'):
+        m = re.search(pat, body, re.DOTALL | re.I)
+        if not m:
+            continue
+        inner = m.group(1)
+        # 找该区域第一个有意义的 <p>
+        ps = re.findall(r'<p[^>]*>(.*?)</p>', inner, re.DOTALL | re.I)
+        for p in ps:
+            clean = re.sub(r'<[^>]+>', '', p).strip()
+            clean = re.sub(r'\s+', ' ', clean)
+            clean = re.sub(r'&amp;', '&', clean)
+            clean = re.sub(r'&[a-z]{2,6};', ' ', clean)  # &nbsp; &mdash; etc
+            if len(clean) > 40:
+                return clean
     return None
 
 def _truncate(text):
