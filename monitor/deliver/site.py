@@ -362,20 +362,32 @@ def generate(settings, subjects=None):
     db = load_json(ITEMS_DB, [])
     db.sort(key=lambda r: r.get("first_seen", ""), reverse=True)
 
-    # ── 内联摘要生成（这一步保证一定有摘要）──
+    # ── 内联摘要生成 ──
     summaries_file = os.path.join(ROOT, "data", "summaries.json")
     summaries = load_json(summaries_file, {})
-    new_summary_count = 0
+    new_count, clean_count = 0, 0
     for r in db:
         uid = r.get("uid", "")
-        if uid and uid not in summaries:
+        if not uid:
+            continue
+        cached = summaries.get(uid)
+        # 清理垃圾缓存（旧代码写入的 Google News 描述 / 标题重复）
+        if cached and (_is_garbage(cached) or _similar_to_title(cached, r.get("title", ""))):
+            del summaries[uid]
+            clean_count += 1
+            cached = None
+        if not cached:
             s = _generate_summary(r)
             if s:
                 summaries[uid] = s
-                new_summary_count += 1
-    if new_summary_count:
+                new_count += 1
+    if new_count or clean_count:
         save_json(summaries_file, summaries)
-        print(f"  [site] 内联生成 {new_summary_count} 条新摘要（累计 {len(summaries)}）")
+        msg = f"  [site] 摘要: 新生成 {new_count} 条"
+        if clean_count:
+            msg += f", 清理过期缓存 {clean_count} 条"
+        msg += f"（累计 {len(summaries)}）"
+        print(msg)
     else:
         print(f"  [site] 摘要完整（{len(summaries)} 条）")
 
