@@ -109,6 +109,34 @@ SETTINGS = {
 }
 
 
+# —— 监控主体（左侧栏导航） ——
+# 每个主体定义一个 id + 名称 + 描述 + 关联公司列表（自身+竞品）。
+# 看板左侧栏按此顺序排列，点击后在右侧显示该主体及其竞品的最新情报。
+# 添加新主体：只需在下表中新增一条记录，并将其 company 及竞品加入 COMPANIES。
+MONITORING_SUBJECTS = [
+    {
+        "id": "lyell",
+        "name": "Lyell Immunopharma",
+        "description": "下一代CAR-T（ronde-cel + LYL273）",
+        # 关联公司：Lyell 自身 + 全部竞品（COMPANIES 中除 Lyell 外的所有公司）
+        "companies": [
+            "Lyell Immunopharma",
+            "Allogene Therapeutics", "Caribou Biosciences", "CRISPR Therapeutics",
+            "Century Therapeutics", "Autolus Therapeutics", "Arsenal Biosciences",
+            "Gilead (含Arcellx/Kite)", "Roche (含Poseida/Genentech)",
+            "A2 Biotherapeutics", "Affini-T Therapeutics", "Immatics", "Immunocore",
+            "Adaptimmune Therapeutics", "Precision Biosciences", "Sana Biotechnology",
+            "Bristol Myers Squibb", "Johnson & Johnson", "Legend Biotech", "Novartis",
+            "AbbVie / Genmab (epcoritamab)", "ADC Therapeutics", "Incyte",
+            "Miltenyi Biomedicine (zamto-cel)", "CARsgen Therapeutics (科济药业)",
+            "Innovative Cellular Therapeutics (ICT)", "北京艺妙神州 (Immunochina)",
+            "Chimeric Therapeutics", "Carina Biotech", "Merck KGaA (M9140)",
+            "Sanofi", "Pfizer", "AstraZeneca (含EsoBiotec)", "Agenus",
+            "Akeso（康方生物）", "Summit Therapeutics",
+        ],
+    },
+]
+
 COMPANIES = [
     # ————————————————————————————— 监控主体 —————————————————————————————
     {

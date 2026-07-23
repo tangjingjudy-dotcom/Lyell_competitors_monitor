@@ -14,7 +14,7 @@ import sys
 import time
 from datetime import date
 
-from config import COMPANIES, SETTINGS
+from config import COMPANIES, SETTINGS, MONITORING_SUBJECTS
 from monitor.base import (
     Http, StateStore, RunStats, diff_new, merge_into_items_db, is_milestone,
     append_run_log, load_json, save_json, META_FILE, now_iso,
@@ -128,7 +128,7 @@ def run(args):
         meta["initialized"] = True
         meta["first_run_at"] = now_iso()
         save_json(META_FILE, meta)
-        out_path = site.generate(SETTINGS)
+        out_path = site.generate(SETTINGS, subjects=MONITORING_SUBJECTS)
         print(f"\n站点已生成: {out_path}")
         print(f"基线建立完成：已将当前 {len(all_new)} 条存量里程碑记为‘已见’（不展示）；"
               f"后续运行仅呈现新增。")
@@ -141,7 +141,18 @@ def run(args):
     cleaned_age = _clean_expired_items()
     if cleaned_age:
         print(f"  已从 items.json 移除 {cleaned_age} 条超过{_get_site_max_age()}天的旧条目")
-    out_path = site.generate(SETTINGS)
+
+    # —— 摘要生成：为新增条目抓取文章内容并生成 1-2 句摘要 ——
+    if all_new:
+        try:
+            from monitor.summarizer import summarize_items
+            summaries = summarize_items(all_new)
+            new_summaries = len(summaries)
+            print(f"  摘要生成: 已缓存 {new_summaries} 条")
+        except Exception as e:
+            print(f"  摘要生成跳过: {e}")
+
+    out_path = site.generate(SETTINGS, subjects=MONITORING_SUBJECTS)
     print(f"\n站点已生成: {out_path}")
     print(f"本轮里程碑新增合计: {len(all_new)} 条（其中重点对象 {len(priority_new)} 条；已过滤例行噪音 {filtered_total} 条）")
 
