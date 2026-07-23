@@ -94,8 +94,8 @@ def _generate_summary(item):
     if full_text and (_is_garbage(full_text) or _similar_to_title(full_text, title)):
         full_text = ""  # 无效内容跳过
 
-    # —— DeepSeek 路径 ——
-    if _DS_CLIENT and (full_text or title):
+    # —— DeepSeek 路径（仅周一执行，其他日子读缓存） ——
+    if _DS_CLIENT and (full_text or title) and _ds_due_today():
         result = _ds_summarize(full_text, title, item.get("company", ""), src)
         if result:
             return result
@@ -111,6 +111,11 @@ _DS_SYSTEM = (
     "监管/审批必须体现机构、适应症。合作/交易必须体现金额。"
     "只输出摘要本身，不加前缀、引号或标记。≤180字。"
 )
+
+def _ds_due_today():
+    """仅在周一返回 True（0=Mon...6=Sun）。"""
+    return datetime.now(timezone.utc).astimezone().weekday() == 0
+
 
 def _ds_summarize(body_text, title, company, source):
     """调用 DeepSeek 生成摘要。失败返回 None。"""
