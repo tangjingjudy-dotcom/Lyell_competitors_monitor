@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-"""摘要生成 v2：抓取全文 → DeepSeek 阅读理解式总结（含关键数据提取）。
+"""摘要生成 v3：抓取全文 → DeepSeek 理解式总结 + 提取式兜底。
 
-数据流：
-  1. 对每条 web/rss/pubmed 条目，抓取文章全文（最多 4000 字符）
-  2. 对 clinicaltrials/sec 条目，用内置信息拼接
-  3. 调用 DeepSeek API 生成中文摘要（1-2 句，关键数据优先）
-  4. 结果缓存到 data/summaries.json
+策略改进（v2 → v3）：
+  1. 创建一次 OpenAI client，复用给所有请求
+  2. 每次 DeepSeek 失败时打印具体错误（标题+异常），方便排查
+  3. DeepSeek 失败时，fallback 到提取式摘要（meta description → 首段 → 截断）
+  4. SEC 跳过摘要，clinicaltrials 用 detail 字段生成
 
 环境变量：
-  DEEPSEEK_API_KEY — DeepSeek API 密钥（https://platform.deepseek.com）
+  DEEPSEEK_API_KEY — DeepSeek API 密钥
 """
 import json
 import os
@@ -17,7 +17,7 @@ import time
 from html.parser import HTMLParser
 
 import requests
-from openai import OpenAI
+# openai 懒加载（仅 DeepSeek 需要，避免 --no-summary 时崩溃）
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(ROOT, "data")
@@ -26,7 +26,6 @@ SUMMARY_MAX_CHARS = 260
 
 DEEPSEEK_BASE = "https://api.deepseek.com"
 DEEPSEEK_MODEL = "deepseek-chat"
-
 
 # ─── HTML 正文提取 ──────────────────────────────────────────────
 
@@ -53,7 +52,6 @@ class _TextExtractor(HTMLParser):
 
 
 def _fetch_article_text(url, timeout=10):
-    """抓取网页全文（去 HTML 标签），返回纯文本（最多 4000 字符）。"""
     try:
         r = requests.get(url, timeout=timeout,
                          headers={"User-Agent": "Mozilla/5.0 (compatible; LyellMonitor/1.0)"})
@@ -62,14 +60,12 @@ def _fetch_article_text(url, timeout=10):
     except Exception:
         return ""
 
-    # 尝试提取 <article> 或主内容区
     for tag in ("article", "main", '[role="main"]'):
         m = re.search(rf'<{tag}[^>]*>(.*?)</{tag}>', html, re.DOTALL | re.I)
         if m:
             html = m.group(1)
             break
 
-    # 纯文本提取
     parser = _TextExtractor()
     try:
         parser.feed(html)
@@ -83,8 +79,62 @@ def _fetch_article_text(url, timeout=10):
     return text
 
 
+def _extract_meta_description(html):
+    m = re.search(r'<meta[^>]+name=["\']description["\'][^>]+content=["\']([^"\']+)["\']', html, re.I)
+    if not m:
+        m = re.search(r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+name=["\']description["\']', html, re.I)
+    return m.group(1).strip() if m else None
+
+
+def _extract_first_paragraph(html):
+    art_match = re.search(r'<article[^>]*>(.*?)</article>', html, re.DOTALL | re.I)
+    target = art_match.group(1) if art_match else html
+    ps = re.findall(r'<p[^>]*>(.*?)</p>', target, re.DOTALL | re.I)
+    for p in ps:
+        clean = re.sub(r'<[^>]+>', '', p).strip()
+        clean = re.sub(r'\s+', ' ', clean)
+        if len(clean) > 30:
+            return clean
+    return None
+
+
+def _truncate(text, max_chars=SUMMARY_MAX_CHARS):
+    if len(text) <= max_chars:
+        return text
+    sentences = re.split(r'(?<=[。！？.!?])\s*', text)
+    result = ""
+    for s in sentences:
+        if len(result) + len(s) > max_chars:
+            break
+        result += s
+    if not result:
+        result = text[:max_chars]
+    return result.strip()
+
+
+def _extractive_summary(item):
+    """提取式摘要（DeepSeek 失败时兜底）。"""
+    if item.source == "clinicaltrials":
+        return item.detail or "临床试验更新"
+    if item.source == "sec":
+        return None  # SEC 跳过
+    if item.source == "pubmed":
+        return item.detail or item.title
+    # web / rss
+    try:
+        r = requests.get(item.url, timeout=10,
+                         headers={"User-Agent": "Mozilla/5.0 (compatible; LyellMonitor/1.0)"})
+        r.raise_for_status()
+        html = r.text
+        result = _extract_meta_description(html) or _extract_first_paragraph(html)
+        if result:
+            return _truncate(result)
+    except Exception:
+        pass
+    return item.title  # 最终兜底
+
+
 def _build_prompt_text(item):
-    """为不同类型的条目构建传给 LLM 的输入文本。"""
     src = item.source
     title = item.title
     detail = item.detail or ""
@@ -99,15 +149,9 @@ def _build_prompt_text(item):
         )
 
     if src == "sec":
-        return (
-            f"【类型】SEC 申报文件\n"
-            f"【公司】{item.company}\n"
-            f"【表单】{title}\n"
-            f"【详情】{detail}（提交于 {date_str}）"
-        )
+        return None  # 不需要 LLM 摘要
 
     if src == "pubmed":
-        # PubMed 可能有 abstract 在 detail 里，再补抓全文
         article_text = _fetch_article_text(item.url)
         combined = f"{title}\n{detail}"
         if article_text:
@@ -132,24 +176,30 @@ def _build_prompt_text(item):
     )
 
 
-# ─── DeepSeek 调用 ──────────────────────────────────────────────
+# ─── DeepSeek ───────────────────────────────────────────────────
 
-_SUMMARIZE_SYSTEM = """你是一个生物医药竞争情报分析师。你的任务是用中文撰写简洁的每日摘要。
+_SUMMARIZE_SYSTEM = (
+    "你是生物医药竞争情报分析师。用 1-2 句中文总结信息核心内容。"
+    "临床数据必须体现关键数字（ORR、CR、PFS、OS、安全性、入组人数等）。"
+    "监管/审批必须体现机构、适应症、阶段。合作/交易必须体现金额。"
+    "只输出摘要本身，不加前缀、引号或标记。2 句内，≤200 字。"
+)
 
-要求：
-1. 用 1-2 句话总结这条信息的核心内容。
-2. 如果是临床数据更新，必须体现关键数据（ORR、CR、PFS、OS、安全性、入组人数等）。
-3. 如果是监管/审批进展，必须体现监管机构、适应症、阶段。
-4. 如果是合作/交易/财报，必须体现金额或交易结构。
-5. 只输出摘要本身，不要加"摘要："前缀，不要加引号或其他标记。
-6. 控制在 2 句话以内，中文，不超过 200 字。"""
+_ds_client = None  # 模块级复用
+
+
+def _get_deepseek_client(api_key):
+    global _ds_client
+    if _ds_client is None:
+        from openai import OpenAI
+        _ds_client = OpenAI(api_key=api_key, base_url=DEEPSEEK_BASE)
+    return _ds_client
 
 
 def _deepseek_summarize(prompt_text, api_key, max_retries=2):
-    """调用 DeepSeek API 生成摘要。"""
-    if not api_key:
+    if not api_key or not prompt_text:
         return None
-    client = OpenAI(api_key=api_key, base_url=DEEPSEEK_BASE)
+    client = _get_deepseek_client(api_key)
     for attempt in range(max_retries + 1):
         try:
             resp = client.chat.completions.create(
@@ -162,7 +212,6 @@ def _deepseek_summarize(prompt_text, api_key, max_retries=2):
                 max_tokens=300,
             )
             summary = resp.choices[0].message.content.strip()
-            # 清理多余引号/标记
             summary = re.sub(r'^["\'\u201c\u2018]|["\'\u201d\u2019]$', '', summary)
             summary = re.sub(r'^(摘要[：:]?\s*)', '', summary)
             if len(summary) > SUMMARY_MAX_CHARS:
@@ -170,9 +219,9 @@ def _deepseek_summarize(prompt_text, api_key, max_retries=2):
             return summary
         except Exception as e:
             if attempt < max_retries:
-                time.sleep(2 * (attempt + 1))
+                time.sleep(3 * (attempt + 1))
             else:
-                print(f"    [DeepSeek 失败] {e}")
+                print(f"    [DS失败] retries exhausted: {type(e).__name__}")
                 return None
     return None
 
@@ -200,22 +249,13 @@ def _save_cache(cache):
 # ─── 主入口 ─────────────────────────────────────────────────────
 
 def summarize_items(items, delay=1.2, max_per_run=60):
-    """为一组 Item 生成 DeepSeek 摘要。
-
-    参数:
-      items: Item 列表
-      delay: 每次 API 调用间隔（秒），DeepSeek 免费版 QPS 较低
-      max_per_run: 单次最多生成条数（控制成本）
-
-    返回: {uid: summary_str} 的缓存字典（含已有缓存）
-    """
+    """为一组 Item 生成摘要。DeepSeek 优先，失败则提取式兜底。"""
     api_key = os.environ.get("DEEPSEEK_API_KEY", "").strip()
-    if not api_key:
-        print("    ⚠ 未设置 DEEPSEEK_API_KEY 环境变量，跳过摘要生成")
-        return _load_cache()
-
     cache = _load_cache()
     new_count = 0
+    ds_ok = 0
+    ds_fail = 0
+    fallback_ok = 0
 
     for item in items:
         if new_count >= max_per_run:
@@ -224,12 +264,31 @@ def summarize_items(items, delay=1.2, max_per_run=60):
         if uid in cache:
             continue
 
-        prompt = _build_prompt_text(item)
-        if not prompt.strip():
+        summary = None
+
+        # SEC 跳过
+        if item.source == "sec":
             continue
 
-        time.sleep(delay)
-        summary = _deepseek_summarize(prompt, api_key)
+        # 尝试 DeepSeek
+        if api_key:
+            prompt = _build_prompt_text(item)
+            if prompt:
+                time.sleep(delay)
+                summary = _deepseek_summarize(prompt, api_key)
+                if summary:
+                    ds_ok += 1
+                else:
+                    ds_fail += 1
+        else:
+            ds_fail += 1
+
+        # DeepSeek 失败则提取式兜底
+        if not summary:
+            fallback = _extractive_summary(item)
+            if fallback:
+                summary = _truncate(fallback)
+                fallback_ok += 1
 
         if summary:
             cache[uid] = summary
@@ -239,13 +298,12 @@ def summarize_items(items, delay=1.2, max_per_run=60):
 
     if new_count:
         _save_cache(cache)
-        print(f"    摘要生成完成: 新增 {new_count} 条，累计 {len(cache)} 条")
+        print(f"    摘要完成: DeepSeek {ds_ok} 条, 兜底 {fallback_ok} 条, 失败 {ds_fail - fallback_ok} 条, 累计 {len(cache)} 条")
 
     return cache
 
 
 def generate_daily_report(subject_name, items, summaries):
-    """为某个监控主体生成日度摘要报告（Markdown + HTML）。"""
     from datetime import datetime, timezone
     now = datetime.now(timezone.utc).astimezone()
     date_str = now.strftime("%Y-%m-%d")

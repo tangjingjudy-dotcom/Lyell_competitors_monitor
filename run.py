@@ -22,6 +22,7 @@ from monitor.base import (
 )
 from monitor.sources import clinicaltrials, sec_edgar, pubmed, webwatch
 from monitor.deliver import site, email_digest
+from monitor.summarizer import summarize_items, _load_cache, _save_cache
 
 
 def _due_today(tier_cfg):
@@ -148,7 +149,6 @@ def run(args):
         print(f"  摘要生成: 已跳过（--no-summary）")
     else:
         try:
-            from monitor.summarizer import summarize_items, _load_cache, _save_cache
             if all_new:
                 summarize_items(all_new, max_per_run=60)
             cache = _load_cache()
@@ -164,9 +164,10 @@ def run(args):
                         pending.append(Item(**{k: v for k, v in d.items()
                                                if k in ("company", "category", "source", "title",
                                                         "url", "date", "detail", "tier", "uid")}))
-                    except Exception:
-                        continue
+                    except Exception as ex:
+                        print(f"    跳过条目（Item构造失败）: {d.get('title','')[:40]} - {ex}")
                 if pending:
+                    print(f"    将生成 {len(pending)} 条摘要...")
                     summarize_items(pending, max_per_run=40)
         except Exception as e:
             print(f"  摘要生成跳过: {e}")
