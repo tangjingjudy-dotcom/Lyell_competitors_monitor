@@ -157,7 +157,8 @@ COMPANIES = [
      "ct_keywords": ["arsenal", "ab-1015", "car-t", "car t", "chimeric antigen"]},
     # Arcellx 已被 Gilead 收购 → 跟踪 Gilead
     {"name": "Gilead (含Arcellx/Kite)", "category": "自体下一代CAR-T / 在位者",
-     "diversified": True,           # 多元化大集团，网页新闻走关键词过滤
+     "tier": "priority",            # Yescarta/Tecartus 已上市CAR-T，双靶点管线在研；ronde-cel上市后直接在位者竞品
+     "diversified": True,           # 多元化大集团，网页新闻走关键词过滤；重点档 + product_keywords 精准放行
      "ct_sponsor": "Kite, A Gilead Company", "sec_ticker": "GILD",
      "news_pages": ["https://www.gilead.com/news/news-details"],
      # 只保留 CAR-T/细胞治疗 相关试验（过滤HIV/HCV/肝病等大量无关管线）
