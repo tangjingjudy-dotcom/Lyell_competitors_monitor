@@ -260,19 +260,29 @@ def summarize_items(items, delay=1.2, max_per_run=60):
     for item in items:
         if new_count >= max_per_run:
             break
-        uid = item.uid
+        try:
+            uid = item.uid
+        except Exception:
+            continue
         if uid in cache:
             continue
 
         summary = None
 
         # SEC 跳过
-        if item.source == "sec":
+        try:
+            if item.source == "sec":
+                continue
+        except Exception:
             continue
 
         # 尝试 DeepSeek
         if api_key:
-            prompt = _build_prompt_text(item)
+            try:
+                prompt = _build_prompt_text(item)
+            except Exception as e:
+                prompt = None
+                ds_fail += 1
             if prompt:
                 time.sleep(delay)
                 summary = _deepseek_summarize(prompt, api_key)
@@ -285,21 +295,26 @@ def summarize_items(items, delay=1.2, max_per_run=60):
 
         # DeepSeek 失败则提取式兜底
         if not summary:
-            fallback = _extractive_summary(item)
-            if fallback:
-                summary = _truncate(fallback)
-                fallback_ok += 1
+            try:
+                fallback = _extractive_summary(item)
+                if fallback:
+                    summary = _truncate(fallback)
+                    fallback_ok += 1
+            except Exception:
+                pass
 
         if summary:
             cache[uid] = summary
             new_count += 1
-            if new_count % 10 == 0:
-                print(f"    摘要进度: {new_count} 条")
+            if new_count % 5 == 0:
+                print(f"    摘要进度: {new_count} 条 (DS:{ds_ok} FB:{fallback_ok})")
+            # 每生成一条就保存，避免批量失败丢失全部
+            _save_cache(cache)
 
     if new_count:
-        _save_cache(cache)
-        print(f"    摘要完成: DeepSeek {ds_ok} 条, 兜底 {fallback_ok} 条, 失败 {ds_fail - fallback_ok} 条, 累计 {len(cache)} 条")
-
+        print(f"    摘要完成: DeepSeek {ds_ok} 条, 兜底 {fallback_ok} 条, 跳过 {ds_fail - fallback_ok} 条, 累计 {len(cache)} 条")
+    else:
+        print(f"    摘要: 无新增（已全部缓存）")
     return cache
 
 
