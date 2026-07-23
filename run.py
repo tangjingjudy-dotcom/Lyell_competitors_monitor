@@ -22,7 +22,6 @@ from monitor.base import (
 )
 from monitor.sources import clinicaltrials, sec_edgar, pubmed, webwatch
 from monitor.deliver import site, email_digest
-from monitor.summarizer import summarize_items, _load_cache, _save_cache
 
 
 def _due_today(tier_cfg):
@@ -144,42 +143,8 @@ def run(args):
     if cleaned_age:
         print(f"  已从 items.json 移除 {cleaned_age} 条超过{_get_site_max_age()}天的旧条目")
 
-    # —— 摘要生成（周度：由 --no-summary 控制） ——
-    if args.no_summary:
-        print(f"  摘要生成: 已跳过（--no-summary）")
-    else:
-        # 阶段1：新条目摘要（容错，失败不阻断补生成）
-        if all_new:
-            try:
-                print(f"  阶段1: 为新条目 {len(all_new)} 条生成摘要...")
-                summarize_items(all_new, max_per_run=60)
-            except Exception as e:
-                print(f"  阶段1失败（不影响补生成）: {type(e).__name__}: {e}")
-
-        # 阶段2：补生成 missing 条目（独立 try，不依赖阶段1）
-        try:
-            cache = _load_cache()
-            all_db = load_json(ITEMS_DB, [])
-            all_db.sort(key=lambda r: r.get("first_seen", ""), reverse=True)
-            missing = [it for it in all_db if it.get("uid") not in cache]
-            if missing:
-                print(f"  阶段2: items.json 中 {len(missing)} 条无缓存，将逐步生成")
-                from monitor.base import Item
-                pending = []
-                for d in missing[:40]:
-                    try:
-                        pending.append(Item(**{k: v for k, v in d.items()
-                                               if k in ("company", "category", "source", "title",
-                                                        "url", "date", "detail", "tier", "uid")}))
-                    except Exception as ex:
-                        print(f"    跳过条目: {d.get('title','')[:40]} - {ex}")
-                if pending:
-                    print(f"    将生成 {len(pending)} 条摘要...")
-                    summarize_items(pending, max_per_run=40)
-            else:
-                print(f"  摘要缓存已完整（共 {len(cache)} 条）")
-        except Exception as e:
-            print(f"  阶段2失败: {type(e).__name__}: {e}")
+    # —— 摘要生成已内联到 site.generate() 中，run.py 不再独立调用 ——
+    # 详情见 monitor/deliver/site.py 的 _generate_summary()
 
     out_path = site.generate(SETTINGS, subjects=MONITORING_SUBJECTS)
     print(f"\n站点已生成: {out_path}")
