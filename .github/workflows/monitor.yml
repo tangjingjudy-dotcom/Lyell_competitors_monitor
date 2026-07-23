@@ -53,16 +53,16 @@ jobs:
           MONITOR_MAIL_TO: ${{ secrets.MONITOR_MAIL_TO }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         run: |
-          FULL=""
+          # 强制摘要：周一自动，或手动勾选 force_summary
+          if [ "1" = "$(date +%u)" ] || [ "${{ github.event.inputs.force_summary }}" = "true" ]; then
+            export FORCE_DS_SUMMARY=1
+            echo "摘要: 强制生成（AI）"
+          fi
           if [ "${{ github.event.inputs.full_sweep }}" = "true" ]; then
-            FULL="--all"
+            python run.py --all
+          else
+            python run.py
           fi
-          # 周一生成摘要，其他日子跳过；手动勾选 force_summary 则强制生成
-          SUMMARY_FLAG="--no-summary"
-          if [ "$(date +%u)" = "1" ] || [ "${{ github.event.inputs.force_summary }}" = "true" ]; then
-            SUMMARY_FLAG=""
-          fi
-          python run.py $FULL $SUMMARY_FLAG
 
       - name: Commit state snapshot
         run: |

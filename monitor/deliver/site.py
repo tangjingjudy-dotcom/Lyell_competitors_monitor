@@ -113,7 +113,9 @@ _DS_SYSTEM = (
 )
 
 def _ds_due_today():
-    """仅在周一返回 True（0=Mon...6=Sun）。"""
+    """周一自动执行；FORCE_DS_SUMMARY 环境变量强制执行。"""
+    if os.environ.get("FORCE_DS_SUMMARY", "").strip() == "1":
+        return True
     return datetime.now(timezone.utc).astimezone().weekday() == 0
 
 
