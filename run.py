@@ -7,6 +7,7 @@
   python run.py --site-url URL  # 在邮件中附上看板链接
   python run.py --no-email      # 本次不发邮件（只更新站点）
   python run.py --only LYEL     # 只跑名称包含该关键词的公司（调试用）
+  python run.py --no-summary    # 跳过摘要生成（日常高频运行推荐）
 """
 import argparse
 import re
@@ -142,34 +143,33 @@ def run(args):
     if cleaned_age:
         print(f"  已从 items.json 移除 {cleaned_age} 条超过{_get_site_max_age()}天的旧条目")
 
-    # —— 摘要生成：为新增条目 + 已入库未摘要条目，调用 DeepSeek 生成阅读理解式摘要 ——
-    try:
-        from monitor.summarizer import summarize_items, _load_cache, _save_cache
-        # 1) 生成新条目的摘要
-        if all_new:
-            summarize_items(all_new, max_per_run=60)
-        # 2) 检查 items.json 中还有哪些条目没摘要，补生成（按时间倒序，优先最新的）
-        cache = _load_cache()
-        all_db = load_json(ITEMS_DB, [])
-        all_db.sort(key=lambda r: r.get("first_seen", ""), reverse=True)
-        missing = [it for it in all_db if it.get("uid") not in cache]
-        if missing:
-            print(f"    补摘要: items.json 中 {len(missing)} 条无缓存，将逐步生成")
-            # 最多补 40 条，避免单次 API 成本过高
-            # 转换为 Item 对象
-            from monitor.base import Item
-            pending = []
-            for d in missing[:40]:
-                try:
-                    pending.append(Item(**{k: v for k, v in d.items()
-                                           if k in ("company", "category", "source", "title",
-                                                    "url", "date", "detail", "tier", "uid")}))
-                except Exception:
-                    continue
-            if pending:
-                summarize_items(pending, max_per_run=40)
-    except Exception as e:
-        print(f"  摘要生成跳过: {e}")
+    # —— 摘要生成（周度：由 --no-summary 控制） ——
+    if args.no_summary:
+        print(f"  摘要生成: 已跳过（--no-summary）")
+    else:
+        try:
+            from monitor.summarizer import summarize_items, _load_cache, _save_cache
+            if all_new:
+                summarize_items(all_new, max_per_run=60)
+            cache = _load_cache()
+            all_db = load_json(ITEMS_DB, [])
+            all_db.sort(key=lambda r: r.get("first_seen", ""), reverse=True)
+            missing = [it for it in all_db if it.get("uid") not in cache]
+            if missing:
+                print(f"    补摘要: items.json 中 {len(missing)} 条无缓存，将逐步生成")
+                from monitor.base import Item
+                pending = []
+                for d in missing[:40]:
+                    try:
+                        pending.append(Item(**{k: v for k, v in d.items()
+                                               if k in ("company", "category", "source", "title",
+                                                        "url", "date", "detail", "tier", "uid")}))
+                    except Exception:
+                        continue
+                if pending:
+                    summarize_items(pending, max_per_run=40)
+        except Exception as e:
+            print(f"  摘要生成跳过: {e}")
 
     out_path = site.generate(SETTINGS, subjects=MONITORING_SUBJECTS)
     print(f"\n站点已生成: {out_path}")
@@ -280,6 +280,7 @@ def main():
     p.add_argument("--no-email", action="store_true", help="本次不发送邮件")
     p.add_argument("--only", default=None, help="仅运行名称包含该关键词的公司")
     p.add_argument("--all", action="store_true", help="强制全量扫描（忽略常规对象的降频，手动全扫时用）")
+    p.add_argument("--no-summary", action="store_true", help="跳过 DeepSeek 摘要生成（日常运行推荐）")
     args = p.parse_args()
     try:
         run(args)

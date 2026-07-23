@@ -1,11 +1,13 @@
 name: competitor-monitor
 
-# 每天 UTC 01:17（≈ 北京时间 09:17）自动运行。
+# 每天 UTC 01:17（≈ 北京时间 09:17）自动运行（跳过摘要，节约 API 成本）。
+# 每周一 UTC 01:47（≈ 北京时间 09:47）运行一次含摘要生成的完整扫描。
 # 注意：故意避开整点(:00) —— GitHub 定时任务在整点最拥堵、经常被延迟甚至丢弃，错开几分钟更可靠。
 # 也可在 Actions 页面手动触发（可勾选 full_sweep 强制全量扫描）。
 on:
   schedule:
-    - cron: "17 1 * * *"
+    - cron: "17 1 * * *"    # 每日（跳过摘要）
+    - cron: "47 1 * * 1"   # 每周一早 09:47（含摘要）
   workflow_dispatch:
     inputs:
       full_sweep:
@@ -38,19 +40,25 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run crawler
-        # 手动触发且勾选 full_sweep 时加 --all 全量扫描；定时运行按各档频率执行。
-        # 邮件开关由 config.py 的 email.enabled 决定；SMTP 账号密码从仓库 Secrets 注入（未配置则自动跳过发送）。
+        # 周一 → 含摘要生成；周二至周日 → 跳过摘要（--no-summary）
+        # 手动触发且勾选 full_sweep 时加 --all 全量扫描。
+        # 邮件开关由 config.py 的 email.enabled 决定；SMTP 账号密码从仓库 Secrets 注入。
         env:
           MONITOR_SMTP_USER: ${{ secrets.MONITOR_SMTP_USER }}
           MONITOR_SMTP_PASS: ${{ secrets.MONITOR_SMTP_PASS }}
           MONITOR_MAIL_TO: ${{ secrets.MONITOR_MAIL_TO }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         run: |
+          FULL=""
           if [ "${{ github.event.inputs.full_sweep }}" = "true" ]; then
-            python run.py --all
-          else
-            python run.py
+            FULL="--all"
           fi
+          # 周一生成摘要，其他日子跳过
+          SUMMARY_FLAG="--no-summary"
+          if [ "$(date +%u)" = "1" ]; then
+            SUMMARY_FLAG=""
+          fi
+          python run.py $FULL $SUMMARY_FLAG
 
       - name: Commit state snapshot
         run: |
