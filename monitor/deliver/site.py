@@ -14,6 +14,17 @@ from datetime import datetime, timezone, timedelta
 
 import requests
 
+# DeepSeek 懒加载（仅 api_key 存在时 import）
+_DS_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "").strip()
+if _DS_API_KEY:
+    try:
+        from openai import OpenAI
+        _DS_CLIENT = OpenAI(api_key=_DS_API_KEY, base_url="https://api.deepseek.com")
+    except Exception:
+        _DS_CLIENT = None
+else:
+    _DS_CLIENT = None
+
 from ..base import ITEMS_DB, RUN_LOG, load_json, save_json
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -60,7 +71,7 @@ def _similar_to_title(text, title, threshold=0.85):
     return clean_text.startswith(clean_title[:min(len(clean_title), len(clean_text))])
 
 def _generate_summary(item):
-    """为单条 item 生成摘要文本。不抛异常。"""
+    """为单条 item 生成摘要文本。优先 DeepSeek，失败则提取式兜底。"""
     src = item.get("source", "")
     title = item.get("title", "")
     detail = item.get("detail", "")
@@ -78,16 +89,54 @@ def _generate_summary(item):
     if src == "sec":
         return None
 
-    # pubmed/web/rss: 抓取网页提取
-    text = _try_fetch_extract(url, title)
-    if text and not _is_garbage(text) and not _similar_to_title(text, title):
-        return _truncate(text)
+    # pubmed/web/rss: 提取正文
+    full_text = _try_fetch_extract(url, title) or _deep_extract(url) or ""
+    if full_text and (_is_garbage(full_text) or _similar_to_title(full_text, title)):
+        full_text = ""  # 无效内容跳过
 
-    # 垃圾文本/标题重复 → 尝试更深层提取
-    text2 = _deep_extract(url)
-    if text2 and not _is_garbage(text2) and not _similar_to_title(text2, title):
-        return _truncate(text2)
+    # —— DeepSeek 路径 ——
+    if _DS_CLIENT and (full_text or title):
+        result = _ds_summarize(full_text, title, item.get("company", ""), src)
+        if result:
+            return result
+
+    # —— 提取式兜底 ——
+    if full_text:
+        return _truncate(full_text)
     return None
+
+_DS_SYSTEM = (
+    "你是生物医药竞争情报分析师。用1-2句中文总结信息核心内容。"
+    "临床数据必须体现关键数字（ORR、CR、PFS、OS、安全性、入组人数等）。"
+    "监管/审批必须体现机构、适应症。合作/交易必须体现金额。"
+    "只输出摘要本身，不加前缀、引号或标记。≤180字。"
+)
+
+def _ds_summarize(body_text, title, company, source):
+    """调用 DeepSeek 生成摘要。失败返回 None。"""
+    if not _DS_CLIENT:
+        return None
+    src_label = {"pubmed": "学术论文", "web": "新闻稿", "rss": "新闻稿"}.get(source, "新闻稿")
+    user_text = f"【公司】{company}\n【类型】{src_label}\n【标题】{title}"
+    if body_text:
+        user_text += f"\n【正文】{body_text[:2500]}"
+    try:
+        resp = _DS_CLIENT.chat.completions.create(
+            model="deepseek-chat",
+            messages=[
+                {"role": "system", "content": _DS_SYSTEM},
+                {"role": "user", "content": user_text},
+            ],
+            temperature=0.3, max_tokens=300,
+        )
+        summary = resp.choices[0].message.content.strip()
+        summary = re.sub(r'''^["'\u201c\u2018]|["'\u201d\u2019]$''', '', summary)
+        summary = re.sub(r'^(摘要[：:]?\s*)', '', summary)
+        if len(summary) > 200:
+            summary = summary[:200]
+        return summary if summary else None
+    except Exception:
+        return None
 
 def _extract_drug_hint(title):
     """从临床试验标题中提取药品名和适应症简短提示。
