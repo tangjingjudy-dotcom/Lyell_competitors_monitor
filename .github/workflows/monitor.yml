@@ -44,6 +44,7 @@ jobs:
           MONITOR_SMTP_USER: ${{ secrets.MONITOR_SMTP_USER }}
           MONITOR_SMTP_PASS: ${{ secrets.MONITOR_SMTP_PASS }}
           MONITOR_MAIL_TO: ${{ secrets.MONITOR_MAIL_TO }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         run: |
           if [ "${{ github.event.inputs.full_sweep }}" = "true" ]; then
             python run.py --all
