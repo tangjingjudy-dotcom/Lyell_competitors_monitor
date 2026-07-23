@@ -586,5 +586,47 @@
         "raw": 240
       }
     }
+  },
+  {
+    "timestamp": "2026-07-23T03:29:05.340232+00:00",
+    "duration_sec": 133.8,
+    "companies": 36,
+    "skipped_cadence": 0,
+    "first_run": false,
+    "kept_new": 1,
+    "priority_new": 1,
+    "filtered_noise": 0,
+    "sources": {
+      "clinicaltrials": {
+        "ok": 36,
+        "error": 0,
+        "raw": 36
+      },
+      "sec_ticker_map": {
+        "ok": 1,
+        "error": 0,
+        "raw": 10419
+      },
+      "sec": {
+        "ok": 23,
+        "error": 0,
+        "raw": 690
+      },
+      "pubmed": {
+        "ok": 27,
+        "error": 0,
+        "raw": 115
+      },
+      "rss": {
+        "ok": 11,
+        "error": 0,
+        "raw": 247
+      },
+      "web": {
+        "ok": 14,
+        "error": 0,
+        "raw": 240
+      }
+    }
   }
 ]
