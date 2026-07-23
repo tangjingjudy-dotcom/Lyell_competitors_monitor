@@ -36,17 +36,17 @@ HEALTH_SOURCE_LABELS = {
 STALE_HOURS = 36
 SUMMARY_MAX_LEN = 200
 
-_GARBAGE = ("we use cookies", "this website uses", "we and our ", "click here to",
+_GARBAGE = ("we use cookies", "this website uses", "we and our", "click here to",
             "please enable javascript", "your browser does not support",
-            "comprehensive up-to-date news coverage",  # Google News 通用描述
-            "comprehensive up-to-date news",)
+            "comprehensive up-to-date news", "aggregated from sources all over")
 
 # ─── 摘要生成（内联） ───────────────────────────────────────────
 
 def _is_garbage(text):
-    """过滤 cookie 横幅、Google News 通用描述等无用文本。"""
     t = text.lower().strip()
-    return any(t.startswith(g) for g in _GARBAGE)
+    if not t or len(t) < 15:
+        return True
+    return any(g in t for g in _GARBAGE)
 
 def _similar_to_title(text, title, threshold=0.85):
     """标题和摘要是否过于相似（重复比例>threshold）。"""
@@ -87,17 +87,7 @@ def _generate_summary(item):
     text2 = _deep_extract(url)
     if text2 and not _is_garbage(text2) and not _similar_to_title(text2, title):
         return _truncate(text2)
-
-    # 最终兜底（仅保留有意义的一两句话，避免纯标题重复）
-    return _title_summary(title)
-
-def _title_summary(title):
-    """从标题提取有意义摘要（去 URL 后缀、去重复短语）。"""
-    t = title.strip()
-    t = re.sub(r'\s*[-–|]\s*(Ad-hoc-news|Google News|RSS|PR Newswire|Business Wire).*$', '', t, flags=re.I)
-    if len(t) > 120:
-        t = t[:120]
-    return t
+    return None
 
 def _extract_drug_hint(title):
     """从临床试验标题中提取药品名和适应症简短提示。
