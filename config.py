@@ -680,36 +680,9 @@ COMPANIES = [
 # 看板"路线图"按钮展示为甘特图矩阵（公司×时间轴）。
 ROADMAP = [
     {
-        "company": "Lyell Immunopharma",
-        "date": "2026-09",
-        "event": "ronde-cel PiNACLE Phase 2 数据锁定/更新",
-        "category": "临床数据",
-        "product": "ronde-cel",
-        "confidence": "预计",
-        "note": "为 pre-BLA 及 PiNACLE-H2H 中期分析做准备"
-    },
-    {
-        "company": "Lyell Immunopharma",
-        "date": "2026-09",
-        "event": "LYL273 Phase 1 mCRC 剂量扩展队列数据更新",
-        "category": "临床数据",
-        "product": "LYL273",
-        "confidence": "预计",
-        "note": "GUCY2C 靶向 CAR-T；同靶点竞品 IM96 已有 JCO 2024 数据"
-    },
-    {
-        "company": "Lyell Immunopharma",
-        "date": "2026-09",
-        "event": "PiNACLE-H2H 头对头试验中期数据公布预期窗口",
-        "category": "临床数据",
-        "product": "ronde-cel",
-        "confidence": "可能",
-        "note": "vs Yescarta/Breyanzi；2025.2 已启动入组，业界首个头对头 CAR-T 试验"
-    },
-    {
         "company": "北京艺妙神州 (Immunochina)",
-        "date": "2026-09",
-        "event": "IM96 双试验 (NCT05287165/NCT06718738) 扩展数据更新预期",
+        "date": "2026-Q3",
+        "event": "IM96 NCT06718738 数据更新",
         "category": "临床数据",
         "product": "IM96",
         "confidence": "预计",
@@ -717,18 +690,45 @@ ROADMAP = [
     },
     {
         "company": "Lyell Immunopharma",
-        "date": "2026-12",
-        "event": "ASH 2026: ronde-cel / LYL273 摘要提交截止",
-        "category": "学术会议",
-        "product": "ronde-cel / LYL273",
-        "confidence": "确定",
-        "note": "关注 PiNACLE-H2H 中期数据是否有口头报告"
+        "date": "2026-Q4",
+        "event": "ronde-cel PiNACLE Phase 2 数据更新",
+        "category": "临床数据",
+        "product": "ronde-cel",
+        "confidence": "预计",
+        "note": ""
     },
     {
         "company": "Lyell Immunopharma",
-        "date": "2027-Q1",
-        "event": "ronde-cel 与 FDA pre-BLA 会议",
-        "category": "监管进展",
+        "date": "2026-Q4",
+        "event": "LYL273 Phase 1 mCRC DL3剂量数据更新",
+        "category": "临床数据",
+        "product": "LYL273",
+        "confidence": "预计",
+        "note": ""
+    },
+    {
+        "company": "Lyell Immunopharma",
+        "date": "2026-Q4",
+        "event": "PiNACLE-H2H 头对头试验3期进展公布",
+        "category": "临床数据",
+        "product": "ronde-cel",
+        "confidence": "预计",
+        "note": "vs Yescarta/Breyanzi；2025.2 已启动入组，业界首个头对头 CAR-T 试验"
+    },
+        {
+        "company": "Lyell Immunopharma",
+        "date": "2027-Q2",
+        "event": "LYL273关键性/注册性试验启动",
+        "category": "临床数据",
+        "product": "ronde-cel",
+        "confidence": "预计",
+        "note": ""
+    },
+    {
+        "company": "Lyell Immunopharma",
+        "date": "2027-Q2",
+        "event": "ronde-cel PiNACLE 关键性试验数据读出",
+        "category": "临床数据",
         "product": "ronde-cel",
         "confidence": "预计",
         "note": "取决于 PiNACLE 数据是否支持加速批准路径"
@@ -745,11 +745,11 @@ ROADMAP = [
     {
         "company": "Gilead (含Arcellx/Kite)",
         "date": "2027-H2",
-        "event": "KITE-753 vs axi-cel 随机对照中期/关键数据读出预期",
+        "event": "KITE-753 vs axi-cel 随机对照中期/关键数据读出",
         "category": "临床数据",
         "product": "KITE-753",
         "confidence": "可能",
-        "note": "若数据积极，Kite 在位者优势将直接威胁 ronde-cel"
+        "note": "若数据积极，Kite 将直接威胁 ronde-cel"
     },
     {
         "company": "Lyell Immunopharma",
