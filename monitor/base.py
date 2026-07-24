@@ -158,8 +158,6 @@ def is_milestone(item, cfg, relaxed=False, diversified=False, product_keywords=N
         return any(f.lower() in blob.lower() for f in forms)
 
     if relaxed:
-        if item.source == "pubmed":
-            return True
         if not diversified:
             return True
 

@@ -20,7 +20,7 @@ from monitor.base import (
     Http, StateStore, RunStats, diff_new, merge_into_items_db, is_milestone,
     append_run_log, load_json, save_json, META_FILE, now_iso,
 )
-from monitor.sources import sec_edgar, pubmed, webwatch
+from monitor.sources import sec_edgar, webwatch
 from monitor.deliver import site, email_digest
 
 
@@ -75,9 +75,6 @@ def run(args):
 
         sec_items = sec_edgar.fetch(http, c, SETTINGS["sec_recent_count"], stats=stats)
         collected.append((f"{c['name']}:sec", sec_items))
-
-        pm_items = pubmed.fetch(http, c, SETTINGS["pubmed_retmax"], stats=stats)
-        collected.append((f"{c['name']}:pubmed", pm_items))
 
         rss_items = webwatch.fetch_rss(http, c, stats=stats)
         collected.append((f"{c['name']}:rss", rss_items))

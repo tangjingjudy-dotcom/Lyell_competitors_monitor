@@ -6,7 +6,6 @@
   - sec_ticker : 美股代码（用于 SEC EDGAR 申报监控，自动映射到 CIK）
   - rss        : RSS/Atom 订阅地址列表（最稳，优先使用）
   - news_pages : 需要监控的新闻/IR 页面 URL 列表（无 RSS 时，做"链接集合差异"检测）
-  - pubmed     : PubMed 检索关键词列表（监控新发表论文）
 
 分类 category 仅用于站点分组展示。
 """
@@ -17,13 +16,13 @@ _SMTP_USER = os.environ.get("MONITOR_SMTP_USER", "")
 _SMTP_PASS = os.environ.get("MONITOR_SMTP_PASS", "")
 _MAIL_TO = os.environ.get("MONITOR_MAIL_TO", _SMTP_USER)
 
+
 # —— 全局设置 ——
 SETTINGS = {
     "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
     "request_timeout": 25,
     "request_delay_sec": 0.8,
     "sec_recent_count": 30,
-    "pubmed_retmax": 15,
     "email": {
         "enabled": False,
         "smtp_host": "smtp.gmail.com",
@@ -250,14 +249,6 @@ COMPANIES = [
         "sec_ticker": "LYEL",
         "rss": [
             "https://ir.lyell.com/rss/news-releases.xml"
-        ],
-        "pubmed": [
-            "Lyell Immunopharma",
-            "rondecabtagene",
-            "ronde-cel",
-            "LYL314",
-            "LYL273",
-            "LYL119"
         ]
     },
     {
@@ -266,9 +257,6 @@ COMPANIES = [
         "sec_ticker": "ALLO",
         "rss": [
             "https://ir.allogene.com/rss/news-releases.xml"
-        ],
-        "pubmed": [
-            "Allogene cema-cel"
         ],
         "product_keywords": [
             "cema-cel",
@@ -282,9 +270,6 @@ COMPANIES = [
         "sec_ticker": "CRBU",
         "rss": [
             "https://news.google.com/rss/search?q=%22Caribou+Biosciences%22+car-t&hl=en-US&gl=US&ceid=US:en"
-        ],
-        "pubmed": [
-            "Caribou CB-010 vispa-cel"
         ],
         "product_keywords": [
             "cb-010",
@@ -429,10 +414,6 @@ COMPANIES = [
     {
         "name": "Adaptimmune Therapeutics",
         "category": "实体瘤CAR-T/TCR-T",
-        "pubmed": [
-            "afami-cel Tecelra",
-            "Adaptimmune TCR"
-        ],
         "product_keywords": [
             "afami-cel",
             "tecelra",
@@ -553,11 +534,6 @@ COMPANIES = [
         "news_pages": [
             "https://www.miltenyibiomedicine.com/news-events/press-releases"
         ],
-        "pubmed": [
-            "zamtocabtagene",
-            "zamto-cel",
-            "MB-CART2019.1"
-        ],
         "product_keywords": [
             "zamto-cel",
             "zamtocabtagene",
@@ -570,10 +546,6 @@ COMPANIES = [
         "tier": "priority",
         "rss": [
             "https://news.google.com/rss/search?q=CARsgen+Therapeutics+car-t&hl=en-US&gl=US&ceid=US:en"
-        ],
-        "pubmed": [
-            "CARsgen satricabtagene",
-            "satri-cel CT041"
         ],
         "product_keywords": [
             "satri-cel",
@@ -589,10 +561,6 @@ COMPANIES = [
         "news_pages": [
             "https://www.ictbio.com/news/"
         ],
-        "pubmed": [
-            "GCC19CART",
-            "GCC CAR-T colorectal"
-        ],
         "product_keywords": [
             "gcc19cart",
             "gcc",
@@ -606,10 +574,6 @@ COMPANIES = [
         "news_pages": [
             "http://www.immunochina.com/en/index.php/home/news/news_1.html"
         ],
-        "pubmed": [
-            "IM96 CAR-T colorectal",
-            "GUCY2C CAR-T"
-        ],
         "product_keywords": [
             "im96",
             "gucy2c"
@@ -621,9 +585,6 @@ COMPANIES = [
         "news_pages": [
             "https://www.chimerictherapeutics.com/investor"
         ],
-        "pubmed": [
-            "CHM-2101 CDH17"
-        ],
         "product_keywords": [
             "chm-2101",
             "cdh17"
@@ -634,9 +595,6 @@ COMPANIES = [
         "category": "LYL273竞品(mCRC)",
         "news_pages": [
             "https://www.carinabiotech.com/news/"
-        ],
-        "pubmed": [
-            "CNA3103 LGR5 CAR-T"
         ],
         "product_keywords": [
             "cna3103",
@@ -651,10 +609,6 @@ COMPANIES = [
         "rss": [
             "https://news.google.com/rss/search?q=%22Merck+KGaA%22+ADC+cancer+colorectal&hl=en-US&gl=US&ceid=US:en"
         ],
-        "pubmed": [
-            "precemtabart tocentecan",
-            "M9140 CEACAM5"
-        ],
         "product_keywords": [
             "precemtabart",
             "m9140",
@@ -666,9 +620,6 @@ COMPANIES = [
         "name": "Sanofi",
         "category": "LYL273竞品(mCRC)",
         "sec_ticker": "SNY",
-        "pubmed": [
-            "tusamitamab CEACAM5"
-        ],
         "product_keywords": [
             "tusamitamab",
             "ceacam5"
@@ -678,9 +629,6 @@ COMPANIES = [
         "name": "Pfizer",
         "category": "LYL273竞品(mCRC) / 10-K列示",
         "sec_ticker": "PFE",
-        "pubmed": [
-            "tusamitamab CEACAM5"
-        ],
         "product_keywords": [
             "tusamitamab",
             "ceacam5"
@@ -690,9 +638,6 @@ COMPANIES = [
         "name": "AstraZeneca (含EsoBiotec)",
         "category": "10-K潜在竞品",
         "sec_ticker": "AZN",
-        "pubmed": [
-            "in vivo CAR-T ENaBL"
-        ],
         "product_keywords": [
             "enabl",
             "esobiotec",
@@ -713,9 +658,6 @@ COMPANIES = [
         "category": "10-K潜在竞品",
         "news_pages": [
             "https://www.akesobio.com/en/media/akeso-news/"
-        ],
-        "pubmed": [
-            "Akeso ivonescimab"
         ],
         "product_keywords": [
             "ivonescimab",
