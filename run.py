@@ -20,7 +20,7 @@ from monitor.base import (
     Http, StateStore, RunStats, diff_new, merge_into_items_db, is_milestone,
     append_run_log, load_json, save_json, META_FILE, now_iso,
 )
-from monitor.sources import clinicaltrials, sec_edgar, pubmed, webwatch
+from monitor.sources import sec_edgar, pubmed, webwatch
 from monitor.deliver import site, email_digest
 
 
@@ -72,11 +72,6 @@ def run(args):
         tag = "★重点" if tier == "priority" else ""
         print(f"[{c['name']}]{tag}")
         collected = []
-
-        ct_items = clinicaltrials.fetch(http, c, SETTINGS["clinicaltrials_page_size"],
-                                        max_age_days=SETTINGS["clinicaltrials_max_age_days"] if c.get("ct_keywords") else None,
-                                        stats=stats)
-        collected.append((f"{c['name']}:ct", ct_items))
 
         sec_items = sec_edgar.fetch(http, c, SETTINGS["sec_recent_count"], stats=stats)
         collected.append((f"{c['name']}:sec", sec_items))
@@ -136,9 +131,6 @@ def run(args):
         return
 
     merge_into_items_db(all_new)
-    cleaned_ct = _clean_stale_ct_items(companies)
-    if cleaned_ct:
-        print(f"  已从 items.json 移除 {cleaned_ct} 条过期临床试验（当前 ct_keywords 规则下不再保留）")
     cleaned_age = _clean_expired_items()
     if cleaned_age:
         print(f"  已从 items.json 移除 {cleaned_age} 条超过{_get_site_max_age()}天的旧条目")
@@ -154,65 +146,6 @@ def run(args):
         # 邮件只推送“重点监控对象”的新增，避免常规对象刷屏
         ok, info = email_digest.send_digest(SETTINGS["email"], priority_new, args.site_url)
         print(f"邮件（仅重点对象 {len(priority_new)} 条）: {'已发送' if ok else '未发送'} ({info})")
-
-
-def _clean_stale_ct_items(companies):
-    """将 items.json 中已被当前 ct_keywords/时间窗口 规则过滤掉的条目删除。
-
-    两次检查：
-    1. 关键词：有 ct_keywords 的公司，标题不匹配 → 删除
-    2. 时间窗口：有 ct_keywords 的公司，detail 中的更新时间超过 max_age → 删除
-
-    不检查 source != "clinicaltrials" 的条目；不检查无 ct_keywords 的公司（如 Lyell）。
-    """
-    from monitor.base import ITEMS_DB, load_json, save_json
-    from datetime import datetime, timezone
-
-    ctk_map = {}
-    for c in companies:
-        kw = c.get("ct_keywords")
-        if kw:
-            ctk_map[c["name"]] = kw
-
-    if not ctk_map:
-        return 0
-
-    max_age = SETTINGS.get("clinicaltrials_max_age_days", 14)
-    now = datetime.now(timezone.utc)
-    db = load_json(ITEMS_DB, [])
-    keep = []
-    removed = 0
-    for row in db:
-        if row.get("source") != "clinicaltrials":
-            keep.append(row)
-            continue
-        kwlist = ctk_map.get(row.get("company", ""))
-        if kwlist is None:
-            keep.append(row)
-            continue
-
-        title = (row.get("title", "") or "").lower()
-        if not any(kw.lower() in title for kw in kwlist):
-            removed += 1
-            continue
-
-        # 时间窗口检查：从 detail 字段提取 更新: YYYY-MM-DD
-        detail = row.get("detail", "") or ""
-        import re
-        m = re.search(r'更新:\s*(\d{4}-\d{2}-\d{2})', detail)
-        if m:
-            try:
-                td = now - datetime.strptime(m.group(1), "%Y-%m-%d").replace(tzinfo=timezone.utc)
-                if td.days > max_age:
-                    removed += 1
-                    continue
-            except (ValueError, TypeError):
-                pass
-        keep.append(row)
-
-    if removed:
-        save_json(ITEMS_DB, keep)
-    return removed
 
 
 def _get_site_max_age():

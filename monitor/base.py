@@ -152,9 +152,6 @@ def is_milestone(item, cfg, relaxed=False, diversified=False, product_keywords=N
         return True
 
     # ——— 第4层：来源特定规则 ———
-    if item.source == "clinicaltrials":
-        return cfg.get("always_keep_clinicaltrials", True)
-
     if item.source == "sec":
         forms = cfg.get("meaningful_sec_forms") or []
         blob = f"{item.detail} {item.title}"
