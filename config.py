@@ -337,14 +337,8 @@ COMPANIES = [
             "https://www.gilead.com/news/news-details"
         ],
         "product_keywords": [
-            "yescarta",
-            "axi-cel",
-            "tecartus",
-            "brexu-cel",
-            "anito-cel",
             "kite-363",
-            "kite-753",
-            "arcellx"
+            "kite-753"
         ]
     },
     {
