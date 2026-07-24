@@ -735,7 +735,7 @@ ROADMAP = [
     },
     {
         "company": "Miltenyi Biomedicine (zamto-cel)",
-        "date": "2027-Q2",
+        "date": "2027-H1",
         "event": "EMA 审评决定预期 (MAA)",
         "category": "监管进展",
         "product": "zamto-cel",
