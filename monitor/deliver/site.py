@@ -713,13 +713,21 @@ window.open(rp.md_url,'_blank');
 // ── Roadmap Gantt ──
 var ROADMAP=[];
 fetch('roadmap.json').then(function(r){{return r.json()}}).then(function(data){{ROADMAP=data;}}).catch(function(){{}});
-var COLS=['2026-07','2026-08','2026-09','2026-Q4','2027-Q1','2027-Q2','2027-H2'];
+var COLS=['2025','2026-Q1','2026-Q2','2026-Q3','2026-Q4','2027-H1','2027-H2','2028'];
 function _colIdx(d){{
-var m=d.substring(5);
-if(m==='07')return 0;if(m==='08')return 1;if(m==='09')return 2;
-if(m==='Q4'||m==='10'||m==='11'||m==='12')return 3;
-if(m==='Q1')return 4;if(m==='Q2')return 5;
-if(m==='H2')return 6;
+var y=parseInt(d.substring(0,4)),m=d.substring(5);
+if(y===2025)return 0;
+if(y===2026){{
+  if(m==='01'||m==='Q1')return 1;
+  if(m==='04'||m==='05'||m==='06'||m==='Q2')return 2;
+  if(m==='07'||m==='08'||m==='09'||m==='Q3')return 3;
+  if(m==='Q4'||m==='10'||m==='11'||m==='12')return 4;
+}}
+if(y===2027){{
+  if(m==='Q1'||m==='H1'||m==='01'||m==='02'||m==='03')return 5;
+  if(m==='Q2'||m==='H2'||m==='04'||m==='05'||m==='06'||m==='07'||m==='08'||m==='09'||m==='10'||m==='11'||m==='12')return 6;
+}}
+if(y>=2028)return 7;
 return -1;
 }}
 function buildTimeline(sid){{

@@ -672,30 +672,30 @@ COMPANIES = [
 # ═══════════════════════════════════════════════════════
 # 竞争路线图（Competitive Roadmap）
 # ═══════════════════════════════════════════════════════
-# 手动维护优先监控对象的关键里程碑时间节点。
-# 重点对象（5家）：Lyell / zamto-cel / Kite / IM96 / M9140
-# 每个条目：company(需匹配COMPANIES)、date(YYYY-MM/YYYY-QX/YYYY-HX)、
-#           event、category(临床数据/监管进展/学术会议/商业化)、
+# 基于实际试验时间线手动维护。
+# 重点对象（5家）：Lyell/ronde-cel+LYL273 / zamto-cel / KITE-753 / M9140 / IM96
+# 每个条目：company(需匹配COMPANIES)、date(YYYY-MM / YYYY-QX / YYYY-HX)、
+#           event、category(临床数据/监管进展/学术会议)、
 #           product、confidence(确定/预计/可能/乐观预计)、note
 # 看板"路线图"按钮展示为甘特图矩阵（公司×时间轴）。
 ROADMAP = [
     {
-        "company": "Lyell Immunopharma",
-        "date": "2026-09",
-        "event": "ronde-cel PiNACLE Phase 2 最终数据整理/锁定",
-        "category": "临床数据",
-        "product": "ronde-cel",
-        "confidence": "预计",
-        "note": "为 pre-BLA 及 H2H 试验中期分析做准备"
+        "company": "Gilead (含Arcellx/Kite)",
+        "date": "2025-12",
+        "event": "ASH 2025: KITE-753/363 下一代双顺反子 CAR-T Phase 1 数据公布",
+        "category": "学术会议",
+        "product": "KITE-753 / KITE-363",
+        "confidence": "确定",
+        "note": "双靶点 CD19/CD20，初步结果显示 encouraging；与 ronde-cel 同靶点策略"
     },
     {
         "company": "Lyell Immunopharma",
         "date": "2026-09",
-        "event": "ronde-cel PiNACLE-H2H 头对头试验中期数据公布预期窗口",
+        "event": "ronde-cel PiNACLE Phase 2 数据锁定/更新",
         "category": "临床数据",
         "product": "ronde-cel",
-        "confidence": "可能",
-        "note": "对比 Yescarta/Breyanzi；2025.2 已启动入组，业界首个头对头 CAR-T 试验"
+        "confidence": "预计",
+        "note": "为 pre-BLA 及 PiNACLE-H2H 中期分析做准备"
     },
     {
         "company": "Lyell Immunopharma",
@@ -704,43 +704,61 @@ ROADMAP = [
         "category": "临床数据",
         "product": "LYL273",
         "confidence": "预计",
-        "note": "GUCY2C 靶向，前期已显示初步疗效信号"
+        "note": "GUCY2C 靶向 CAR-T；同靶点竞品 IM96 已有 JCO 2024 数据"
     },
     {
-        "company": "Miltenyi Biomedicine (zamto-cel)",
-        "date": "2026-07",
-        "event": "zamto-cel DALY 2-EU 随机对照 III 期入组进度更新",
+        "company": "Lyell Immunopharma",
+        "date": "2026-09",
+        "event": "PiNACLE-H2H 头对头试验中期数据公布预期窗口",
         "category": "临床数据",
-        "product": "zamto-cel",
-        "confidence": "预计",
-        "note": "CD19/CD20 双靶点 vs 化疗；ronde-cel 最直接竞品"
-    },
-    {
-        "company": "Gilead (含Arcellx/Kite)",
-        "date": "2027-Q1",
-        "event": "KITE-363 (CD19/CD20 双靶点) Phase 1 首次数据披露",
-        "category": "临床数据",
-        "product": "KITE-363",
-        "confidence": "预计",
-        "note": "与 ronde-cel 同靶点策略；KITE-753 双靶点管线同步跟踪"
+        "product": "ronde-cel",
+        "confidence": "可能",
+        "note": "vs Yescarta/Breyanzi；2025.2 已启动入组，业界首个头对头 CAR-T 试验"
     },
     {
         "company": "Merck KGaA (M9140)",
-        "date": "2026-09",
-        "event": "M9140 CEACAM5 ADC 结直肠癌扩展队列 Phase 1b 数据",
+        "date": "2026-01",
+        "event": "M9140 PROCEADE-CRC-03 全球 3 期首例患者入组",
         "category": "临床数据",
-        "product": "M9140",
-        "confidence": "预计",
-        "note": "mCRC 跨模态关键威胁，LYL273 直接竞品"
+        "product": "M9140 (precemtabart tocentecan)",
+        "confidence": "确定",
+        "note": "CEACAM5 ADC ± 贝伐珠单抗 vs TAS-102+贝伐珠单抗；mCRC 跨模态最大威胁，已进入 3 期"
+    },
+    {
+        "company": "Miltenyi Biomedicine (zamto-cel)",
+        "date": "2026-01",
+        "event": "ASH 发表 DALY 2-EU 关键性试验主要分析",
+        "category": "学术会议",
+        "product": "zamto-cel",
+        "confidence": "确定",
+        "note": "2L R/R LBCL，vs 化疗；ronde-cel 最直接竞品"
+    },
+    {
+        "company": "Miltenyi Biomedicine (zamto-cel)",
+        "date": "2026-01",
+        "event": "向 EMA 提交 zamto-cel 上市许可申请 (MAA)",
+        "category": "监管进展",
+        "product": "zamto-cel",
+        "confidence": "确定",
+        "note": "基于 DALY 2-EU 结果；预计 2027 审评决定"
+    },
+    {
+        "company": "Gilead (含Arcellx/Kite)",
+        "date": "2026-01",
+        "event": "KITE-753 随机对照试验 (NCT07479797) 入组进行中",
+        "category": "临床数据",
+        "product": "KITE-753",
+        "confidence": "确定",
+        "note": "KITE-753 vs axi-cel (Yescarta)，R/R LBCL 1L 治疗后"
     },
     {
         "company": "北京艺妙神州 (Immunochina)",
         "date": "2026-09",
-        "event": "IM96 Phase 1/2 mCRC 扩展队列更新数据",
+        "event": "IM96 双试验 (NCT05287165/NCT06718738) 扩展数据更新预期",
         "category": "临床数据",
         "product": "IM96",
         "confidence": "预计",
-        "note": "GUCY2C 靶点，JCO 2024 已报 20 例爬坡数据；LYL273 最直接竞品"
+        "note": "GUCY2C CAR-T；JCO 2024 已有 20 例爬坡 ORR 26.3%/DL3 40%；LYL273 同靶点唯一竞品"
     },
     {
         "company": "Lyell Immunopharma",
@@ -749,7 +767,7 @@ ROADMAP = [
         "category": "学术会议",
         "product": "ronde-cel / LYL273",
         "confidence": "确定",
-        "note": "关注是否有 PiNACLE-H2H 中期数据口头报告"
+        "note": "关注 PiNACLE-H2H 中期数据是否有口头报告"
     },
     {
         "company": "Lyell Immunopharma",
@@ -763,20 +781,20 @@ ROADMAP = [
     {
         "company": "Miltenyi Biomedicine (zamto-cel)",
         "date": "2027-Q2",
-        "event": "zamto-cel DALY 2-EU III 期 中期分析/主要终点读出",
-        "category": "临床数据",
+        "event": "EMA 审评决定预期 (MAA)",
+        "category": "监管进展",
         "product": "zamto-cel",
         "confidence": "预计",
-        "note": "若数据积极，可能触发 EMA 提交"
+        "note": "若获批，将成为 ronde-cel 上市前已存在的同赛道竞品"
     },
     {
-        "company": "Merck KGaA (M9140)",
-        "date": "2027-Q2",
-        "event": "M9140 Phase 2 结直肠癌关键性队列启动",
+        "company": "Gilead (含Arcellx/Kite)",
+        "date": "2027-H2",
+        "event": "KITE-753 vs axi-cel 随机对照中期/关键数据读出预期",
         "category": "临床数据",
-        "product": "M9140",
+        "product": "KITE-753",
         "confidence": "可能",
-        "note": "取决于 Phase 1b 数据读出"
+        "note": "若数据积极，Kite 在位者优势将直接威胁 ronde-cel"
     },
     {
         "company": "Lyell Immunopharma",
@@ -786,5 +804,14 @@ ROADMAP = [
         "product": "ronde-cel",
         "confidence": "乐观预计",
         "note": "最早上市时间窗口"
+    },
+    {
+        "company": "Merck KGaA (M9140)",
+        "date": "2028-H2",
+        "event": "M9140 PROCEADE-CRC-03 3 期关键数据读出预期",
+        "category": "临床数据",
+        "product": "M9140",
+        "confidence": "可能",
+        "note": "若积极，ADC 可能在 LYL273 之前获批 mCRC 后线"
     }
 ]
