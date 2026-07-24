@@ -394,6 +394,19 @@ def generate(settings, subjects=None):
     # subjects.json / js
     with open(os.path.join(out_dir, "subjects.json"), "w", encoding="utf-8") as f:
         json.dump(subjects, f, ensure_ascii=False, indent=2)
+
+    # roadmap.json
+    try:
+        import importlib.util as _iu
+        spec = _iu.spec_from_file_location("config", os.path.join(ROOT, "config.py"))
+        cfg_mod = _iu.module_from_spec(spec)
+        spec.loader.exec_module(cfg_mod)
+        roadmap = getattr(cfg_mod, "ROADMAP", [])
+    except Exception:
+        roadmap = []
+    with open(os.path.join(out_dir, "roadmap.json"), "w", encoding="utf-8") as f:
+        json.dump(roadmap, f, ensure_ascii=False, indent=2)
+
     js_subjects = "var SUBJECTS = " + json.dumps(subjects, ensure_ascii=False) + ";"
 
     # report pages
@@ -491,6 +504,7 @@ def generate(settings, subjects=None):
 
     btns = ('<div class="action-bar"><button id="btn-preview" class="btn">📋 预览摘要</button>'
             '<button id="btn-download" class="btn btn-outline">📥 下载日报</button>'
+            '<button id="btn-roadmap" class="btn btn-outline">📅 路线图</button>'
             '<span id="active-subj-label" class="active-subj-label"></span></div>')
 
     health = _build_health_panel()
@@ -587,6 +601,24 @@ table.mini th{{background:#f2f4f7;color:var(--navy)}}.health-err-cell{{color:var
 .modal.show{{display:flex}}.modal-content{{background:#fff;border-radius:10px;max-width:800px;width:90%;max-height:80vh;overflow-y:auto;padding:24px;box-shadow:0 8px 30px rgba(0,0,0,.15)}}
 .modal-close{{float:right;font-size:20px;cursor:pointer;color:var(--gray);border:none;background:none}}
 @media(max-width:768px){{#sidebar{{width:200px}}#main{{margin-left:200px}}header{{flex-direction:column;gap:6px}}}}
+/* Roadmap Timeline */
+.timeline{{position:relative;padding-left:28px;margin:0}}
+.timeline::before{{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--border)}}
+.tl-group{{margin-bottom:20px}}
+.tl-group-label{{font-size:13px;font-weight:700;color:var(--navy);margin:0 0 10px -28px;padding:4px 0 4px 28px;background:#f0f3f7;border-radius:4px}}
+.tl-item{{position:relative;margin-bottom:14px;padding-left:16px}}
+.tl-item::before{{content:'';position:absolute;left:-22px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--navy);border:2px solid #fff;box-shadow:0 0 0 2px var(--navy)}}
+.tl-item.cat-监管进展::before{{background:var(--red);box-shadow:0 0 0 2px var(--red)}}
+.tl-item.cat-学术会议::before{{background:var(--blue);box-shadow:0 0 0 2px var(--blue)}}
+.tl-item.cat-商业化::before{{background:var(--gold);box-shadow:0 0 0 2px var(--gold)}}
+.tl-date{{font-size:11px;color:var(--gray);font-weight:600}}
+.tl-co{{font-size:12px;font-weight:600;color:var(--navy)}}
+.tl-prod{{font-size:10.5px;background:#eef1f5;border-radius:3px;padding:0 5px;margin-left:4px;color:var(--gray)}}
+.tl-event{{font-size:13px;margin:3px 0 2px;line-height:1.5}}
+.tl-note{{font-size:11px;color:var(--gray);font-style:italic}}
+.tl-conf{{font-size:10px;padding:1px 6px;border-radius:3px;margin-left:6px}}
+.tl-conf-预计{{background:#fef3cd;color:#856404}}.tl-conf-确定{{background:#d4edda;color:#155724}}
+.tl-conf-可能{{background:#e2e3e5;color:#383d41}}.tl-conf-乐观预计{{background:#cce5ff;color:#004085}}
 </style></head><body>
 <div id="sidebar"><div class="sb-logo"><h2>竞品监控</h2><p>{generated}</p></div>
 {sidebar_items}
@@ -607,6 +639,10 @@ table.mini th{{background:#f2f4f7;color:var(--navy)}}.health-err-cell{{color:var
 <div class="modal" id="summary-modal"><div class="modal-content">
 <button class="modal-close" onclick="closeModal()">✕</button>
 <div id="modal-body">加载中...</div></div></div>
+<div class="modal" id="roadmap-modal"><div class="modal-content">
+<button class="modal-close" onclick="closeRoadmap()">✕</button>
+<h2 id="roadmap-title" style="margin:0 0 16px;font-size:17px">竞争路线图</h2>
+<div id="roadmap-body">加载中...</div></div></div>
 <script>
 {js_subjects}
 var REPORTS = {report_pages_json};
@@ -669,6 +705,53 @@ document.getElementById('btn-download').addEventListener('click',function(){{
 var rp=REPORTS[activeSid];if(!rp){{alert('暂无该主体的报告');return;}}
 window.open(rp.md_url,'_blank');
 }});
+// ── Roadmap ──
+var ROADMAP=[];
+fetch('roadmap.json').then(function(r){{return r.json()}}).then(function(data){{ROADMAP=data;}}).catch(function(){{}});
+function buildTimeline(sid){{
+var subj=SUBJECTS.find(function(s){{return s.id===sid}});
+if(!subj){{document.getElementById('roadmap-body').innerHTML='<p style="color:var(--gray)">请先选择监控主体</p>';return;}}
+var cos=new Set(subj.companies);
+var items=ROADMAP.filter(function(r){{return cos.has(r.company);}});
+if(!items.length){{document.getElementById('roadmap-body').innerHTML='<p style="color:var(--gray)">该主体暂无路线图数据，请手动在 config.py ROADMAP 中添加关键时间节点。</p>';return;}}
+items.sort(function(a,b){{return a.date<b.date?-1:a.date>b.date?1:0;}});
+var groups={{}},order=[];
+items.forEach(function(it){{
+var label=it.date.substring(0,4);
+var q=it.date.substring(5);
+if(q.indexOf('Q')>=0||q.indexOf('H')>=0)label+=' '+q;
+else if(q.length>=2)label+='-'+q.substring(0,2);
+if(!groups[label]){{groups[label]=[];order.push(label);}}
+groups[label].push(it);
+}});
+var catMap={{'临床数据':'cat-临床数据','监管进展':'cat-监管进展','学术会议':'cat-学术会议','商业化':'cat-商业化'}};
+var html='<div class="timeline">';
+order.forEach(function(g){{
+html+='<div class="tl-group"><div class="tl-group-label">'+g+'</div>';
+groups[g].forEach(function(it){{
+var cat=it.category||'';
+var catCls=catMap[cat]||'';
+html+='<div class="tl-item '+catCls+'">';
+html+='<div class="tl-date">'+it.date+' <span class="tl-conf tl-conf-'+it.confidence.replace(/[^a-zA-Z\\u4e00-\\u9fa5]/g,'')+'">'+it.confidence+'</span></div>';
+html+='<div class="tl-co">'+it.company;
+if(it.product)html+='<span class="tl-prod">'+it.product+'</span>';
+html+='</div>';
+html+='<div class="tl-event">'+it.event+'</div>';
+if(it.note)html+='<div class="tl-note">'+it.note+'</div>';
+html+='</div>';
+}});
+html+='</div>';
+}});
+html+='</div>';
+document.getElementById('roadmap-body').innerHTML=html;
+document.getElementById('roadmap-title').textContent=subj.name+' 竞品路线图';
+}}
+document.getElementById('btn-roadmap').addEventListener('click',function(){{
+buildTimeline(activeSid);
+document.getElementById('roadmap-modal').classList.add('show');
+}});
+function closeRoadmap(){{document.getElementById('roadmap-modal').classList.remove('show');}}
+document.getElementById('roadmap-modal').addEventListener('click',function(e){{if(e.target===this)closeRoadmap();}});
 function closeModal(){{document.getElementById('summary-modal').classList.remove('show');}}
 document.getElementById('summary-modal').addEventListener('click',function(e){{if(e.target===this)closeModal();}});
 </script></body></html>"""
