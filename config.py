@@ -717,7 +717,7 @@ ROADMAP = [
     },
         {
         "company": "Lyell Immunopharma",
-        "date": "2027-Q2",
+        "date": "2027-H1",
         "event": "LYL273关键性/注册性试验启动",
         "category": "临床数据",
         "product": "ronde-cel",
@@ -726,7 +726,7 @@ ROADMAP = [
     },
     {
         "company": "Lyell Immunopharma",
-        "date": "2027-Q2",
+        "date": "2027-H1",
         "event": "ronde-cel PiNACLE 关键性试验数据读出",
         "category": "临床数据",
         "product": "ronde-cel",
