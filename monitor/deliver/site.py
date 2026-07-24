@@ -601,24 +601,28 @@ table.mini th{{background:#f2f4f7;color:var(--navy)}}.health-err-cell{{color:var
 .modal.show{{display:flex}}.modal-content{{background:#fff;border-radius:10px;max-width:800px;width:90%;max-height:80vh;overflow-y:auto;padding:24px;box-shadow:0 8px 30px rgba(0,0,0,.15)}}
 .modal-close{{float:right;font-size:20px;cursor:pointer;color:var(--gray);border:none;background:none}}
 @media(max-width:768px){{#sidebar{{width:200px}}#main{{margin-left:200px}}header{{flex-direction:column;gap:6px}}}}
-/* Roadmap Timeline */
-.timeline{{position:relative;padding-left:28px;margin:0}}
-.timeline::before{{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--border)}}
-.tl-group{{margin-bottom:20px}}
-.tl-group-label{{font-size:13px;font-weight:700;color:var(--navy);margin:0 0 10px -28px;padding:4px 0 4px 28px;background:#f0f3f7;border-radius:4px}}
-.tl-item{{position:relative;margin-bottom:14px;padding-left:16px}}
-.tl-item::before{{content:'';position:absolute;left:-22px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--navy);border:2px solid #fff;box-shadow:0 0 0 2px var(--navy)}}
-.tl-item.cat-监管进展::before{{background:var(--red);box-shadow:0 0 0 2px var(--red)}}
-.tl-item.cat-学术会议::before{{background:var(--blue);box-shadow:0 0 0 2px var(--blue)}}
-.tl-item.cat-商业化::before{{background:var(--gold);box-shadow:0 0 0 2px var(--gold)}}
-.tl-date{{font-size:11px;color:var(--gray);font-weight:600}}
-.tl-co{{font-size:12px;font-weight:600;color:var(--navy)}}
-.tl-prod{{font-size:10.5px;background:#eef1f5;border-radius:3px;padding:0 5px;margin-left:4px;color:var(--gray)}}
-.tl-event{{font-size:13px;margin:3px 0 2px;line-height:1.5}}
-.tl-note{{font-size:11px;color:var(--gray);font-style:italic}}
-.tl-conf{{font-size:10px;padding:1px 6px;border-radius:3px;margin-left:6px}}
-.tl-conf-预计{{background:#fef3cd;color:#856404}}.tl-conf-确定{{background:#d4edda;color:#155724}}
-.tl-conf-可能{{background:#e2e3e5;color:#383d41}}.tl-conf-乐观预计{{background:#cce5ff;color:#004085}}
+/* Roadmap Gantt */
+.rm-gantt{{overflow-x:auto;overflow-y:visible}}
+.rm-table{{border-collapse:collapse;font-size:12px;width:100%;min-width:700px}}
+.rm-table th,.rm-table td{{border:1px solid var(--border);padding:8px 6px;vertical-align:top}}
+.rm-table th{{background:var(--navy);color:#fff;font-size:11px;text-align:center;white-space:nowrap;min-width:80px}}
+.rm-co{{font-weight:700;color:var(--navy);white-space:nowrap;font-size:12px;background:#f8f9fb;position:sticky;left:0;z-index:1;min-width:130px}}
+.rm-ev{{position:relative;padding:4px 5px!important;min-height:60px}}
+.rm-ev-block{{border-radius:6px;padding:5px 7px;margin:2px 0;font-size:11px;line-height:1.4;cursor:default}}
+.rm-ev-block:hover{{filter:brightness(.92)}}
+.rm-ev-title{{font-weight:600}}
+.rm-ev-prod{{font-size:10px;opacity:.8;margin-top:1px}}
+.rm-ev-note{{font-size:9.5px;opacity:.65;margin-top:1px;font-style:italic}}
+.rm-cat-临床数据{{background:#d6e9f8;border-left:3px solid var(--blue);color:#1a3a5c}}
+.rm-cat-监管进展{{background:#fce4e4;border-left:3px solid var(--red);color:#5c1a1a}}
+.rm-cat-学术会议{{background:#d4edda;border-left:3px solid #2d7a3f;color:#1a3a1a}}
+.rm-cat-商业化{{background:#fef3cd;border-left:3px solid var(--gold);color:#5c4a1a}}
+.rm-conf{{font-size:9px;padding:0 4px;border-radius:2px;margin-left:3px;font-weight:600}}
+.rm-cf-预计{{background:#fef3cd;color:#856404}}.rm-cf-确定{{background:#d4edda;color:#155724}}
+.rm-cf-可能{{background:#e8e8e8;color:#555}}.rm-cf-乐观预计{{background:#cce5ff;color:#004085}}
+.rm-legend{{display:flex;gap:14px;margin-bottom:12px;font-size:11px;flex-wrap:wrap}}
+.rm-legend span{{display:flex;align-items:center;gap:4px}}
+.rm-dot{{width:10px;height:10px;border-radius:2px;display:inline-block}}
 </style></head><body>
 <div id="sidebar"><div class="sb-logo"><h2>竞品监控</h2><p>{generated}</p></div>
 {sidebar_items}
@@ -639,9 +643,10 @@ table.mini th{{background:#f2f4f7;color:var(--navy)}}.health-err-cell{{color:var
 <div class="modal" id="summary-modal"><div class="modal-content">
 <button class="modal-close" onclick="closeModal()">✕</button>
 <div id="modal-body">加载中...</div></div></div>
-<div class="modal" id="roadmap-modal"><div class="modal-content">
+<div class="modal" id="roadmap-modal"><div class="modal-content" style="max-width:1100px">
 <button class="modal-close" onclick="closeRoadmap()">✕</button>
-<h2 id="roadmap-title" style="margin:0 0 16px;font-size:17px">竞争路线图</h2>
+<h2 id="roadmap-title" style="margin:0 0 4px;font-size:17px">竞争路线图</h2>
+<div style="font-size:11px;color:var(--gray);margin-bottom:12px">横轴 = 时间 · 纵轴 = 公司 · 色块 = 关键里程碑</div>
 <div id="roadmap-body">加载中...</div></div></div>
 <script>
 {js_subjects}
@@ -705,44 +710,62 @@ document.getElementById('btn-download').addEventListener('click',function(){{
 var rp=REPORTS[activeSid];if(!rp){{alert('暂无该主体的报告');return;}}
 window.open(rp.md_url,'_blank');
 }});
-// ── Roadmap ──
+// ── Roadmap Gantt ──
 var ROADMAP=[];
 fetch('roadmap.json').then(function(r){{return r.json()}}).then(function(data){{ROADMAP=data;}}).catch(function(){{}});
+var COLS=['2026-07','2026-08','2026-09','2026-Q4','2027-Q1','2027-Q2','2027-H2'];
+function _colIdx(d){{
+var m=d.substring(5);
+if(m==='07')return 0;if(m==='08')return 1;if(m==='09')return 2;
+if(m==='Q4'||m==='10'||m==='11'||m==='12')return 3;
+if(m==='Q1')return 4;if(m==='Q2')return 5;
+if(m==='H2')return 6;
+return -1;
+}}
 function buildTimeline(sid){{
 var subj=SUBJECTS.find(function(s){{return s.id===sid}});
 if(!subj){{document.getElementById('roadmap-body').innerHTML='<p style="color:var(--gray)">请先选择监控主体</p>';return;}}
 var cos=new Set(subj.companies);
 var items=ROADMAP.filter(function(r){{return cos.has(r.company);}});
 if(!items.length){{document.getElementById('roadmap-body').innerHTML='<p style="color:var(--gray)">该主体暂无路线图数据，请手动在 config.py ROADMAP 中添加关键时间节点。</p>';return;}}
-items.sort(function(a,b){{return a.date<b.date?-1:a.date>b.date?1:0;}});
-var groups={{}},order=[];
+// Group by company, only priority companies
+var byCo={{}},coOrder=[];
 items.forEach(function(it){{
-var label=it.date.substring(0,4);
-var q=it.date.substring(5);
-if(q.indexOf('Q')>=0||q.indexOf('H')>=0)label+=' '+q;
-else if(q.length>=2)label+='-'+q.substring(0,2);
-if(!groups[label]){{groups[label]=[];order.push(label);}}
-groups[label].push(it);
+if(!byCo[it.company]){{byCo[it.company]=Array(COLS.length).fill(null);coOrder.push(it.company);}}
+var ci=_colIdx(it.date);if(ci<0)return;
+var cell=byCo[it.company][ci];if(!cell)cell=[];
+cell.push(it);byCo[it.company][ci]=cell;
 }});
-var catMap={{'临床数据':'cat-临床数据','监管进展':'cat-监管进展','学术会议':'cat-学术会议','商业化':'cat-商业化'}};
-var html='<div class="timeline">';
-order.forEach(function(g){{
-html+='<div class="tl-group"><div class="tl-group-label">'+g+'</div>';
-groups[g].forEach(function(it){{
-var cat=it.category||'';
-var catCls=catMap[cat]||'';
-html+='<div class="tl-item '+catCls+'">';
-html+='<div class="tl-date">'+it.date+' <span class="tl-conf tl-conf-'+it.confidence.replace(/[^a-zA-Z\\u4e00-\\u9fa5]/g,'')+'">'+it.confidence+'</span></div>';
-html+='<div class="tl-co">'+it.company;
-if(it.product)html+='<span class="tl-prod">'+it.product+'</span>';
-html+='</div>';
-html+='<div class="tl-event">'+it.event+'</div>';
-if(it.note)html+='<div class="tl-note">'+it.note+'</div>';
-html+='</div>';
+// Sort: Lyell first, then others
+coOrder.sort(function(a,b){{return a.indexOf('Lyell')>=0?-1:b.indexOf('Lyell')>=0?1:0;}});
+var catCls={{'临床数据':'rm-cat-临床数据','监管进展':'rm-cat-监管进展',
+  '学术会议':'rm-cat-学术会议','商业化':'rm-cat-商业化'}};
+var html='<div class="rm-legend">';
+for(var k in catCls)html+='<span><span class="rm-dot '+catCls[k]+'"></span> '+k+'</span>';
+html+='</div><div class="rm-gantt"><table class="rm-table"><thead><tr><th>公司</th>';
+COLS.forEach(function(c){{html+='<th>'+c+'</th>';}});
+html+='</tr></thead><tbody>';
+coOrder.forEach(function(co){{
+var row=byCo[co];
+var isLyell=co.indexOf('Lyell')>=0;
+html+='<tr><td class="rm-co" style="'+(isLyell?'background:#e8f0fe;':'')+'">'+(isLyell?'★ ':'')+co+'</td>';
+for(var i=0;i<COLS.length;i++){{
+  var cell=row[i];
+  if(!cell||!cell.length){{html+='<td class="rm-ev"></td>';continue;}}
+  html+='<td class="rm-ev">';
+  cell.forEach(function(it){{
+    var cls=catCls[it.category]||'rm-cat-临床数据';
+    html+='<div class="rm-ev-block '+cls+'">';
+    html+='<div class="rm-ev-title">'+it.event+'<span class="rm-conf rm-cf-'+it.confidence.replace(/[^\\u4e00-\\u9fa5]/g,'')+'">'+it.confidence+'</span></div>';
+    if(it.product)html+='<div class="rm-ev-prod">🔬 '+it.product+'</div>';
+    if(it.note)html+='<div class="rm-ev-note">'+it.note+'</div>';
+    html+='</div>';
+  }});
+  html+='</td>';
+}}
+html+='</tr>';
 }});
-html+='</div>';
-}});
-html+='</div>';
+html+='</tbody></table></div>';
 document.getElementById('roadmap-body').innerHTML=html;
 document.getElementById('roadmap-title').textContent=subj.name+' 竞品路线图';
 }}
