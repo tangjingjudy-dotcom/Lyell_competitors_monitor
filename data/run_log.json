@@ -1,40 +1,5 @@
 [
   {
-    "timestamp": "2026-07-21T09:13:03.630685+00:00",
-    "duration_sec": 298.0,
-    "companies": 38,
-    "first_run": true,
-    "kept_new": 1047,
-    "filtered_noise": 726,
-    "sources": {
-      "clinicaltrials": {
-        "ok": 38,
-        "error": 0,
-        "raw": 729
-      },
-      "sec_ticker_map": {
-        "ok": 1,
-        "error": 0,
-        "raw": 10426
-      },
-      "sec": {
-        "ok": 24,
-        "error": 0,
-        "raw": 720
-      },
-      "pubmed": {
-        "ok": 25,
-        "error": 0,
-        "raw": 117
-      },
-      "web": {
-        "ok": 13,
-        "error": 12,
-        "raw": 207
-      }
-    }
-  },
-  {
     "timestamp": "2026-07-22T03:05:54.149496+00:00",
     "duration_sec": 299.4,
     "companies": 38,
@@ -1189,6 +1154,38 @@
         "ok": 11,
         "error": 0,
         "raw": 247
+      },
+      "web": {
+        "ok": 14,
+        "error": 0,
+        "raw": 240
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-24T04:32:13.309388+00:00",
+    "duration_sec": 55.9,
+    "companies": 36,
+    "skipped_cadence": 0,
+    "first_run": false,
+    "kept_new": 0,
+    "priority_new": 0,
+    "filtered_noise": 1,
+    "sources": {
+      "sec_ticker_map": {
+        "ok": 1,
+        "error": 0,
+        "raw": 10426
+      },
+      "sec": {
+        "ok": 23,
+        "error": 0,
+        "raw": 690
+      },
+      "rss": {
+        "ok": 11,
+        "error": 0,
+        "raw": 248
       },
       "web": {
         "ok": 14,
