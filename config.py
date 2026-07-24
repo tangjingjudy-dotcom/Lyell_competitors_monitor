@@ -464,7 +464,6 @@ COMPANIES = [
     {
         "name": "Legend Biotech",
         "category": "在位者大药企",
-        "tier": "priority",
         "sec_ticker": "LEGN",
         "rss": [
             "https://investors.legendbiotech.com/rss/news-releases.xml"
@@ -743,17 +742,7 @@ ROADMAP = [
         "product": "satri-cel",
         "confidence": "预计",
         "note": "CD19/CD20 双靶点，ronde-cel/LYL273 跨适应症关注"
-    },
-    {
-        "company": "Legend Biotech",
-        "date": "2026-12",
-        "event": "ASH 2026: cilta-cel / 下一代双靶点管线数据更新预期",
-        "category": "学术会议",
-        "product": "cilta-cel / 下一代管线",
-        "confidence": "可能",
-        "note": "CAR-T 在位者，关注其是否会进入 LBCL/mCRC 赛道"
-    },
-    {
+    },    {
         "company": "Lyell Immunopharma",
         "date": "2026-12",
         "event": "ASH 2026: ronde-cel / LYL273 摘要提交截止",
