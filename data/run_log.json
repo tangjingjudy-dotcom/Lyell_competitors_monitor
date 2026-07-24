@@ -1132,5 +1132,37 @@
         "raw": 240
       }
     }
+  },
+  {
+    "timestamp": "2026-07-24T03:18:31.336582+00:00",
+    "duration_sec": 61.2,
+    "companies": 36,
+    "skipped_cadence": 0,
+    "first_run": false,
+    "kept_new": 0,
+    "priority_new": 0,
+    "filtered_noise": 0,
+    "sources": {
+      "sec_ticker_map": {
+        "ok": 1,
+        "error": 0,
+        "raw": 10429
+      },
+      "sec": {
+        "ok": 23,
+        "error": 0,
+        "raw": 690
+      },
+      "rss": {
+        "ok": 11,
+        "error": 0,
+        "raw": 247
+      },
+      "web": {
+        "ok": 14,
+        "error": 0,
+        "raw": 240
+      }
+    }
   }
 ]
