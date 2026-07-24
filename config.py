@@ -183,7 +183,7 @@ SETTINGS = {
         },
         "standard": {
             "label": "常规监控",
-            "run_every_days": 3,
+            "run_every_days": 7,
             "relaxed_filter": False,
             "email": False
         }
@@ -538,7 +538,6 @@ COMPANIES = [
     {
         "name": "CARsgen Therapeutics (科济药业)",
         "category": "Ronde-cel竞品(LBCL)",
-        "tier": "priority",
         "rss": [
             "https://news.google.com/rss/search?q=CARsgen+Therapeutics+car-t&hl=en-US&gl=US&ceid=US:en"
         ],
@@ -571,7 +570,8 @@ COMPANIES = [
         "product_keywords": [
             "im96",
             "gucy2c"
-        ]
+        ],
+        "tier": "priority"
     },
     {
         "name": "Chimeric Therapeutics",
@@ -669,12 +669,11 @@ COMPANIES = [
         ]
     }
 ]
-
 # ═══════════════════════════════════════════════════════
 # 竞争路线图（Competitive Roadmap）
 # ═══════════════════════════════════════════════════════
 # 手动维护优先监控对象的关键里程碑时间节点。
-# 重点对象（6家）：Lyell / zamto-cel / Kite(753|363) / M9140 / CARsgen / Legend
+# 重点对象（5家）：Lyell / zamto-cel / Kite / IM96 / M9140
 # 每个条目：company(需匹配COMPANIES)、date(YYYY-MM/YYYY-QX/YYYY-HX)、
 #           event、category(临床数据/监管进展/学术会议/商业化)、
 #           product、confidence(确定/预计/可能/乐观预计)、note
@@ -735,14 +734,15 @@ ROADMAP = [
         "note": "mCRC 跨模态关键威胁，LYL273 直接竞品"
     },
     {
-        "company": "CARsgen Therapeutics (科济药业)",
+        "company": "北京艺妙神州 (Immunochina)",
         "date": "2026-09",
-        "event": "satri-cel Phase 1/2 更新数据",
+        "event": "IM96 Phase 1/2 mCRC 扩展队列更新数据",
         "category": "临床数据",
-        "product": "satri-cel",
+        "product": "IM96",
         "confidence": "预计",
-        "note": "CD19/CD20 双靶点，ronde-cel/LYL273 跨适应症关注"
-    },    {
+        "note": "GUCY2C 靶点，JCO 2024 已报 20 例爬坡数据；LYL273 最直接竞品"
+    },
+    {
         "company": "Lyell Immunopharma",
         "date": "2026-12",
         "event": "ASH 2026: ronde-cel / LYL273 摘要提交截止",
