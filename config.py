@@ -343,6 +343,7 @@ COMPANIES = [
             "brexu-cel",
             "anito-cel",
             "kite-363",
+            "kite-753",
             "arcellx"
         ]
     },
@@ -469,6 +470,7 @@ COMPANIES = [
     {
         "name": "Legend Biotech",
         "category": "在位者大药企",
+        "tier": "priority",
         "sec_ticker": "LEGN",
         "rss": [
             "https://investors.legendbiotech.com/rss/news-releases.xml"
@@ -557,7 +559,6 @@ COMPANIES = [
     {
         "name": "Innovative Cellular Therapeutics (ICT)",
         "category": "LYL273竞品(mCRC)",
-        "tier": "priority",
         "news_pages": [
             "https://www.ictbio.com/news/"
         ],
@@ -680,10 +681,10 @@ COMPANIES = [
 # 竞争路线图（Competitive Roadmap）
 # ═══════════════════════════════════════════════════════
 # 手动维护优先监控对象的关键里程碑时间节点。
-# 每个条目：company(需匹配COMPANIES的name)、date(YYYY-MM/YYYY-QX/YYYY-HX)、
-#           event(事件描述)、category(临床数据/监管进展/学术会议/商业化)、
-#           product(关联产品)、confidence(确定/预计/可能/乐观预计)、
-#           note(备注/为什么关注)
+# 重点对象（6家）：Lyell / zamto-cel / Kite(753|363) / M9140 / CARsgen / Legend
+# 每个条目：company(需匹配COMPANIES)、date(YYYY-MM/YYYY-QX/YYYY-HX)、
+#           event、category(临床数据/监管进展/学术会议/商业化)、
+#           product、confidence(确定/预计/可能/乐观预计)、note
 # 看板"路线图"按钮展示为甘特图矩阵（公司×时间轴）。
 ROADMAP = [
     {
@@ -698,29 +699,20 @@ ROADMAP = [
     {
         "company": "Lyell Immunopharma",
         "date": "2026-09",
+        "event": "ronde-cel PiNACLE-H2H 头对头试验中期数据公布预期窗口",
+        "category": "临床数据",
+        "product": "ronde-cel",
+        "confidence": "可能",
+        "note": "对比 Yescarta/Breyanzi；2025.2 已启动入组，业界首个头对头 CAR-T 试验"
+    },
+    {
+        "company": "Lyell Immunopharma",
+        "date": "2026-09",
         "event": "LYL273 Phase 1 mCRC 剂量扩展队列数据更新",
         "category": "临床数据",
         "product": "LYL273",
         "confidence": "预计",
         "note": "GUCY2C 靶向，前期已显示初步疗效信号"
-    },
-    {
-        "company": "Lyell Immunopharma",
-        "date": "2026-09",
-        "event": "ronde-cel PiNACLE-H2H 头对头试验中期数据公布预期窗口",
-        "category": "临床数据",
-        "product": "ronde-cel",
-        "confidence": "可能",
-        "note": "对比 Yescarta/Breyanzi；已在 2025 年 2 月启动入组，业界首个头对头 CAR-T 试验"
-    },
-    {
-        "company": "Gilead (含Arcellx/Kite)",
-        "date": "2027-Q1",
-        "event": "KITE-363 双靶点 (CD19/CD20) Phase 1 首次数据披露",
-        "category": "临床数据",
-        "product": "KITE-363",
-        "confidence": "预计",
-        "note": "与 ronde-cel 同靶点策略（CD19/CD20），需密切关注"
     },
     {
         "company": "Miltenyi Biomedicine (zamto-cel)",
@@ -729,48 +721,57 @@ ROADMAP = [
         "category": "临床数据",
         "product": "zamto-cel",
         "confidence": "预计",
-        "note": "CD19/CD20 双靶点，vs 化疗；ronde-cel 最直接竞争对手"
+        "note": "CD19/CD20 双靶点 vs 化疗；ronde-cel 最直接竞品"
+    },
+    {
+        "company": "Gilead (含Arcellx/Kite)",
+        "date": "2027-Q1",
+        "event": "KITE-363 (CD19/CD20 双靶点) Phase 1 首次数据披露",
+        "category": "临床数据",
+        "product": "KITE-363",
+        "confidence": "预计",
+        "note": "与 ronde-cel 同靶点策略；KITE-753 双靶点管线同步跟踪"
     },
     {
         "company": "Merck KGaA (M9140)",
         "date": "2026-09",
         "event": "M9140 CEACAM5 ADC 结直肠癌扩展队列 Phase 1b 数据",
         "category": "临床数据",
-        "product": "M9140 (precemtabart tocentecan)",
+        "product": "M9140",
         "confidence": "预计",
         "note": "mCRC 跨模态关键威胁，LYL273 直接竞品"
     },
     {
-        "company": "Innovative Cellular Therapeutics (ICT)",
-        "date": "2026-09",
-        "event": "GCC19CART Phase 1b/2 mCRC 更新数据",
-        "category": "临床数据",
-        "product": "GCC19CART",
-        "confidence": "预计",
-        "note": "GUCY2C CAR-T，前期 Phase 1 数据已在 ASCO 等会议公布；mCRC 进度最快直接竞品"
-    },
-    {
         "company": "CARsgen Therapeutics (科济药业)",
         "date": "2026-09",
-        "event": "satri-cel Phase 1/2 LBCL 更新数据",
+        "event": "satri-cel Phase 1/2 更新数据",
         "category": "临床数据",
-        "product": "satri-cel (CT041)",
+        "product": "satri-cel",
         "confidence": "预计",
-        "note": "CD19/CD20 双靶点，ronde-cel 直接竞品"
+        "note": "CD19/CD20 双靶点，ronde-cel/LYL273 跨适应症关注"
+    },
+    {
+        "company": "Legend Biotech",
+        "date": "2026-12",
+        "event": "ASH 2026: cilta-cel / 下一代双靶点管线数据更新预期",
+        "category": "学术会议",
+        "product": "cilta-cel / 下一代管线",
+        "confidence": "可能",
+        "note": "CAR-T 在位者，关注其是否会进入 LBCL/mCRC 赛道"
     },
     {
         "company": "Lyell Immunopharma",
         "date": "2026-12",
-        "event": "ASH 2026: ronde-cel / LYL273 数据提交截止日",
+        "event": "ASH 2026: ronde-cel / LYL273 摘要提交截止",
         "category": "学术会议",
         "product": "ronde-cel / LYL273",
         "confidence": "确定",
-        "note": "美国血液学年会，摘要截止通常 8 月；关注是否有 PiNACLE-H2H 中期数据口头报告"
+        "note": "关注是否有 PiNACLE-H2H 中期数据口头报告"
     },
     {
         "company": "Lyell Immunopharma",
         "date": "2027-Q1",
-        "event": "ronde-cel PiNACLE 数据包完成后与 FDA pre-BLA 会议",
+        "event": "ronde-cel 与 FDA pre-BLA 会议",
         "category": "监管进展",
         "product": "ronde-cel",
         "confidence": "预计",
@@ -788,7 +789,7 @@ ROADMAP = [
     {
         "company": "Merck KGaA (M9140)",
         "date": "2027-Q2",
-        "event": "M9140 Phase 2 启动（结直肠癌关键性队列）",
+        "event": "M9140 Phase 2 结直肠癌关键性队列启动",
         "category": "临床数据",
         "product": "M9140",
         "confidence": "可能",
@@ -801,6 +802,6 @@ ROADMAP = [
         "category": "监管进展",
         "product": "ronde-cel",
         "confidence": "乐观预计",
-        "note": "最早上市时间窗口，取决于 FDA 沟通结果及 H2H 数据成熟度"
+        "note": "最早上市时间窗口"
     }
 ]
