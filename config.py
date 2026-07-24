@@ -744,6 +744,15 @@ ROADMAP = [
     },
     {
         "company": "Gilead (含Arcellx/Kite)",
+        "date": "2026-Q2",
+        "event": "KITE-753 Ph3 (NCT07479797) 启动, vs axi-cel 随机对照",
+        "category": "临床数据",
+        "product": "KITE-753",
+        "confidence": "确定",
+        "note": "CD19/CD20双CAR+双共刺激; 2026-05-22首例入组"
+    },
+    {
+        "company": "Gilead (含Arcellx/Kite)",
         "date": "2027-H2",
         "event": "KITE-753 vs axi-cel 随机对照中期/关键数据读出",
         "category": "临床数据",
