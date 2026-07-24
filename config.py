@@ -680,15 +680,6 @@ COMPANIES = [
 # 看板"路线图"按钮展示为甘特图矩阵（公司×时间轴）。
 ROADMAP = [
     {
-        "company": "Gilead (含Arcellx/Kite)",
-        "date": "2025-12",
-        "event": "ASH 2025: KITE-753/363 下一代双顺反子 CAR-T Phase 1 数据公布",
-        "category": "学术会议",
-        "product": "KITE-753 / KITE-363",
-        "confidence": "确定",
-        "note": "双靶点 CD19/CD20，初步结果显示 encouraging；与 ronde-cel 同靶点策略"
-    },
-    {
         "company": "Lyell Immunopharma",
         "date": "2026-09",
         "event": "ronde-cel PiNACLE Phase 2 数据锁定/更新",
@@ -714,42 +705,6 @@ ROADMAP = [
         "product": "ronde-cel",
         "confidence": "可能",
         "note": "vs Yescarta/Breyanzi；2025.2 已启动入组，业界首个头对头 CAR-T 试验"
-    },
-    {
-        "company": "Merck KGaA (M9140)",
-        "date": "2026-01",
-        "event": "M9140 PROCEADE-CRC-03 全球 3 期首例患者入组",
-        "category": "临床数据",
-        "product": "M9140 (precemtabart tocentecan)",
-        "confidence": "确定",
-        "note": "CEACAM5 ADC ± 贝伐珠单抗 vs TAS-102+贝伐珠单抗；mCRC 跨模态最大威胁，已进入 3 期"
-    },
-    {
-        "company": "Miltenyi Biomedicine (zamto-cel)",
-        "date": "2026-01",
-        "event": "ASH 发表 DALY 2-EU 关键性试验主要分析",
-        "category": "学术会议",
-        "product": "zamto-cel",
-        "confidence": "确定",
-        "note": "2L R/R LBCL，vs 化疗；ronde-cel 最直接竞品"
-    },
-    {
-        "company": "Miltenyi Biomedicine (zamto-cel)",
-        "date": "2026-01",
-        "event": "向 EMA 提交 zamto-cel 上市许可申请 (MAA)",
-        "category": "监管进展",
-        "product": "zamto-cel",
-        "confidence": "确定",
-        "note": "基于 DALY 2-EU 结果；预计 2027 审评决定"
-    },
-    {
-        "company": "Gilead (含Arcellx/Kite)",
-        "date": "2026-01",
-        "event": "KITE-753 随机对照试验 (NCT07479797) 入组进行中",
-        "category": "临床数据",
-        "product": "KITE-753",
-        "confidence": "确定",
-        "note": "KITE-753 vs axi-cel (Yescarta)，R/R LBCL 1L 治疗后"
     },
     {
         "company": "北京艺妙神州 (Immunochina)",
