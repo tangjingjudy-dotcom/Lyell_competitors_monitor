@@ -607,10 +607,10 @@ table.mini th{{background:#f2f4f7;color:var(--navy)}}.health-err-cell{{color:var
 .rm-line-canvas{{overflow-x:auto}}
 .rm-time-hdr{{display:flex;padding-left:120px;margin-bottom:4px}}
 .rm-time-hdr .rm-time-col{{flex:1;text-align:center;font-size:10px;color:var(--gray);font-weight:600;min-width:100px}}
-.rm-axis-row{{display:flex;align-items:flex-start;margin-bottom:0;position:relative;padding-left:120px}}
+.rm-axis-row{{display:flex;align-items:flex-start;margin-bottom:16px;position:relative;padding-left:120px}}
 .rm-co-name{{width:120px;font-size:11px;font-weight:700;color:var(--navy);padding-right:8px;text-align:right;flex-shrink:0;line-height:1.4;position:absolute;left:0;top:0;height:100%;display:flex;align-items:flex-start;justify-content:flex-end;padding-top:14px}}
-.rm-axis-area{{flex:1;position:relative;min-height:62px}}
-.rm-axis-line{{position:absolute;left:0;right:0;top:32px;height:2px;opacity:.55}}
+.rm-axis-area{{flex:1;position:relative;min-height:80px}}
+.rm-axis-line{{position:absolute;left:0;right:0;top:42px;height:2px;opacity:.55}}
 .rm-ev-node{{position:absolute;top:0;transform:translateX(-50%)}}
 .rm-ev-dot{{width:12px;height:12px;border-radius:50%;margin:0 auto 2px}}
 .rm-ev-lbl{{font-size:10px;text-align:center;line-height:1.3;max-width:80px;word-break:keep-all;font-weight:600}}
@@ -750,13 +750,23 @@ function renderOneLine(title, items) {{
     html+='<div class="rm-co-name" style="color:'+clr+'">'+(isLyell?'★ ':'')+co+'</div>';
     html+='<div class="rm-axis-area">';
     html+='<div class="rm-axis-line" style="background:'+clr+'"></div>';
+    // group events by column, stagger vertically when >1 per column
+    var colGroups={{}};
     evts.forEach(function(it){{
       var ci=_colIdx(it.date); if(ci<0) return;
-      var pct = (ci + 0.5) / COLS.length * 100;
-      html+='<div class="rm-ev-node" style="left:'+pct+'%">';
-      html+='<div class="rm-ev-lbl" style="color:'+clr+'">'+it.event+'</div>';
-      html+='<div class="rm-ev-dot" style="background:'+clr+'"></div>';
-      html+='</div>';
+      if(!colGroups[ci]) colGroups[ci]=[];
+      colGroups[ci].push(it);
+    }});
+    Object.keys(colGroups).forEach(function(ci){{
+      var group=colGroups[ci];
+      var pct = (parseInt(ci) + 0.5) / COLS.length * 100;
+      group.forEach(function(it,i){{
+        var topPx = i * 28; // stagger: 0, 28, 56px
+        html+='<div class="rm-ev-node" style="left:'+pct+'%;top:'+topPx+'px">';
+        html+='<div class="rm-ev-lbl" style="color:'+clr+'">'+it.event+'</div>';
+        html+='<div class="rm-ev-dot" style="background:'+clr+'"></div>';
+        html+='</div>';
+      }});
     }});
     html+='</div></div>';
   }});
