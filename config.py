@@ -678,18 +678,14 @@ COMPANIES = [
 #           event、category(临床数据/监管进展/学术会议)、
 #           product、confidence(确定/预计/可能/乐观预计)、note
 # 看板"路线图"按钮展示为甘特图矩阵（公司×时间轴）。
+# 分为两条产品线: ronde-cel (竞品zamto-cel/KITE-753) / LYL273 (竞品M9140/IM96)
+# 每个条目新增 product_line 字段
+# 看板渲染为每条产品线独立的三轴时间线（Lyell + 竞品1 + 竞品2）
 ROADMAP = [
-    {
-        "company": "北京艺妙神州 (Immunochina)",
-        "date": "2026-Q3",
-        "event": "IM96 NCT06718738 数据更新",
-        "category": "临床数据",
-        "product": "IM96",
-        "confidence": "预计",
-        "note": "GUCY2C CAR-T；JCO 2024 已有 20 例爬坡 ORR 26.3%/DL3 40%；LYL273 同靶点唯一竞品"
-    },
+    # ────── ronde-cel 产品线 ──────
     {
         "company": "Lyell Immunopharma",
+        "product_line": "ronde-cel",
         "date": "2026-Q4",
         "event": "ronde-cel PiNACLE Phase 2 数据更新",
         "category": "临床数据",
@@ -699,69 +695,47 @@ ROADMAP = [
     },
     {
         "company": "Lyell Immunopharma",
+        "product_line": "ronde-cel",
         "date": "2026-Q4",
-        "event": "LYL273 Phase 1 mCRC DL3剂量数据更新",
-        "category": "临床数据",
-        "product": "LYL273",
-        "confidence": "预计",
-        "note": ""
-    },
-    {
-        "company": "Lyell Immunopharma",
-        "date": "2026-Q4",
-        "event": "PiNACLE-H2H 头对头试验3期进展公布",
+        "event": "PiNACLE-H2H 头对头试验 Ph3 进展公布",
         "category": "临床数据",
         "product": "ronde-cel",
         "confidence": "预计",
-        "note": "vs Yescarta/Breyanzi；2025.2 已启动入组，业界首个头对头 CAR-T 试验"
-    },
-        {
-        "company": "Lyell Immunopharma",
-        "date": "2027-H1",
-        "event": "LYL273关键性/注册性试验启动",
-        "category": "临床数据",
-        "product": "ronde-cel",
-        "confidence": "预计",
-        "note": ""
+        "note": "vs Yescarta/Breyanzi; 业界首个头对头CAR-T试验"
     },
     {
         "company": "Lyell Immunopharma",
+        "product_line": "ronde-cel",
         "date": "2027-H1",
         "event": "ronde-cel PiNACLE 关键性试验数据读出",
         "category": "临床数据",
         "product": "ronde-cel",
         "confidence": "预计",
-        "note": "取决于 PiNACLE 数据是否支持加速批准路径"
+        "note": "支撑加速批准路径"
     },
     {
         "company": "Miltenyi Biomedicine (zamto-cel)",
+        "product_line": "ronde-cel",
         "date": "2027-H1",
         "event": "EMA 审评决定预期 (MAA)",
         "category": "监管进展",
         "product": "zamto-cel",
         "confidence": "预计",
-        "note": "若获批，将成为 ronde-cel 上市前已存在的同赛道竞品"
+        "note": "若获批, 将成为ronde-cel上市前已存在的同赛道竞品"
     },
     {
         "company": "Gilead (含Arcellx/Kite)",
-        "date": "2026-Q2",
-        "event": "KITE-753 Ph3 (NCT07479797) 启动, vs axi-cel 随机对照",
-        "category": "临床数据",
-        "product": "KITE-753",
-        "confidence": "确定",
-        "note": "CD19/CD20双CAR+双共刺激; 2026-05-22首例入组"
-    },
-    {
-        "company": "Gilead (含Arcellx/Kite)",
+        "product_line": "ronde-cel",
         "date": "2027-H2",
         "event": "KITE-753 vs axi-cel 随机对照中期/关键数据读出",
         "category": "临床数据",
         "product": "KITE-753",
         "confidence": "可能",
-        "note": "若数据积极，Kite 将直接威胁 ronde-cel"
+        "note": "若数据积极, Kite在位者优势直接威胁ronde-cel"
     },
     {
         "company": "Lyell Immunopharma",
+        "product_line": "ronde-cel",
         "date": "2027-H2",
         "event": "ronde-cel BLA 提交（加速批准路径）",
         "category": "监管进展",
@@ -769,13 +743,45 @@ ROADMAP = [
         "confidence": "乐观预计",
         "note": "最早上市时间窗口"
     },
+    # ────── LYL273 产品线 ──────
+    {
+        "company": "北京艺妙神州 (Immunochina)",
+        "product_line": "LYL273",
+        "date": "2026-Q3",
+        "event": "IM96 NCT06718738 爬坡+扩展数据更新",
+        "category": "临床数据",
+        "product": "IM96",
+        "confidence": "预计",
+        "note": "GUCY2C CAR-T; JCO已发表爬坡; 同靶点唯一竞品"
+    },
+    {
+        "company": "Lyell Immunopharma",
+        "product_line": "LYL273",
+        "date": "2026-Q4",
+        "event": "LYL273 Phase 1/2 mCRC DL3剂量数据更新",
+        "category": "临床数据",
+        "product": "LYL273",
+        "confidence": "预计",
+        "note": ""
+    },
+    {
+        "company": "Lyell Immunopharma",
+        "product_line": "LYL273",
+        "date": "2027-H1",
+        "event": "LYL273 关键性/注册性试验启动",
+        "category": "临床数据",
+        "product": "LYL273",
+        "confidence": "预计",
+        "note": ""
+    },
     {
         "company": "Merck KGaA (M9140)",
+        "product_line": "LYL273",
         "date": "2028-H2",
-        "event": "M9140 PROCEADE-CRC-03 3 期关键数据读出预期",
+        "event": "M9140 PROCEADE-CRC-03 Ph3 关键数据读出",
         "category": "临床数据",
         "product": "M9140",
         "confidence": "可能",
-        "note": "若积极，ADC 可能在 LYL273 之前获批 mCRC 后线"
+        "note": "CEACAM5 ADC; 若积极, 可能在LYL273之前获批mCRC"
     }
 ]
