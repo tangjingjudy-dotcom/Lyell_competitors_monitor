@@ -602,18 +602,19 @@ table.mini th{{background:#f2f4f7;color:var(--navy)}}.health-err-cell{{color:var
 .modal-close{{float:right;font-size:20px;cursor:pointer;color:var(--gray);border:none;background:none}}
 @media(max-width:768px){{#sidebar{{width:200px}}#main{{margin-left:200px}}header{{flex-direction:column;gap:6px}}}}
 /* Roadmap: 产品线分轴 */
-.rm-line-section{{margin-bottom:24px}}
+.rm-line-section{{margin-bottom:28px}}
 .rm-line-title{{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:16px;padding:5px 0 5px 12px;border-left:4px solid var(--gold)}}
 .rm-line-canvas{{overflow-x:auto}}
-.rm-time-hdr{{display:flex;padding-left:120px;margin-bottom:4px}}
+.rm-time-hdr{{display:flex;padding-left:120px;margin-bottom:6px}}
 .rm-time-hdr .rm-time-col{{flex:1;text-align:center;font-size:10px;color:var(--gray);font-weight:600;min-width:100px}}
-.rm-axis-row{{display:flex;align-items:flex-start;margin-bottom:16px;position:relative;padding-left:120px}}
-.rm-co-name{{width:120px;font-size:11px;font-weight:700;color:var(--navy);padding-right:8px;text-align:right;flex-shrink:0;line-height:1.4;position:absolute;left:0;top:0;height:100%;display:flex;align-items:flex-start;justify-content:flex-end;padding-top:14px}}
-.rm-axis-area{{flex:1;position:relative;min-height:80px}}
-.rm-axis-line{{position:absolute;left:0;right:0;top:42px;height:2px;opacity:.55}}
-.rm-ev-node{{position:absolute;top:0;transform:translateX(-50%)}}
-.rm-ev-dot{{width:12px;height:12px;border-radius:50%;margin:0 auto 2px}}
-.rm-ev-lbl{{font-size:10px;text-align:center;line-height:1.3;max-width:80px;word-break:keep-all;font-weight:600}}
+.rm-axis-row{{display:flex;margin-bottom:26px;padding-left:120px;position:relative}}
+.rm-co-name{{width:120px;font-size:11px;font-weight:700;color:var(--navy);padding-right:8px;text-align:right;flex-shrink:0;line-height:1.4;position:absolute;left:0;top:0;padding-top:2px}}
+.rm-axis-track{{flex:1;position:relative;display:flex}}
+.rm-axis-line{{position:absolute;left:0;right:0;top:27px;height:2px;opacity:.45;z-index:0}}
+.rm-ev-col{{flex:1;min-width:100px;position:relative;z-index:1;display:flex;justify-content:center;align-items:flex-start;gap:8px;padding-top:6px}}
+.rm-ev-pin{{display:inline-flex;flex-direction:column;align-items:center;flex-shrink:0}}
+.rm-ev-dot{{width:10px;height:10px;border-radius:50%;flex-shrink:0;order:2}}
+.rm-ev-lbl{{font-size:9.5px;text-align:center;line-height:1.3;max-width:60px;word-break:keep-all;font-weight:600;margin-bottom:3px;order:1}}
 </style></head><body>
 <div id="sidebar"><div class="sb-logo"><h2>竞品监控</h2><p>{generated}</p></div>
 {sidebar_items}
@@ -741,33 +742,32 @@ function renderOneLine(title, items) {{
   html+='<div class="rm-time-hdr">';
   COLS.forEach(function(c){{html+='<div class="rm-time-col">'+c+'</div>';}});
   html+='</div>';
-  // rows
   coOrder.forEach(function(co){{
     var evts=byCo[co];
     var clr=LINE_COLORS[co]||'#3E7CB1';
     var isLyell=co.indexOf('Lyell')>=0;
     html+='<div class="rm-axis-row">';
     html+='<div class="rm-co-name" style="color:'+clr+'">'+(isLyell?'★ ':'')+co+'</div>';
-    html+='<div class="rm-axis-area">';
+    html+='<div class="rm-axis-track">';
     html+='<div class="rm-axis-line" style="background:'+clr+'"></div>';
-    // group events by column, stagger vertically when >1 per column
+    // group by column index
     var colGroups={{}};
     evts.forEach(function(it){{
       var ci=_colIdx(it.date); if(ci<0) return;
       if(!colGroups[ci]) colGroups[ci]=[];
       colGroups[ci].push(it);
     }});
-    Object.keys(colGroups).forEach(function(ci){{
-      var group=colGroups[ci];
-      var pct = (parseInt(ci) + 0.5) / COLS.length * 100;
-      group.forEach(function(it,i){{
-        var topPx = i * 28; // stagger: 0, 28, 56px
-        html+='<div class="rm-ev-node" style="left:'+pct+'%;top:'+topPx+'px">';
+    for(var ci=0;ci<COLS.length;ci++){{
+      var group=colGroups[ci]||[];
+      html+='<div class="rm-ev-col">';
+      group.forEach(function(it){{
+        html+='<div class="rm-ev-pin">';
         html+='<div class="rm-ev-lbl" style="color:'+clr+'">'+it.event+'</div>';
         html+='<div class="rm-ev-dot" style="background:'+clr+'"></div>';
         html+='</div>';
       }});
-    }});
+      html+='</div>';
+    }}
     html+='</div></div>';
   }});
   html+='</div></div>';
