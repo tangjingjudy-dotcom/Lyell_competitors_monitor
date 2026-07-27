@@ -602,21 +602,18 @@ table.mini th{{background:#f2f4f7;color:var(--navy)}}.health-err-cell{{color:var
 .modal-close{{float:right;font-size:20px;cursor:pointer;color:var(--gray);border:none;background:none}}
 @media(max-width:768px){{#sidebar{{width:200px}}#main{{margin-left:200px}}header{{flex-direction:column;gap:6px}}}}
 /* Roadmap: 产品线分轴 */
-.rm-line-section{{margin-bottom:28px}}
-.rm-line-title{{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:14px;padding:5px 0 5px 12px;border-left:4px solid var(--gold)}}
+.rm-line-section{{margin-bottom:24px}}
+.rm-line-title{{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:16px;padding:5px 0 5px 12px;border-left:4px solid var(--gold)}}
 .rm-line-canvas{{overflow-x:auto}}
-.rm-line-header{{display:flex;margin-bottom:8px;padding-left:130px}}
-.rm-line-header .rm-line-col{{flex:1;text-align:center;font-size:10px;color:var(--gray);font-weight:600;min-width:80px}}
-.rm-line-lbl{{width:130px;font-size:11px;color:var(--navy);padding-right:8px;text-align:right;flex-shrink:0;line-height:1.3}}
-.rm-line-row{{display:flex;align-items:center;margin-bottom:10px;min-height:32px}}
-.rm-line-track{{flex:1;display:flex}}
-.rm-line-slot{{text-align:center;min-width:80px;flex:1;display:flex;justify-content:center;align-items:center;padding:4px 0}}
-.rm-line-dot{{transition:transform .15s}}
-.rm-line-dot:hover{{transform:scale(1.5);z-index:3}}
-.rm-line-col{{flex:1;min-width:80px}}
-.rm-legend{{display:flex;gap:14px;margin-bottom:12px;font-size:11px;flex-wrap:wrap}}
-.rm-legend span{{display:flex;align-items:center;gap:4px}}
-.rm-dot{{width:10px;height:10px;border-radius:2px;display:inline-block}}
+.rm-time-hdr{{display:flex;padding-left:120px;margin-bottom:4px}}
+.rm-time-hdr .rm-time-col{{flex:1;text-align:center;font-size:10px;color:var(--gray);font-weight:600;min-width:100px}}
+.rm-axis-row{{display:flex;align-items:flex-start;margin-bottom:0;position:relative;padding-left:120px}}
+.rm-co-name{{width:120px;font-size:11px;font-weight:700;color:var(--navy);padding-right:8px;text-align:right;flex-shrink:0;line-height:1.4;position:absolute;left:0;top:0;height:100%;display:flex;align-items:flex-start;justify-content:flex-end;padding-top:14px}}
+.rm-axis-area{{flex:1;position:relative;min-height:62px}}
+.rm-axis-line{{position:absolute;left:0;right:0;top:32px;height:2px;opacity:.55}}
+.rm-ev-node{{position:absolute;top:0;transform:translateX(-50%)}}
+.rm-ev-dot{{width:12px;height:12px;border-radius:50%;margin:0 auto 2px}}
+.rm-ev-lbl{{font-size:10px;text-align:center;line-height:1.3;max-width:80px;word-break:keep-all;font-weight:600}}
 </style></head><body>
 <div id="sidebar"><div class="sb-logo"><h2>竞品监控</h2><p>{generated}</p></div>
 {sidebar_items}
@@ -637,7 +634,7 @@ table.mini th{{background:#f2f4f7;color:var(--navy)}}.health-err-cell{{color:var
 <div class="modal" id="summary-modal"><div class="modal-content">
 <button class="modal-close" onclick="closeModal()">✕</button>
 <div id="modal-body">加载中...</div></div></div>
-<div class="modal" id="roadmap-modal"><div class="modal-content" style="max-width:1100px">
+<div class="modal" id="roadmap-modal"><div class="modal-content" style="max-width:1150px">
 <button class="modal-close" onclick="closeRoadmap()">✕</button>
 <h2 id="roadmap-title" style="margin:0 0 4px;font-size:17px">竞争路线图</h2>
 <div style="font-size:11px;color:var(--gray);margin-bottom:12px">按产品线分轴: ronde-cel(竞品zamto-cel/KITE-753) / LYL273(竞品M9140/IM96)</div>
@@ -741,36 +738,27 @@ function renderOneLine(title, items) {{
   var html='<div class="rm-line-section"><div class="rm-line-title">'+title+'</div>';
   html+='<div class="rm-line-canvas">';
   // time header
-  html+='<div class="rm-line-header">';
-  html+='<div class="rm-line-lbl"></div>';
-  COLS.forEach(function(c){{html+='<div class="rm-line-col">'+c+'</div>';}});
+  html+='<div class="rm-time-hdr">';
+  COLS.forEach(function(c){{html+='<div class="rm-time-col">'+c+'</div>';}});
   html+='</div>';
   // rows
   coOrder.forEach(function(co){{
     var evts=byCo[co];
     var clr=LINE_COLORS[co]||'#3E7CB1';
     var isLyell=co.indexOf('Lyell')>=0;
-    html+='<div class="rm-line-row">';
-    html+='<div class="rm-line-lbl" style="color:'+clr+';'+(isLyell?'font-weight:700;':'')+'">'+(isLyell?'★ ':'')+co+'</div>';
-    // build track with dots
-    html+='<div class="rm-line-track">';
-    html+='<div class="rm-line-col rm-line-slot"></div>'.repeat(0);
-    for(var ci=0;ci<COLS.length;ci++){{
-      var dots=[];
-      evts.forEach(function(it){{ if(_colIdx(it.date)===ci) dots.push(it); }});
-      if(dots.length){{
-        html+='<div class="rm-line-col rm-line-slot">';
-        dots.forEach(function(it){{
-          html+='<div class="rm-line-dot" style="background:'+clr+';display:inline-block;width:16px;height:16px;border-radius:50%;margin:2px;cursor:pointer;vertical-align:middle" title="'+it.date+' '+it.event+'\\n'+it.confidence+'">';
-          html+='</div>';
-        }});
-        html+='</div>';
-      }}else{{
-        html+='<div class="rm-line-col rm-line-slot"></div>';
-      }}
-    }}
-    html+='</div>';
-    html+='</div>';
+    html+='<div class="rm-axis-row">';
+    html+='<div class="rm-co-name" style="color:'+clr+'">'+(isLyell?'★ ':'')+co+'</div>';
+    html+='<div class="rm-axis-area">';
+    html+='<div class="rm-axis-line" style="background:'+clr+'"></div>';
+    evts.forEach(function(it){{
+      var ci=_colIdx(it.date); if(ci<0) return;
+      var pct = (ci + 0.5) / COLS.length * 100;
+      html+='<div class="rm-ev-node" style="left:'+pct+'%">';
+      html+='<div class="rm-ev-lbl" style="color:'+clr+'">'+it.event+'</div>';
+      html+='<div class="rm-ev-dot" style="background:'+clr+'"></div>';
+      html+='</div>';
+    }});
+    html+='</div></div>';
   }});
   html+='</div></div>';
   return html;
