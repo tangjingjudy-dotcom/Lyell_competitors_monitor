@@ -46,5 +46,29 @@
     "tier": "priority",
     "uid": "sec-0001140361-26-029791",
     "first_seen": "2026-07-28T04:27:12.038763+00:00"
+  },
+  {
+    "company": "Allogene Therapeutics",
+    "category": "异体/现货型CAR-T",
+    "source": "web",
+    "title": "Allogene Therapeutics Receives FDA Regenerative Medicine Advanced Therapy (RMAT) Designation for Cemacabtagene Ansegedleucel (Cema-Cel) as First-Line Consolidation Therapy for Large B-Cell Lymphoma",
+    "url": "https://ir.allogene.com/news-releases/news-release-details/allogene-therapeutics-receives-fda-regenerative-medicine-0",
+    "date": "Wed, 29 Jul 2026 08:30:00 -0400",
+    "detail": "RSS",
+    "tier": "standard",
+    "uid": "31fa05c01c0cd5a1",
+    "first_seen": "2026-08-02T04:37:25.219275+00:00"
+  },
+  {
+    "company": "Akeso（康方生物）",
+    "category": "10-K潜在竞品",
+    "source": "web",
+    "title": "Akeso IO2.0 + ADC2.0 Strategy Makes Another Advancement: First Patient Dosed in Phase Ib/II Study of HER3 ADC (AK138D1) Combined with Ivonescimab in Lung Cancer",
+    "url": "https://www.akesobio.com/en/media/akeso-news/260728/",
+    "date": "",
+    "detail": "来源页: https://www.akesobio.com/en/media/akeso-news/",
+    "tier": "standard",
+    "uid": "b186634e087649bd",
+    "first_seen": "2026-08-02T04:37:25.219275+00:00"
   }
 ]
