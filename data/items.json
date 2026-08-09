@@ -58,5 +58,41 @@
     "tier": "priority",
     "uid": "bac0d3f320c9ec38",
     "first_seen": "2026-08-07T04:03:41.114404+00:00"
+  },
+  {
+    "company": "AbbVie / Genmab (epcoritamab)",
+    "category": "Ronde-cel竞品(LBCL)",
+    "source": "web",
+    "title": "Genmab Announces Financial Results for the First Half of 2026",
+    "url": "https://ir.genmab.com/news-releases/news-release-details/genmab-announces-financial-results-first-half-2026",
+    "date": "Thu, 06 Aug 2026 17:02:25 +0200",
+    "detail": "RSS",
+    "tier": "standard",
+    "uid": "8cc5301d4436902c",
+    "first_seen": "2026-08-09T03:08:57.210692+00:00"
+  },
+  {
+    "company": "CARsgen Therapeutics (科济药业)",
+    "category": "Ronde-cel竞品(LBCL)",
+    "source": "web",
+    "title": "China's CARsgen Therapeutics Gains Over 4% After Allogeneic CAR-T Gets NMPA Approval - finance.biggo.com",
+    "url": "https://news.google.com/rss/articles/CBMidkFVX3lxTE5BeGV1Yk52QmwxYlBDOUFqeVFZNmdMNzlYQWNzQTVLcGZfVklYWFE0WXNadXhUQUFwV1l4eThYWTYtT2YwY1ZuU1NkQkt4MW5Cc3FYbk9EempocWt4ZnRLN1Jsc1lFWWpybU1SOE5sVzhqU0hXcVE?oc=5",
+    "date": "Tue, 04 Aug 2026 03:15:00 GMT",
+    "detail": "RSS",
+    "tier": "standard",
+    "uid": "0408a9b88119e35d",
+    "first_seen": "2026-08-09T03:08:57.210692+00:00"
+  },
+  {
+    "company": "CARsgen Therapeutics (科济药业)",
+    "category": "Ronde-cel竞品(LBCL)",
+    "source": "web",
+    "title": "HKEX Market Movement | CARsgen Therapeutics-B (2171.HK) Rises Nearly 4% Again as Its Allogeneic BCMA CAR-T Product CT0596 Receives IND Approval in China - 富途牛牛",
+    "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxNSDVKRVJxU2pRNW52VGQ4LU1rQndQSmd4SFJGSWg0Ry10UnBqYzc4cnlNTU5oaE1zV0F5TWxOaDE3c2pPR0Q1RE1UeWt0TVlFbDY0R0lVTDdpMTc1c2ljbjY3cGRVTVpXbW1mdXkxV0g2Qm9WU0dEMHBTb2xGbllwdUtrdWxDWHVXbkdiUXhIZDNCVjMyQzVFRGhOY3kwY0czc0ptWE5aM2E?oc=5",
+    "date": "Thu, 06 Aug 2026 10:37:24 GMT",
+    "detail": "RSS",
+    "tier": "standard",
+    "uid": "766c172fee903b5f",
+    "first_seen": "2026-08-09T03:08:57.210692+00:00"
   }
 ]
