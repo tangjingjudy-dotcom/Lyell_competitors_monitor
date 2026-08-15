@@ -118,5 +118,17 @@
     "tier": "priority",
     "uid": "sec-0001327111-26-000004",
     "first_seen": "2026-08-12T03:29:24.926496+00:00"
+  },
+  {
+    "company": "Lyell Immunopharma",
+    "category": "监控主体",
+    "source": "sec",
+    "title": "SCHEDULE 13G/A 申报",
+    "url": "https://www.sec.gov/Archives/edgar/data/1806952/000110465926097073/xslSCHEDULE_13G_X02/primary_doc.xml",
+    "date": "2026-08-14",
+    "detail": "表单 SCHEDULE 13G/A",
+    "tier": "priority",
+    "uid": "sec-0001104659-26-097073",
+    "first_seen": "2026-08-15T02:18:40.470178+00:00"
   }
 ]
