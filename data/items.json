@@ -1,41 +1,5 @@
 [
   {
-    "company": "Lyell Immunopharma",
-    "category": "监控主体",
-    "source": "sec",
-    "title": "10-Q 申报：10-Q",
-    "url": "https://www.sec.gov/Archives/edgar/data/1806952/000162828026054367/lyel-20260630.htm",
-    "date": "2026-08-06",
-    "detail": "表单 10-Q",
-    "tier": "priority",
-    "uid": "sec-0001628280-26-054367",
-    "first_seen": "2026-08-07T04:03:41.114404+00:00"
-  },
-  {
-    "company": "Lyell Immunopharma",
-    "category": "监控主体",
-    "source": "sec",
-    "title": "8-K 申报：8-K",
-    "url": "https://www.sec.gov/Archives/edgar/data/1806952/000162828026054330/lyel-20260806.htm",
-    "date": "2026-08-06",
-    "detail": "表单 8-K",
-    "tier": "priority",
-    "uid": "sec-0001628280-26-054330",
-    "first_seen": "2026-08-07T04:03:41.114404+00:00"
-  },
-  {
-    "company": "Lyell Immunopharma",
-    "category": "监控主体",
-    "source": "web",
-    "title": "Lyell Immunopharma Reports Business Highlights and Financial Results for the Second Quarter 2026",
-    "url": "https://ir.lyell.com/news-releases/news-release-details/lyell-immunopharma-reports-business-highlights-and-financial-12",
-    "date": "Thu, 06 Aug 2026 16:05:57 -0400",
-    "detail": "RSS",
-    "tier": "priority",
-    "uid": "bac0d3f320c9ec38",
-    "first_seen": "2026-08-07T04:03:41.114404+00:00"
-  },
-  {
     "company": "AbbVie / Genmab (epcoritamab)",
     "category": "Ronde-cel竞品(LBCL)",
     "source": "web",
@@ -130,5 +94,53 @@
     "tier": "priority",
     "uid": "sec-0001104659-26-097073",
     "first_seen": "2026-08-15T02:18:40.470178+00:00"
+  },
+  {
+    "company": "AbbVie / Genmab (epcoritamab)",
+    "category": "Ronde-cel竞品(LBCL)",
+    "source": "web",
+    "title": "Genmab A/S has published its Articles of Association",
+    "url": "https://ir.genmab.com/news-releases/news-release-details/genmab-has-published-its-articles-association-101",
+    "date": "Wed, 12 Aug 2026 15:32:36 +0200",
+    "detail": "RSS",
+    "tier": "standard",
+    "uid": "0ac7d9508d133350",
+    "first_seen": "2026-08-16T02:35:23.297087+00:00"
+  },
+  {
+    "company": "AbbVie / Genmab (epcoritamab)",
+    "category": "Ronde-cel竞品(LBCL)",
+    "source": "web",
+    "title": "Capital Increase in Genmab as a Result of Employee Warrant Exercise",
+    "url": "https://ir.genmab.com/news-releases/news-release-details/capital-increase-genmab-result-employee-warrant-exercise-93",
+    "date": "Tue, 11 Aug 2026 19:54:09 +0200",
+    "detail": "RSS",
+    "tier": "standard",
+    "uid": "167f009d372b1a0c",
+    "first_seen": "2026-08-16T02:35:23.297087+00:00"
+  },
+  {
+    "company": "Akeso（康方生物）",
+    "category": "10-K潜在竞品",
+    "source": "web",
+    "title": "Ivonescimab Plus Chemotherapy Approved for First-Line Squamous NSCLC; HARMONi-6 Establishes New Gold Standard in Lung Cancer Treatment",
+    "url": "https://www.akesobio.com/en/media/akeso-news/260812/",
+    "date": "",
+    "detail": "来源页: https://www.akesobio.com/en/media/akeso-news/",
+    "tier": "standard",
+    "uid": "70299ff5829bbdc4",
+    "first_seen": "2026-08-16T02:35:23.297087+00:00"
+  },
+  {
+    "company": "Akeso（康方生物）",
+    "category": "10-K潜在竞品",
+    "source": "web",
+    "title": "Akeso Advances IO2.0 + ADC2.0 Strategy: First Patient Dosed in Phase II Study of TROP2/Nectin-4 Bispecific ADC (AK146D1) Combined with Ivonescimab in Breast Cancer",
+    "url": "https://www.akesobio.com/en/media/akeso-news/260810/",
+    "date": "",
+    "detail": "来源页: https://www.akesobio.com/en/media/akeso-news/",
+    "tier": "standard",
+    "uid": "0a57c22ab77897ce",
+    "first_seen": "2026-08-16T02:35:23.297087+00:00"
   }
 ]
