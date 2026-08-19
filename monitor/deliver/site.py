@@ -528,7 +528,7 @@ def generate(settings, subjects=None):
         health_panel=health,
         sidebar_items="\n".join(sidebar_items),
         action_bar=btns,
-        rows="".join(rows_html) or '<tr><td colspan="4" class="empty">基线建立中——竞品一旦发布新的临床数据或监管进展，会自动出现在这里。</td></tr>',
+        rows="".join(rows_html) or '<tr><td colspan="4" class="empty">暂时没有新动态</td></tr>',
         js_subjects=js_subjects,
         report_pages_json=json.dumps({k: v for k, v in report_pages.items()}, ensure_ascii=False),
         first_subj_id=subjects[0]["id"] if subjects else "",
