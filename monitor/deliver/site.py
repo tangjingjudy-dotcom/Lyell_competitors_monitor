@@ -363,9 +363,12 @@ def generate(settings, subjects=None):
     mfilter = settings.get("milestone_filter") or {}
     db = [r for r in db if is_allowed_sec_row(r, mfilter)]
     db = [r for r in db if not (
-        r.get("company") == "Sapience Therapeutics"
+        r.get("source") in ("web", "rss")
         and str(r.get("first_seen") or "").startswith("2026-08-19")
     )]
+    known = {name for subj in (subjects or []) for name in (subj.get("companies") or [])}
+    if known:
+        db = [r for r in db if r.get("company") in known]
     db.sort(key=lambda r: r.get("first_seen", ""), reverse=True)
 
     # ── 内联摘要生成 ──

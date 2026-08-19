@@ -126,12 +126,13 @@ var activeSid = '', filter = 'all', onlyStar = false;
 var SRC = { clinicaltrials:'临床试验', sec:'SEC申报', pubmed:'论文', web:'新闻', rss:'新闻' };
 
 // ─── Init: load all data ───
+var _nocache = '?t=' + Date.now();
 Promise.all([
-  fetch('./subjects.json').then(r=>r.json()),
-  fetch('./items.json').then(r=>r.json()).catch(()=>[]),
-  fetch('./summaries.json').then(r=>r.json()).catch(()=>({})),
-  fetch('./roadmap.json').then(r=>r.json()).catch(()=>[]),
-  fetch('./run_log.json').then(r=>r.json()).catch(()=>[])
+  fetch('./subjects.json'+_nocache).then(r=>r.json()),
+  fetch('./items.json'+_nocache).then(r=>r.json()).catch(()=>[]),
+  fetch('./summaries.json'+_nocache).then(r=>r.json()).catch(()=>({})),
+  fetch('./roadmap.json'+_nocache).then(r=>r.json()).catch(()=>[]),
+  fetch('./run_log.json'+_nocache).then(r=>r.json()).catch(()=>[])
 ]).then(function(results){
   SUBJECTS = results[0];
   ITEMS = results[1];
