@@ -19,7 +19,7 @@ from config import COMPANIES, SETTINGS, MONITORING_SUBJECTS
 from monitor.base import (
     Http, StateStore, RunStats, diff_new, merge_into_items_db, is_milestone,
     append_run_log, load_json, save_json, META_FILE, now_iso,
-    purge_non_financial_sec,
+    purge_non_financial_sec, purge_sapience_backfill,
 )
 from monitor.sources import sec_edgar, webwatch
 from monitor.deliver import site, email_digest
@@ -97,7 +97,12 @@ def run(args):
         for source_id, items in collected:
             for it in items:
                 it.tier = tier
+            # 新公司/新信息源第一次只建基线，避免把列表页上的历史稿全部刷进看板
+            had_baseline = bool(store.seen_uids(source_id))
             new_items = diff_new(store, source_id, items)
+            if not had_baseline:
+                print(f"    基线: {source_id.split(':')[-1]} 已记录 {len(items)} 条（历史不展示）")
+                continue
             if not new_items:
                 continue
             kept = [it for it in new_items if is_milestone(it, mfilter, relaxed=relaxed, diversified=diversified, product_keywords=pk)]
@@ -130,6 +135,9 @@ def run(args):
     dropped_sec = purge_non_financial_sec(mfilter)
     if dropped_sec:
         print(f"  已从看板移除 {dropped_sec} 条非财报 SEC 申报（Form 4 / 8-K / 13G 等）")
+    dropped_sap = purge_sapience_backfill()
+    if dropped_sap:
+        print(f"  已从看板移除 {dropped_sap} 条 Sapience 历史新闻")
 
     if first_run:
         # 首次运行只建立“已见”基线：把当前存量条目全部记为已知，但【不写入展示库】，
@@ -147,6 +155,9 @@ def run(args):
     dropped_sec = purge_non_financial_sec(mfilter)
     if dropped_sec:
         print(f"  已从看板移除 {dropped_sec} 条非财报 SEC 申报（Form 4 / 8-K / 13G 等）")
+    dropped_sap = purge_sapience_backfill()
+    if dropped_sap:
+        print(f"  已从看板移除 {dropped_sap} 条 Sapience 历史新闻")
     cleaned_age = _clean_expired_items()
     if cleaned_age:
         print(f"  已从 items.json 移除 {cleaned_age} 条超过{_get_site_max_age()}天的旧条目")

@@ -140,14 +140,27 @@ def is_allowed_sec_row(row, cfg):
     return bool(form) and form in _allowed_sec_forms(cfg)
 
 
-def purge_non_financial_sec(cfg):
-    """从 items.json 删除 Form 4 / 8-K / 13G 等非财报 SEC 条目（含历史存量）。"""
+def drop_items(pred):
+    """从 items.json 删除满足 pred 的条目，返回删除条数。"""
     db = load_json(ITEMS_DB, [])
-    keep = [r for r in db if is_allowed_sec_row(r, cfg)]
+    keep = [r for r in db if not pred(r)]
     removed = len(db) - len(keep)
     if removed:
         save_json(ITEMS_DB, keep)
     return removed
+
+
+def purge_non_financial_sec(cfg):
+    """从 items.json 删除 Form 4 / 8-K / 13G 等非财报 SEC 条目（含历史存量）。"""
+    return drop_items(lambda r: not is_allowed_sec_row(r, cfg))
+
+
+def purge_sapience_backfill():
+    """去掉 Sapience 第一次入表时刷进来的历史新闻（first_seen 当天）。"""
+    return drop_items(
+        lambda r: r.get("company") == "Sapience Therapeutics"
+        and str(r.get("first_seen") or "").startswith("2026-08-19")
+    )
 
 
 def _is_financial_sec(item, cfg):
