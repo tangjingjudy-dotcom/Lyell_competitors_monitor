@@ -155,12 +155,20 @@ def purge_non_financial_sec(cfg):
     return drop_items(lambda r: not is_allowed_sec_row(r, cfg))
 
 
-def purge_sapience_backfill():
-    """去掉 Sapience 第一次入表时刷进来的历史新闻（first_seen 当天）。"""
+def purge_web_backfill():
+    """去掉 2026-08-19 新公司入表时刷上看板的网页/RSS 历史稿（SEC 财报保留）。"""
     return drop_items(
-        lambda r: r.get("company") == "Sapience Therapeutics"
+        lambda r: r.get("source") in ("web", "rss")
         and str(r.get("first_seen") or "").startswith("2026-08-19")
     )
+
+
+def purge_unknown_companies(known_names):
+    """去掉已不在当前监控名单里的公司条目。"""
+    known = {n for n in known_names if n}
+    if not known:
+        return 0
+    return drop_items(lambda r: r.get("company") not in known)
 
 
 def _is_financial_sec(item, cfg):

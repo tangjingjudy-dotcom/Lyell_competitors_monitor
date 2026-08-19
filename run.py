@@ -19,7 +19,7 @@ from config import COMPANIES, SETTINGS, MONITORING_SUBJECTS
 from monitor.base import (
     Http, StateStore, RunStats, diff_new, merge_into_items_db, is_milestone,
     append_run_log, load_json, save_json, META_FILE, now_iso,
-    purge_non_financial_sec, purge_sapience_backfill,
+    purge_non_financial_sec, purge_web_backfill, purge_unknown_companies,
 )
 from monitor.sources import sec_edgar, webwatch
 from monitor.deliver import site, email_digest
@@ -135,9 +135,12 @@ def run(args):
     dropped_sec = purge_non_financial_sec(mfilter)
     if dropped_sec:
         print(f"  已从看板移除 {dropped_sec} 条非财报 SEC 申报（Form 4 / 8-K / 13G 等）")
-    dropped_sap = purge_sapience_backfill()
-    if dropped_sap:
-        print(f"  已从看板移除 {dropped_sap} 条 Sapience 历史新闻")
+    dropped_web = purge_web_backfill()
+    if dropped_web:
+        print(f"  已从看板移除 {dropped_web} 条第一次入表刷进来的历史新闻")
+    dropped_unk = purge_unknown_companies([c["name"] for c in COMPANIES])
+    if dropped_unk:
+        print(f"  已从看板移除 {dropped_unk} 条已不再监控的公司条目")
 
     if first_run:
         # 首次运行只建立“已见”基线：把当前存量条目全部记为已知，但【不写入展示库】，
@@ -155,9 +158,12 @@ def run(args):
     dropped_sec = purge_non_financial_sec(mfilter)
     if dropped_sec:
         print(f"  已从看板移除 {dropped_sec} 条非财报 SEC 申报（Form 4 / 8-K / 13G 等）")
-    dropped_sap = purge_sapience_backfill()
-    if dropped_sap:
-        print(f"  已从看板移除 {dropped_sap} 条 Sapience 历史新闻")
+    dropped_web = purge_web_backfill()
+    if dropped_web:
+        print(f"  已从看板移除 {dropped_web} 条第一次入表刷进来的历史新闻")
+    dropped_unk = purge_unknown_companies([c["name"] for c in COMPANIES])
+    if dropped_unk:
+        print(f"  已从看板移除 {dropped_unk} 条已不再监控的公司条目")
     cleaned_age = _clean_expired_items()
     if cleaned_age:
         print(f"  已从 items.json 移除 {cleaned_age} 条超过{_get_site_max_age()}天的旧条目")
