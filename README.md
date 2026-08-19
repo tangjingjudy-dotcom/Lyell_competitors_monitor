@@ -2,7 +2,7 @@
 
 对报告中所有公司做长期自动监控：抓取多个可靠信息源 → 计算“上次运行以来的新增” → **里程碑过滤（只留新临床数据/上市前进展/重大事件）** → 更新一个可分享的静态看板 →（可选）在有新消息时发送邮件摘要。
 
-**在线看板（每天在此查看）**：https://tangjingjudy-dotcom.github.io/Lyell_competitors_monitor/
+**在线看板（每天在此查看）**：https://tangjingjudy-dotcom.github.io/competitors_monitor/
 **更新频率**：每天北京时间约 09:17 由 GitHub Actions 自动抓取并发布到 GitHub Pages，无需本机运行。
 **公司名单**：改 [Google 表格](https://docs.google.com/spreadsheets/d/19czgGX9R1Dj9QqI4ebeewQqPLNPoRus3zjFjszXDUUM/edit?gid=1330411179) 即可，下次 Actions 运行会自动读入。
 

@@ -113,22 +113,47 @@ def diff_new(store, source_id, items):
     return new_items
 
 
-def _sec_form_code(item):
+def _sec_form_code_from_text(detail, title):
     """从 SEC 条目的 detail/title 提取表单代码，如 10-Q、10-K/A。"""
-    m = re.search(r"表单\s+(\S+)", item.detail or "")
+    m = re.search(r"表单\s+(\S+)", detail or "")
     if m:
         return m.group(1).strip().upper()
-    m = re.search(r"^([A-Z0-9][A-Z0-9/.-]*)\s+申报", item.title or "", re.I)
+    m = re.search(r"^([A-Z0-9][A-Z0-9/.-]*)\s+申报", title or "", re.I)
     if m:
         return m.group(1).strip().upper()
     return ""
 
 
+def _sec_form_code(item):
+    return _sec_form_code_from_text(item.detail, item.title)
+
+
+def _allowed_sec_forms(cfg):
+    return {f.strip().upper() for f in (cfg.get("meaningful_sec_forms") or []) if str(f).strip()}
+
+
+def is_allowed_sec_row(row, cfg):
+    """非 SEC 条目一律保留；SEC 仅年报/季报。"""
+    if (row.get("source") or "") != "sec":
+        return True
+    form = _sec_form_code_from_text(row.get("detail") or "", row.get("title") or "")
+    return bool(form) and form in _allowed_sec_forms(cfg)
+
+
+def purge_non_financial_sec(cfg):
+    """从 items.json 删除 Form 4 / 8-K / 13G 等非财报 SEC 条目（含历史存量）。"""
+    db = load_json(ITEMS_DB, [])
+    keep = [r for r in db if is_allowed_sec_row(r, cfg)]
+    removed = len(db) - len(keep)
+    if removed:
+        save_json(ITEMS_DB, keep)
+    return removed
+
+
 def _is_financial_sec(item, cfg):
     """只保留年报/季报类表单。美国没有单独的月报（10-K 年报、10-Q 季报）。"""
-    allowed = {f.strip().upper() for f in (cfg.get("meaningful_sec_forms") or [])}
     form = _sec_form_code(item)
-    return bool(form) and form in allowed
+    return bool(form) and form in _allowed_sec_forms(cfg)
 
 
 def is_milestone(item, cfg, relaxed=False, diversified=False, product_keywords=None):

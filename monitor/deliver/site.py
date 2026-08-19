@@ -25,7 +25,7 @@ if _DS_API_KEY:
 else:
     _DS_CLIENT = None
 
-from ..base import ITEMS_DB, RUN_LOG, load_json, save_json
+from ..base import ITEMS_DB, RUN_LOG, load_json, save_json, is_allowed_sec_row
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -358,8 +358,10 @@ def generate(settings, subjects=None):
         except Exception:
             subjects = []
 
-    # items
+    # items：发布前再滤掉历史非财报 SEC（Form 4 / 8-K / 13G 等）
     db = load_json(ITEMS_DB, [])
+    mfilter = settings.get("milestone_filter") or {}
+    db = [r for r in db if is_allowed_sec_row(r, mfilter)]
     db.sort(key=lambda r: r.get("first_seen", ""), reverse=True)
 
     # ── 内联摘要生成 ──
@@ -537,7 +539,10 @@ def generate(settings, subjects=None):
             df.write(sf.read())
 
     import shutil as _shutil
-    for jsfile in ("items.json", "summaries.json", "run_log.json"):
+    import json as _json
+    with open(os.path.join(out_dir, "items.json"), "w", encoding="utf-8") as f:
+        _json.dump(db, f, ensure_ascii=False, indent=2)
+    for jsfile in ("summaries.json", "run_log.json"):
         src = os.path.join(ROOT, "data", jsfile)
         if os.path.isfile(src):
             _shutil.copyfile(src, os.path.join(out_dir, jsfile))

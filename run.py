@@ -19,6 +19,7 @@ from config import COMPANIES, SETTINGS, MONITORING_SUBJECTS
 from monitor.base import (
     Http, StateStore, RunStats, diff_new, merge_into_items_db, is_milestone,
     append_run_log, load_json, save_json, META_FILE, now_iso,
+    purge_non_financial_sec,
 )
 from monitor.sources import sec_edgar, webwatch
 from monitor.deliver import site, email_digest
@@ -126,6 +127,10 @@ def run(args):
     if error_sources:
         print(f"\n⚠️ 本轮存在信息源故障: {error_sources}（详见 run_log.json / 看板顶部“系统运行状态”）")
 
+    dropped_sec = purge_non_financial_sec(mfilter)
+    if dropped_sec:
+        print(f"  已从看板移除 {dropped_sec} 条非财报 SEC 申报（Form 4 / 8-K / 13G 等）")
+
     if first_run:
         # 首次运行只建立“已见”基线：把当前存量条目全部记为已知，但【不写入展示库】，
         # 避免上百条历史条目一次性刷屏。此后仅【新出现】的里程碑条目才会进入看板。
@@ -139,6 +144,9 @@ def run(args):
         return
 
     merge_into_items_db(all_new)
+    dropped_sec = purge_non_financial_sec(mfilter)
+    if dropped_sec:
+        print(f"  已从看板移除 {dropped_sec} 条非财报 SEC 申报（Form 4 / 8-K / 13G 等）")
     cleaned_age = _clean_expired_items()
     if cleaned_age:
         print(f"  已从 items.json 移除 {cleaned_age} 条超过{_get_site_max_age()}天的旧条目")
