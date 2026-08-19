@@ -301,7 +301,7 @@ function apply(){
       summaryHtml+'<div class="detail">'+esc(r.detail||'')+' · '+esc(r.date||'')+'</div></td></tr>';
     srcCounts[r.source] = (srcCounts[r.source]||0)+1;
   }
-  tb.innerHTML = html || '<tr><td colspan="4" class="empty">基线建立中——竞品一旦发布新的临床数据或监管进展，会自动出现在这里。</td></tr>';
+  tb.innerHTML = html || '<tr><td colspan="4" class="empty">暂时没有新动态</td></tr>';
   // chips
   var chipsDiv = document.getElementById('chips');
   chipsDiv.innerHTML = '<button class="chip'+(filter==='all'?' active':'')+'" onclick="filter=\'all\';apply();">全部</button>';
