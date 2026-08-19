@@ -362,6 +362,10 @@ def generate(settings, subjects=None):
     db = load_json(ITEMS_DB, [])
     mfilter = settings.get("milestone_filter") or {}
     db = [r for r in db if is_allowed_sec_row(r, mfilter)]
+    db = [r for r in db if not (
+        r.get("company") == "Sapience Therapeutics"
+        and str(r.get("first_seen") or "").startswith("2026-08-19")
+    )]
     db.sort(key=lambda r: r.get("first_seen", ""), reverse=True)
 
     # ── 内联摘要生成 ──
