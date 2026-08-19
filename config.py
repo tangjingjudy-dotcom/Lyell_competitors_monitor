@@ -36,7 +36,7 @@ SETTINGS = {
         "subject_prefix": "[Lyell竞品监控·重点]"
     },
     "site": {
-        "title": "Lyell 及下一代 CAR-T 竞品动态监控",
+        "title": "竞品动态监控",
         "output_dir": "data/site",
         "recent_days_highlight": 7,
         "items_max_age_days": 7
@@ -44,16 +44,14 @@ SETTINGS = {
     "milestone_filter": {
         "enabled": True,
         "meaningful_sec_forms": [
-            "8-K",
-            "8-K/A",
-            "6-K",
-            "6-K/A",
-            "20-F",
-            "20-F/A",
             "10-K",
             "10-K/A",
-            "F-1",
-            "424B4"
+            "10-Q",
+            "10-Q/A",
+            "20-F",
+            "20-F/A",
+            "40-F",
+            "40-F/A"
         ],
         "keywords": [
             "phase 1",
@@ -202,485 +200,161 @@ MONITORING_SUBJECTS = [
         "description": "下一代CAR-T（ronde-cel + LYL273）",
         "companies": [
             "Lyell Immunopharma",
-            "Allogene Therapeutics",
-            "Caribou Biosciences",
-            "CRISPR Therapeutics",
-            "Century Therapeutics",
-            "Autolus Therapeutics",
-            "Arsenal Biosciences",
             "Gilead (含Arcellx/Kite)",
-            "Roche (含Poseida/Genentech)",
-            "A2 Biotherapeutics",
-            "Affini-T Therapeutics",
-            "Immatics",
-            "Immunocore",
-            "Adaptimmune Therapeutics",
-            "Precision Biosciences",
-            "Sana Biotechnology",
-            "Bristol Myers Squibb",
-            "Johnson & Johnson",
-            "Legend Biotech",
-            "Novartis",
-            "AbbVie / Genmab (epcoritamab)",
-            "ADC Therapeutics",
-            "Incyte",
             "Miltenyi Biomedicine (zamto-cel)",
-            "CARsgen Therapeutics (科济药业)",
-            "Innovative Cellular Therapeutics (ICT)",
-            "北京艺妙神州 (Immunochina)",
-            "Chimeric Therapeutics",
-            "Carina Biotech",
             "Merck KGaA (M9140)",
-            "Sanofi",
-            "Pfizer",
-            "AstraZeneca (含EsoBiotec)",
-            "Agenus",
-            "Akeso（康方生物）",
-            "Summit Therapeutics"
+            "北京艺妙神州 (Immunochina)",
+            "Legend Biotech",
+            "CARsgen (科济药业)",
+        ]
+    },
+    {
+        "id": "parabilis",
+        "name": "Parabilis Medicines",
+        "description": "Helicon 肽 / β-catenin（zolucatetide）",
+        "companies": [
+            "Parabilis Medicines",
+            "Sapience Therapeutics",
+            "Immunome",
         ]
     }
 ]
 
+
+# —— 公司信息源配置 ——
 COMPANIES = [
     {
         "name": "Lyell Immunopharma",
         "category": "监控主体",
         "tier": "priority",
+        "subject_id": "lyell",
+        "subject_name": "Lyell 下一代CAR-T",
         "sec_ticker": "LYEL",
         "rss": [
-            "https://ir.lyell.com/rss/news-releases.xml"
-        ]
-    },
-    {
-        "name": "Allogene Therapeutics",
-        "category": "异体/现货型CAR-T",
-        "sec_ticker": "ALLO",
-        "rss": [
-            "https://ir.allogene.com/rss/news-releases.xml"
+            "https://ir.lyell.com/rss/news-releases.xml",
         ],
-        "product_keywords": [
-            "cema-cel",
-            "allo-501",
-            "allo-715"
-        ]
-    },
-    {
-        "name": "Caribou Biosciences",
-        "category": "异体/现货型CAR-T",
-        "sec_ticker": "CRBU",
-        "rss": [
-            "https://news.google.com/rss/search?q=%22Caribou+Biosciences%22+car-t&hl=en-US&gl=US&ceid=US:en"
-        ],
-        "product_keywords": [
-            "cb-010",
-            "cb-011",
-            "vispa-cel"
-        ]
-    },
-    {
-        "name": "CRISPR Therapeutics",
-        "category": "异体/现货型CAR-T",
-        "sec_ticker": "CRSP",
-        "news_pages": [
-            "https://www.crisprtx.com/about-us/press-releases-and-presentations"
-        ],
-        "product_keywords": [
-            "ctx110",
-            "ctx112",
-            "ctx130",
-            "casgevy"
-        ]
-    },
-    {
-        "name": "Century Therapeutics",
-        "category": "异体/现货型CAR-T",
-        "sec_ticker": "IPSC",
-        "rss": [
-            "https://news.google.com/rss/search?q=%22Century+Therapeutics%22+car-t&hl=en-US&gl=US&ceid=US:en"
-        ],
-        "product_keywords": [
-            "cnty-101",
-            "cnty-102"
-        ]
-    },
-    {
-        "name": "Autolus Therapeutics",
-        "category": "自体下一代CAR-T",
-        "sec_ticker": "AUTL",
-        "rss": [
-            "https://news.google.com/rss/search?q=%22Autolus+Therapeutics%22+car-t&hl=en-US&gl=US&ceid=US:en"
-        ],
-        "product_keywords": [
-            "obe-cel",
-            "obecabtagene",
-            "auto1"
-        ]
-    },
-    {
-        "name": "Arsenal Biosciences",
-        "category": "自体下一代CAR-T",
-        "news_pages": [
-            "https://www.arsenalbio.com/news/"
-        ],
-        "product_keywords": [
-            "arsenal",
-            "ab-1015"
-        ]
     },
     {
         "name": "Gilead (含Arcellx/Kite)",
-        "category": "自体下一代CAR-T / 在位者",
+        "category": "在位者/下一代CAR-T",
         "tier": "priority",
-        "diversified": True,
+        "subject_id": "lyell",
+        "subject_name": "Lyell 下一代CAR-T",
         "sec_ticker": "GILD",
         "news_pages": [
-            "https://www.gilead.com/news/news-details"
+            "https://www.gilead.com/news/news-details",
         ],
         "product_keywords": [
             "kite-363",
-            "kite-753"
-        ]
-    },
-    {
-        "name": "Roche (含Poseida/Genentech)",
-        "category": "自体下一代CAR-T / 在位者",
-        "news_pages": [
-            "https://www.roche.com/media/releases"
+            "kite-753",
         ],
-        "product_keywords": [
-            "columvi",
-            "glofitamab",
-            "lunsumio",
-            "mosunetuzumab",
-            "polivy",
-            "poseida"
-        ]
-    },
-    {
-        "name": "A2 Biotherapeutics",
-        "category": "实体瘤CAR-T/TCR-T",
-        "news_pages": [
-            "https://www.a2bio.com/news/"
-        ],
-        "product_keywords": [
-            "a2b530",
-            "a2b694",
-            "tmod"
-        ]
-    },
-    {
-        "name": "Affini-T Therapeutics",
-        "category": "实体瘤CAR-T/TCR-T",
-        "news_pages": [
-            "https://www.affini-t.com/news"
-        ],
-        "product_keywords": [
-            "afnt-111",
-            "afnt-211"
-        ]
-    },
-    {
-        "name": "Immatics",
-        "category": "实体瘤CAR-T/TCR-T",
-        "sec_ticker": "IMTX",
-        "rss": [
-            "https://investors.immatics.com/rss/news-releases.xml"
-        ],
-        "product_keywords": [
-            "ima401",
-            "ima402",
-            "ima203",
-            "actengine"
-        ]
-    },
-    {
-        "name": "Immunocore",
-        "category": "实体瘤CAR-T/TCR-T",
-        "sec_ticker": "IMCR",
-        "news_pages": [
-            "https://www.immunocore.com/investors/news/press-releases"
-        ],
-        "product_keywords": [
-            "kimmtrak",
-            "tebentafusp",
-            "imc-f106c"
-        ]
-    },
-    {
-        "name": "Adaptimmune Therapeutics",
-        "category": "实体瘤CAR-T/TCR-T",
-        "product_keywords": [
-            "afami-cel",
-            "tecelra",
-            "lete-cel"
-        ]
-    },
-    {
-        "name": "Precision Biosciences",
-        "category": "失败/转向案例",
-        "sec_ticker": "DTIL",
-        "product_keywords": [
-            "pbcar0191",
-            "azer-cel",
-            "azercabtagene"
-        ]
-    },
-    {
-        "name": "Sana Biotechnology",
-        "category": "失败/转向案例",
-        "sec_ticker": "SANA",
-        "product_keywords": [
-            "sc291",
-            "sc262"
-        ]
-    },
-    {
-        "name": "Bristol Myers Squibb",
-        "category": "在位者大药企",
-        "diversified": True,
-        "sec_ticker": "BMY",
-        "rss": [
-            "https://news.google.com/rss/search?q=%22Bristol+Myers+Squibb%22+car-t+cell+therapy&hl=en-US&gl=US&ceid=US:en"
-        ],
-        "product_keywords": [
-            "breyanzi",
-            "liso-cel",
-            "abecma",
-            "ide-cel",
-            "arlo-cel"
-        ]
-    },
-    {
-        "name": "Johnson & Johnson",
-        "category": "在位者大药企",
-        "sec_ticker": "JNJ",
-        "product_keywords": [
-            "carvykti",
-            "cilta-cel",
-            "ciltacabtagene",
-            "c-car039"
-        ]
-    },
-    {
-        "name": "Legend Biotech",
-        "category": "在位者大药企",
-        "sec_ticker": "LEGN",
-        "rss": [
-            "https://investors.legendbiotech.com/rss/news-releases.xml"
-        ],
-        "product_keywords": [
-            "carvykti",
-            "cilta-cel",
-            "lcar-b38m"
-        ]
-    },
-    {
-        "name": "Novartis",
-        "category": "在位者大药企",
-        "sec_ticker": "NVS",
-        "product_keywords": [
-            "kymriah",
-            "tisa-cel",
-            "tisagenlecleucel",
-            "t-charge"
-        ]
-    },
-    {
-        "name": "AbbVie / Genmab (epcoritamab)",
-        "category": "Ronde-cel竞品(LBCL)",
-        "sec_ticker": "GMAB",
-        "rss": [
-            "https://ir.genmab.com/rss/news-releases.xml"
-        ],
-        "product_keywords": [
-            "epcoritamab",
-            "epkinly",
-            "tepkinly",
-            "genmab"
-        ]
-    },
-    {
-        "name": "ADC Therapeutics",
-        "category": "Ronde-cel竞品(LBCL)",
-        "sec_ticker": "ADCT",
-        "news_pages": [
-            "https://ir.adctherapeutics.com/news-releases"
-        ],
-        "product_keywords": [
-            "zynlonta",
-            "loncastuximab",
-            "adct-301",
-            "adct-602"
-        ]
-    },
-    {
-        "name": "Incyte",
-        "category": "Ronde-cel竞品(LBCL)",
-        "sec_ticker": "INCY",
-        "product_keywords": [
-            "monjuvi",
-            "tafasitamab"
-        ]
     },
     {
         "name": "Miltenyi Biomedicine (zamto-cel)",
-        "category": "Ronde-cel竞品(LBCL)",
+        "category": "CD19-CD20双靶点CAR-T",
         "tier": "priority",
+        "subject_id": "lyell",
+        "subject_name": "Lyell 下一代CAR-T",
         "news_pages": [
-            "https://www.miltenyibiomedicine.com/news-events/press-releases"
+            "https://www.miltenyibiomedicine.com/news-events/press-releases/",
         ],
         "product_keywords": [
             "zamto-cel",
-            "zamtocabtagene",
-            "mb-cart2019"
-        ]
-    },
-    {
-        "name": "CARsgen Therapeutics (科济药业)",
-        "category": "Ronde-cel竞品(LBCL)",
-        "rss": [
-            "https://news.google.com/rss/search?q=CARsgen+Therapeutics+car-t&hl=en-US&gl=US&ceid=US:en"
+            "zamtocabtagene autoleucel",
         ],
-        "product_keywords": [
-            "satri-cel",
-            "ct041",
-            "ct1190",
-            "carsgen"
-        ]
-    },
-    {
-        "name": "Innovative Cellular Therapeutics (ICT)",
-        "category": "LYL273竞品(mCRC)",
-        "news_pages": [
-            "https://www.ictbio.com/news/"
-        ],
-        "product_keywords": [
-            "gcc19cart",
-            "gcc",
-            "gucy2c",
-            "coupledcar"
-        ]
-    },
-    {
-        "name": "北京艺妙神州 (Immunochina)",
-        "category": "LYL273竞品(mCRC)",
-        "news_pages": [
-            "http://www.immunochina.com/en/index.php/home/news/news_1.html"
-        ],
-        "product_keywords": [
-            "im96",
-            "gucy2c"
-        ],
-        "tier": "priority"
-    },
-    {
-        "name": "Chimeric Therapeutics",
-        "category": "LYL273竞品(mCRC)",
-        "news_pages": [
-            "https://www.chimerictherapeutics.com/investor"
-        ],
-        "product_keywords": [
-            "chm-2101",
-            "cdh17"
-        ]
-    },
-    {
-        "name": "Carina Biotech",
-        "category": "LYL273竞品(mCRC)",
-        "news_pages": [
-            "https://www.carinabiotech.com/news/"
-        ],
-        "product_keywords": [
-            "cna3103",
-            "lgr5"
-        ]
     },
     {
         "name": "Merck KGaA (M9140)",
-        "category": "LYL273竞品(mCRC)",
+        "category": "CEACAM5 ADC",
         "tier": "priority",
-        "diversified": True,
-        "rss": [
-            "https://news.google.com/rss/search?q=%22Merck+KGaA%22+ADC+cancer+colorectal&hl=en-US&gl=US&ceid=US:en"
-        ],
-        "product_keywords": [
-            "precemtabart",
-            "m9140",
-            "ceacam5",
-            "tocentecan"
-        ]
-    },
-    {
-        "name": "Sanofi",
-        "category": "LYL273竞品(mCRC)",
-        "sec_ticker": "SNY",
-        "product_keywords": [
-            "tusamitamab",
-            "ceacam5"
-        ]
-    },
-    {
-        "name": "Pfizer",
-        "category": "LYL273竞品(mCRC) / 10-K列示",
-        "sec_ticker": "PFE",
-        "product_keywords": [
-            "tusamitamab",
-            "ceacam5"
-        ]
-    },
-    {
-        "name": "AstraZeneca (含EsoBiotec)",
-        "category": "10-K潜在竞品",
-        "sec_ticker": "AZN",
-        "product_keywords": [
-            "enabl",
-            "esobiotec",
-            "in vivo car-t"
-        ]
-    },
-    {
-        "name": "Agenus",
-        "category": "10-K潜在竞品",
-        "sec_ticker": "AGEN",
-        "product_keywords": [
-            "balstilimab",
-            "botensilimab"
-        ]
-    },
-    {
-        "name": "Akeso（康方生物）",
-        "category": "10-K潜在竞品",
+        "subject_id": "lyell",
+        "subject_name": "Lyell 下一代CAR-T",
+        "sec_ticker": "MKKGY",
         "news_pages": [
-            "https://www.akesobio.com/en/media/akeso-news/"
+            "https://www.merckgroup.com/en/news.html",
         ],
         "product_keywords": [
-            "ivonescimab",
-            "ak104",
-            "ak112"
-        ]
+            "M9140",
+        ],
     },
     {
-        "name": "Summit Therapeutics",
-        "category": "10-K潜在竞品",
-        "sec_ticker": "SMMT",
+        "name": "北京艺妙神州 (Immunochina)",
+        "category": "实体瘤CAR-T (GUCY2C)",
+        "tier": "priority",
+        "subject_id": "lyell",
+        "subject_name": "Lyell 下一代CAR-T",
+        "news_pages": [
+            "http://www.immunochina.com/Home/news/news.html",
+        ],
         "product_keywords": [
-            "ivonescimab",
-            "smt112"
-        ]
-    }
+            "IM96",
+        ],
+    },
+    {
+        "name": "Legend Biotech",
+        "category": "体内CAR-T (in vivo)",
+        "tier": "priority",
+        "subject_id": "lyell",
+        "subject_name": "Lyell 下一代CAR-T",
+        "sec_ticker": "LEGN",
+        "news_pages": [
+            "https://investors.legendbiotech.com/news-releases",
+        ],
+        "product_keywords": [
+            "LB2501",
+        ],
+    },
+    {
+        "name": "CARsgen (科济药业)",
+        "category": "同种异体CD19-CD20双靶点",
+        "tier": "priority",
+        "subject_id": "lyell",
+        "subject_name": "Lyell 下一代CAR-T",
+        "news_pages": [
+            "https://www.carsgen.com/en/news/",
+        ],
+        "product_keywords": [
+            "CT1190B",
+        ],
+    },
+    {
+        "name": "Parabilis Medicines",
+        "category": "监控主体",
+        "tier": "priority",
+        "subject_id": "parabilis",
+        "sec_ticker": "PBLS",
+        "news_pages": [
+            "https://investors.parabilismed.com/news-events/news-releases",
+        ],
+    },
+    {
+        "name": "Sapience Therapeutics",
+        "category": "竞品",
+        "tier": "priority",
+        "subject_id": "parabilis",
+        "news_pages": [
+            "https://sapiencetherapeutics.com/news-events/press-releases/",
+        ],
+        "product_keywords": [
+            "ST316",
+        ],
+    },
+    {
+        "name": "Immunome",
+        "category": "竞品",
+        "tier": "priority",
+        "subject_id": "parabilis",
+        "sec_ticker": "IMNM",
+        "news_pages": [
+            "https://investors.immunome.com/news-releases/",
+        ],
+        "product_keywords": [
+            "varegacestat",
+            "AL102",
+        ],
+    },
 ]
-# ═══════════════════════════════════════════════════════
-# 竞争路线图（Competitive Roadmap）
-# ═══════════════════════════════════════════════════════
-# 基于实际试验时间线手动维护。
-# 重点对象（5家）：Lyell/ronde-cel+LYL273 / zamto-cel / KITE-753 / M9140 / IM96
-# 每个条目：company(需匹配COMPANIES)、date(YYYY-MM / YYYY-QX / YYYY-HX)、
-#           event、category(临床数据/监管进展/学术会议)、
-#           product、confidence(确定/预计/可能/乐观预计)、note
-# 看板"路线图"按钮展示为甘特图矩阵（公司×时间轴）。
-# 分为两条产品线: ronde-cel (竞品zamto-cel/KITE-753) / LYL273 (竞品M9140/IM96)
-# 每个条目新增 product_line 字段
-# 看板渲染为每条产品线独立的三轴时间线（Lyell + 竞品1 + 竞品2）
+
 ROADMAP = [
     # ────── ronde-cel 产品线 ──────
     {
@@ -785,3 +459,32 @@ ROADMAP = [
         "note": "CEACAM5 ADC; 若积极, 可能在LYL273之前获批mCRC"
     }
 ]
+
+# ──────────────────────────── Sheets 集成 ────────────────────────────
+import json as _json
+
+_HERE2 = os.path.dirname(os.path.abspath(__file__))
+_ENV_FILE2 = os.path.join(_HERE2, "env.json")
+_CSV_URL = os.environ.get("GOOGLE_SHEETS_CSV_URL", "").strip()
+if not _CSV_URL and os.path.isfile(_ENV_FILE2):
+    with open(_ENV_FILE2, "r", encoding="utf-8") as _f:
+        _CSV_URL = _json.load(_f).get("GOOGLE_SHEETS_CSV_URL", "").strip()
+if _CSV_URL:
+    try:
+        import sys as _sys
+        _sys.path.insert(0, _HERE2)
+        from sheets_loader import fetch_csv as _fetch, parse_csv as _parse
+        _fallback = list(COMPANIES)
+        _csv_text = _fetch()
+        if _csv_text:
+            _companies = _parse(_csv_text)
+            if _companies:
+                _have = {c["name"] for c in _companies}
+                for _c in _fallback:
+                    if _c["name"] not in _have:
+                        _companies.append(_c)
+                COMPANIES = _companies
+                print(f"[config] 已从 Google Sheets 加载 {len(COMPANIES)} 家公司")
+    except Exception as _e:
+        print(f"[config] Google Sheets 加载失败，使用本地 fallback ({len(COMPANIES)} 家): {_e}")
+

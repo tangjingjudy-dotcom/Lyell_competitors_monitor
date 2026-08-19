@@ -24,6 +24,17 @@ from monitor.sources import sec_edgar, webwatch
 from monitor.deliver import site, email_digest
 
 
+def _build_subjects(companies):
+    try:
+        from sheets_loader import build_subjects
+        subjects = build_subjects(companies)
+        if subjects:
+            return subjects
+    except Exception:
+        pass
+    return MONITORING_SUBJECTS
+
+
 def _due_today(tier_cfg):
     """按 tier 的 run_every_days 判断今天是否轮到扫描（每天=1 恒为真）。"""
     n = max(1, int(tier_cfg.get("run_every_days", 1)))
@@ -121,7 +132,7 @@ def run(args):
         meta["initialized"] = True
         meta["first_run_at"] = now_iso()
         save_json(META_FILE, meta)
-        out_path = site.generate(SETTINGS, subjects=MONITORING_SUBJECTS)
+        out_path = site.generate(SETTINGS, subjects=_build_subjects(COMPANIES))
         print(f"\n站点已生成: {out_path}")
         print(f"基线建立完成：已将当前 {len(all_new)} 条存量里程碑记为‘已见’（不展示）；"
               f"后续运行仅呈现新增。")
@@ -135,7 +146,7 @@ def run(args):
     # —— 摘要生成已内联到 site.generate() 中，run.py 不再独立调用 ——
     # 详情见 monitor/deliver/site.py 的 _generate_summary()
 
-    out_path = site.generate(SETTINGS, subjects=MONITORING_SUBJECTS)
+    out_path = site.generate(SETTINGS, subjects=_build_subjects(COMPANIES))
     print(f"\n站点已生成: {out_path}")
     print(f"本轮里程碑新增合计: {len(all_new)} 条（其中重点对象 {len(priority_new)} 条；已过滤例行噪音 {filtered_total} 条）")
 

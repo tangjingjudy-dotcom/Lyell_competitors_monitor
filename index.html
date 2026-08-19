@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>竞品动态监控</title>
+<style>
+:root{--bg:#f7f8fa;--card:#fff;--navy:#1f3b57;--gold:#c98a2c;--gray:#6e6e6e;--border:#e2e6ea;--red:#b0453a;--blue:#3e7cb1;--green:#2e7d5b;--sidebar:260px}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,"Microsoft YaHei",Segoe UI,sans-serif;background:var(--bg);color:#232323;display:flex;min-height:100vh}
+#sidebar{width:var(--sidebar);background:var(--navy);color:#fff;padding:20px 0;overflow-y:auto;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:10}
+.sb-logo{padding:0 18px 18px;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:12px}
+.sb-logo h2{font-size:16px;margin:0;font-weight:700}.sb-logo p{font-size:11px;opacity:.7;margin:4px 0 0}
+.sb-item{padding:12px 18px;cursor:pointer;border-left:3px solid transparent;margin:2px 0;transition:.15s}
+.sb-item:hover,.sb-item.active{background:rgba(255,255,255,.1);border-left-color:var(--gold)}
+.sb-item.active .sb-name{color:var(--gold)}
+.sb-name{font-size:13.5px;font-weight:600}.sb-desc{font-size:11px;opacity:.7;margin-top:2px}
+.sb-stats{font-size:10.5px;opacity:.6;margin-top:4px}
+.sb-add{padding:16px 18px;font-size:11px;opacity:.4;border-top:1px solid rgba(255,255,255,.1);margin-top:12px}
+#main{margin-left:var(--sidebar);flex:1;min-width:0}
+header{background:var(--navy);color:#fff;padding:16px 28px;display:flex;justify-content:space-between;align-items:center}
+header h1{margin:0;font-size:16px}.header-right{font-size:12px;opacity:.8}
+.stats{display:flex;gap:10px;padding:14px 28px;flex-wrap:wrap}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 16px;min-width:100px}
+.stat .n{font-size:20px;font-weight:700;color:var(--navy)}.stat .l{font-size:11px;color:var(--gray);margin-top:2px}
+.action-bar{display:flex;gap:10px;padding:8px 28px 14px;align-items:center;flex-wrap:wrap}
+.btn{padding:8px 18px;border-radius:6px;font-size:13px;cursor:pointer;border:none;background:var(--navy);color:#fff;font-weight:600}
+.btn:hover{opacity:.9}.btn-outline{background:transparent;border:1.5px solid var(--navy);color:var(--navy)}
+.active-subj-label{font-size:12.5px;color:var(--gray);margin-left:auto}
+.controls{padding:0 28px 8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#q{flex:1;min-width:200px;padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px}
+.toggle{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--navy);cursor:pointer;user-select:none}
+.toggle input{cursor:pointer}
+table{width:calc(100% - 56px);margin:0 28px 30px;border-collapse:collapse;background:var(--card);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:top}
+th{background:#eef1f5;color:var(--navy);font-size:12px;position:sticky;top:0}
+.c-date{white-space:nowrap;color:var(--gray);font-size:11.5px}.c-co{white-space:nowrap;font-weight:600;color:var(--navy);font-size:12.5px}
+.star{color:var(--gold)}
+.c-title a{color:#1a1a1a;text-decoration:none;font-size:13px}.c-title a:hover{color:var(--gold);text-decoration:underline}
+.detail{color:var(--gray);font-size:11px;margin-top:3px}
+.item-summary{color:#555;font-size:11.5px;line-height:1.5;margin-top:4px;padding-left:8px;border-left:2px solid var(--blue)}
+.badge{background:var(--gold);color:#fff;font-size:9.5px;border-radius:3px;padding:1px 4px;margin-left:4px}
+.src{font-size:10.5px;border-radius:3px;padding:1px 6px;color:#fff;white-space:nowrap}
+.src-clinicaltrials{background:var(--blue)}.src-sec{background:var(--navy)}.src-pubmed{background:#6a7f4f}.src-web,.src-rss{background:var(--gold)}
+.empty{text-align:center;color:var(--gray);padding:30px}
+.chip{cursor:pointer;padding:4px 14px;border-radius:14px;font-size:12px;border:1px solid var(--border);background:var(--card);color:var(--navy);margin:2px}.chip.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.health{margin:12px 28px 0;border-radius:8px;padding:12px 16px;font-size:12.5px;border:1px solid var(--border)}
+.health-ok{background:#eaf6ee;border-color:#bfe3c9}.health-warn{background:#fbeeea;border-color:#f0c4b4}
+.health-badge{font-weight:700;font-size:13px;color:var(--navy);margin-bottom:3px}.health-warn .health-badge{color:var(--red)}
+.health-text{color:#3a3a3a;line-height:1.6}.health-err{color:var(--red);font-weight:600}
+.health-history{margin-top:6px}.health-history summary{cursor:pointer;color:var(--blue);font-size:12px}
+table.mini{width:100%;margin-top:6px;border-collapse:collapse;font-size:11.5px}
+table.mini th,table.mini td{padding:5px 8px;border-bottom:1px solid var(--border);text-align:left}
+table.mini th{background:#f2f4f7;color:var(--navy)}.health-err-cell{color:var(--red);font-weight:700}
+.modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);z-index:100;justify-content:center;align-items:flex-start;padding-top:60px}
+.modal.show{display:flex}.modal-content{background:#fff;border-radius:10px;max-width:800px;width:90%;max-height:80vh;overflow-y:auto;padding:24px;box-shadow:0 8px 30px rgba(0,0,0,.15)}
+.modal-close{float:right;font-size:20px;cursor:pointer;color:var(--gray);border:none;background:none}
+@media(max-width:768px){#sidebar{width:200px;position:relative;flex-shrink:1}#main{margin-left:0}body{flex-direction:column}header{flex-direction:column;gap:6px}}
+/* Roadmap */
+.rm-line-section{margin-bottom:28px}
+.rm-line-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:16px;padding:5px 0 5px 12px;border-left:4px solid var(--gold)}
+.rm-line-canvas{overflow-x:auto}
+.rm-time-hdr{display:flex;padding-left:130px;margin-bottom:6px}
+.rm-time-hdr .rm-time-col{flex:1;text-align:center;font-size:10px;color:var(--gray);font-weight:600;min-width:100px}
+.rm-axis-row{display:flex;margin-bottom:26px;padding-left:130px;position:relative}
+.rm-co-name{width:130px;font-size:11px;font-weight:700;color:var(--navy);padding-right:8px;text-align:right;flex-shrink:0;line-height:1.4;position:absolute;left:0;top:0;padding-top:2px}
+.rm-axis-track{flex:1;position:relative;display:flex}
+.rm-axis-line{position:absolute;left:0;right:0;top:27px;height:2px;opacity:.45;z-index:0}
+.rm-ev-col{flex:1;min-width:100px;position:relative;z-index:1;display:flex;justify-content:center;align-items:flex-start;gap:8px;padding-top:6px}
+.rm-ev-pin{display:inline-flex;flex-direction:column;align-items:center;flex-shrink:0}
+.rm-ev-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;order:2}
+.rm-ev-lbl{font-size:9.5px;text-align:center;line-height:1.3;max-width:60px;word-break:keep-all;font-weight:600;margin-bottom:3px;order:1}
+/* Loading */
+.loading{text-align:center;padding:40px;color:var(--gray);font-size:14px}
+.spinner{display:inline-block;width:20px;height:20px;border:3px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .8s linear infinite;margin-right:8px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div id="sidebar">
+  <div class="sb-logo"><h2>竞品监控</h2><p id="gen-time">加载中...</p></div>
+  <div id="sidebar-items"><div class="loading"><span class="spinner"></span>加载中</div></div>
+  <div class="sb-add">+ 后续可通过 Google Sheets 编辑公司名单</div>
+</div>
+<div id="main">
+  <header><h1 id="page-title">竞品动态监控</h1><div class="header-right">最近 7 天 NEW 标记</div></header>
+  <div id="health-panel"></div>
+  <div class="stats">
+    <div class="stat"><div class="n" id="stat-total">-</div><div class="l">累计条目</div></div>
+    <div class="stat"><div class="n" id="stat-recent">-</div><div class="l">近7天新增</div></div>
+    <div class="stat"><div class="n" id="stat-subj">-</div><div class="l">监控主体</div></div>
+  </div>
+  <div class="action-bar">
+    <button class="btn" id="btn-preview">预览摘要</button>
+    <button class="btn btn-outline" id="btn-download">下载日报</button>
+    <button class="btn btn-outline" id="btn-roadmap">路线图</button>
+    <span class="active-subj-label" id="active-subj-label"></span>
+  </div>
+  <div class="controls">
+    <input id="q" placeholder="搜索公司 / 标题 / 关键词...">
+    <label class="toggle"><input type="checkbox" id="onlyStar"> 只看重点</label>
+  </div>
+  <div id="chips" style="padding:0 28px 4px"></div>
+  <table id="tbl"><thead><tr><th>首次发现</th><th>公司</th><th>类型</th><th>标题</th></tr></thead>
+  <tbody id="tbody"><tr><td colspan="4" class="loading"><span class="spinner"></span>加载数据中...</td></tr></tbody>
+  </table>
+</div>
+
+<!-- modals -->
+<div class="modal" id="summary-modal"><div class="modal-content">
+  <button class="modal-close" onclick="closeModal()">&#10005;</button>
+  <div id="modal-body">加载中...</div>
+</div></div>
+<div class="modal" id="roadmap-modal"><div class="modal-content" style="max-width:1150px">
+  <button class="modal-close" onclick="closeRoadmap()">&#10005;</button>
+  <h2 id="roadmap-title" style="margin:0 0 4px;font-size:17px">竞争路线图</h2>
+  <div style="font-size:11px;color:var(--gray);margin-bottom:12px">按产品线分轴: ronde-cel(竞品 zamto-cel/KITE-753) / LYL273(竞品 M9140/IM96)</div>
+  <div id="roadmap-body">加载中...</div>
+</div></div>
+
+<script>
+// ─── Global state ───
+var ITEMS = [], SUBJECTS = [], SUMMARIES = {}, ROADMAP = [], RUN_LOG = [];
+var activeSid = '', filter = 'all', onlyStar = false;
+
+// ─── Source labels ───
+var SRC = { clinicaltrials:'临床试验', sec:'SEC申报', pubmed:'论文', web:'新闻', rss:'新闻' };
+
+// ─── Init: load all data ───
+Promise.all([
+  fetch('./subjects.json').then(r=>r.json()),
+  fetch('./items.json').then(r=>r.json()).catch(()=>[]),
+  fetch('./summaries.json').then(r=>r.json()).catch(()=>({})),
+  fetch('./roadmap.json').then(r=>r.json()).catch(()=>[]),
+  fetch('./run_log.json').then(r=>r.json()).catch(()=>[])
+]).then(function(results){
+  SUBJECTS = results[0];
+  ITEMS = results[1];
+  SUMMARIES = results[2];
+  ROADMAP = results[3];
+  RUN_LOG = results[4];
+  init();
+}).catch(function(e){
+  document.getElementById('tbody').innerHTML = '<tr><td colspan="4" class="empty">数据加载失败: '+e.message+'。请确认爬虫已运行并生成 JSON 文件。</td></tr>';
+});
+
+function init(){
+  // 生成时间
+  if(RUN_LOG.length){
+    var last = RUN_LOG[RUN_LOG.length-1];
+    document.getElementById('gen-time').textContent = (last.timestamp||'').slice(0,16).replace('T',' ');
+  } else {
+    document.getElementById('gen-time').textContent = '无运行记录';
+  }
+  // sidebar
+  buildSidebar();
+  // health
+  buildHealth();
+  // stats
+  refreshStats(null);
+  // bind events
+  document.getElementById('q').addEventListener('input', apply);
+  document.getElementById('onlyStar').addEventListener('change', function(){ onlyStar=this.checked; apply(); });
+  document.getElementById('btn-preview').addEventListener('click', openSummary);
+  document.getElementById('btn-download').addEventListener('click', openReport);
+  document.getElementById('btn-roadmap').addEventListener('click', openRoadmap);
+}
+
+// ─── Sidebar ───
+function buildSidebar(){
+  var div = document.getElementById('sidebar-items');
+  div.innerHTML = '';
+  SUBJECTS.forEach(function(s, i){
+    var el = document.createElement('div');
+    el.className = 'sb-item' + (i===0?' active':'');
+    el.setAttribute('data-sid', s.id);
+    el.innerHTML = '<div class="sb-name">'+esc(s.name)+'</div>'+
+      '<div class="sb-desc">'+esc(s.description||'')+'</div>'+
+      '<div class="sb-stats" id="sb-stats-'+s.id+'">- 条</div>';
+    el.addEventListener('click', function(){
+      document.querySelector('.sb-item.active').classList.remove('active');
+      this.classList.add('active');
+      activeSid = this.getAttribute('data-sid');
+      document.getElementById('active-subj-label').textContent = '当前主体: ' + esc(s.name);
+      refreshStats(activeSid);
+      apply();
+      updateSidebarCounts();
+    });
+    div.appendChild(el);
+  });
+  if(SUBJECTS.length){
+    activeSid = SUBJECTS[0].id;
+    document.getElementById('active-subj-label').textContent = '当前主体: ' + esc(SUBJECTS[0].name);
+    updateSidebarCounts();
+    refreshStats(activeSid);
+    apply();
+  }
+}
+
+function updateSidebarCounts(){
+  SUBJECTS.forEach(function(s){
+    var cos = new Set(s.companies||[]);
+    var total = 0, prio = 0;
+    ITEMS.forEach(function(it){
+      if(cos.has(it.company)){ total++; if(it.tier==='priority') prio++; }
+    });
+    var el = document.getElementById('sb-stats-'+s.id);
+    if(el) el.textContent = total + ' 条 · ★' + prio;
+  });
+}
+
+function refreshStats(sid){
+  var items = ITEMS;
+  if(sid){
+    var subj = SUBJECTS.find(function(s){return s.id===sid});
+    if(subj){
+      var cos = new Set(subj.companies);
+      items = ITEMS.filter(function(it){return cos.has(it.company)});
+    }
+  }
+  document.getElementById('stat-total').textContent = items.length;
+  var cutoff = new Date(); cutoff.setDate(cutoff.getDate()-7);
+  var cs = cutoff.toISOString().slice(0,10);
+  var recent = items.filter(function(it){ return (it.first_seen||'').slice(0,10) >= cs; }).length;
+  document.getElementById('stat-recent').textContent = recent;
+  document.getElementById('stat-subj').textContent = SUBJECTS.length;
+}
+
+// ─── Health panel ───
+function buildHealth(){
+  var el = document.getElementById('health-panel');
+  if(!RUN_LOG.length){
+    el.innerHTML = '<div class="health health-warn"><div class="health-badge">未检测到运行记录</div><div class="health-text">爬虫从未成功运行，请检查离线服务器。</div></div>';
+    return;
+  }
+  var last = RUN_LOG[RUN_LOG.length-1];
+  var now = new Date();
+  var lastDt = last.timestamp ? new Date(last.timestamp) : null;
+  var stale = !lastDt || (now - lastDt) > 36*3600*1000;
+  var errs = [];
+  var rawTotal = 0;
+  var srcs = last.sources||{};
+  Object.keys(srcs).forEach(function(k){
+    if(k==='sec_ticker_map') return;
+    rawTotal += srcs[k].raw||0;
+    if(srcs[k].error>0) errs.push(k+'×'+srcs[k].error);
+  });
+  var badge, cls;
+  if(stale){ badge = '距上次运行已超过36小时'; cls='health-warn'; }
+  else if(errs.length){ badge = '上次运行存在信息源故障'; cls='health-warn'; }
+  else { badge = '系统运行正常'; cls='health-ok'; }
+  var parts = [];
+  parts.push('上次运行：<b>'+fmtDt(last.timestamp)+'</b>（耗时'+((last.duration_sec||'?'))+'秒）');
+  parts.push('扫描 <b>'+(last.companies||'?')+'</b> 家公司，抓取原始信息 <b>'+rawTotal+'</b> 条');
+  parts.push('过滤噪音 <b>'+(last.filtered_noise||0)+'</b> 条，保留里程碑新增 <b>'+(last.kept_new||0)+'</b> 条');
+  if(errs.length) parts.push('<span class="health-err">故障源：'+esc(errs.join('、'))+'</span>');
+  if(last.first_run) parts.push('（本次为首次运行 / 静默建立基线）');
+  // history
+  var rows = RUN_LOG.slice(-10).reverse().map(function(e){
+    var eErr = 0, eRaw = 0;
+    Object.keys(e.sources||{}).forEach(function(k){
+      if(k==='sec_ticker_map') return;
+      eRaw += e.sources[k].raw||0;
+      eErr += e.sources[k].error||0;
+    });
+    return '<tr><td>'+fmtDt(e.timestamp)+'</td><td>'+(e.companies||'?')+'</td><td>'+eRaw+'</td><td>'+(e.filtered_noise||0)+'</td><td>'+(e.kept_new||0)+'</td><td class="'+(eErr?'health-err-cell':'')+'">'+eErr+'</td></tr>';
+  }).join('');
+  var hist = rows ? '<details class="health-history"><summary>查看最近 '+Math.min(RUN_LOG.length,10)+' 次运行趋势</summary><table class="mini"><thead><tr><th>时间</th><th>公司数</th><th>原始抓取</th><th>过滤噪音</th><th>保留新增</th><th>故障次数</th></tr></thead><tbody>'+rows+'</tbody></table></details>' : '';
+  el.innerHTML = '<div class="health '+cls+'"><div class="health-badge">'+badge+'</div><div class="health-text">'+parts.join(' · ')+'</div>'+hist+'</div>';
+}
+
+// ─── Table rendering ───
+function apply(){
+  var kw = document.getElementById('q').value.trim().toLowerCase();
+  var coSet = null;
+  var subj = SUBJECTS.find(function(s){return s.id===activeSid});
+  if(subj&&subj.companies) coSet = new Set(subj.companies);
+  var cutoff = new Date(); cutoff.setDate(cutoff.getDate()-7);
+  var cs = cutoff.toISOString().slice(0,10);
+  var tb = document.getElementById('tbody');
+  var html = '';
+  var srcCounts = {};
+  for(var i=0;i<ITEMS.length;i++){
+    var r = ITEMS[i];
+    if(coSet && !coSet.has(r.company)) continue;
+    if(filter!=='all' && r.source!==filter) continue;
+    if(onlyStar && r.tier!=='priority') continue;
+    if(kw && r.company.toLowerCase().indexOf(kw)<0 && r.title.toLowerCase().indexOf(kw)<0 && (r.detail||'').toLowerCase().indexOf(kw)<0) continue;
+    var isNew = (r.first_seen||'').slice(0,10) >= cs;
+    var isPrio = r.tier==='priority';
+    var badge = isNew ? '<span class="badge">NEW</span>' : '';
+    var star = isPrio ? '<span class="star" title="重点监控对象">&#9733;</span> ' : '';
+    var uid = r.uid||'';
+    var summary = SUMMARIES[uid]||'';
+    var summaryHtml = summary ? '<div class="item-summary">'+esc(summary)+'</div>' : '';
+    html += '<tr data-co="'+esc(r.company)+'" data-src="'+r.source+'" data-tier="'+(r.tier||'standard')+'">'+
+      '<td class="c-date">'+fmtDt(r.first_seen)+badge+'</td>'+
+      '<td class="c-co">'+star+esc(r.company)+'</td>'+
+      '<td><span class="src src-'+r.source+'">'+(SRC[r.source]||r.source)+'</span></td>'+
+      '<td class="c-title"><a href="'+esc(r.url)+'" target="_blank" rel="noopener">'+esc(r.title)+'</a>'+
+      summaryHtml+'<div class="detail">'+esc(r.detail||'')+' · '+esc(r.date||'')+'</div></td></tr>';
+    srcCounts[r.source] = (srcCounts[r.source]||0)+1;
+  }
+  tb.innerHTML = html || '<tr><td colspan="4" class="empty">基线建立中——竞品一旦发布新的临床数据或监管进展，会自动出现在这里。</td></tr>';
+  // chips
+  var chipsDiv = document.getElementById('chips');
+  chipsDiv.innerHTML = '<button class="chip'+(filter==='all'?' active':'')+'" onclick="filter=\'all\';apply();">全部</button>';
+  Object.keys(srcCounts).sort().forEach(function(s){
+    var cnt = srcCounts[s];
+    chipsDiv.innerHTML += '<button class="chip'+(filter===s?' active':'')+'" onclick="filter=\''+s+'\';apply();">'+(SRC[s]||s)+' ('+cnt+')</button>';
+  });
+}
+
+// ─── Summary modal ───
+function openSummary(){
+  if(!activeSid){ alert('请先选择监控主体'); return; }
+  var subj = SUBJECTS.find(function(s){return s.id===activeSid});
+  if(!subj){ alert('找不到监控主体'); return; }
+  var cos = new Set(subj.companies);
+  var items = ITEMS.filter(function(it){return cos.has(it.company)});
+  var byCo = {};
+  items.forEach(function(r){
+    var co = r.company||'';
+    if(!byCo[co]) byCo[co]=[];
+    byCo[co].push(r);
+  });
+  var html = '<h2>'+esc(subj.name)+' 竞品动态</h2><div style="color:var(--gray);font-size:12px;margin-bottom:12px">'+new Date().toLocaleString()+' · '+items.length+' 条 · '+Object.keys(byCo).length+' 家公司</div><hr>';
+  var coOrder = Object.keys(byCo).sort(function(a,b){
+    var aPrio = byCo[a].some(function(x){return x.tier==='priority'})?0:1;
+    var bPrio = byCo[b].some(function(x){return x.tier==='priority'})?0:1;
+    return aPrio - bPrio;
+  });
+  coOrder.forEach(function(co){
+    var coItems = byCo[co];
+    var star = coItems.some(function(x){return x.tier==='priority'}) ? '&#9733; ' : '';
+    html += '<div style="margin:20px 0;background:#fff;border-radius:8px;padding:16px;border:1px solid var(--border)">';
+    html += '<h3 style="color:var(--navy);margin-top:0;font-size:15px">'+star+esc(co)+' ('+coItems.length+' 条)</h3>';
+    coItems.forEach(function(it){
+      var uid = it.uid||'';
+      var summary = SUMMARIES[uid]||'';
+      html += '<div style="margin:8px 0;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13.5px">'+
+        '<span class="src src-'+it.source+'" style="margin-right:6px">'+(SRC[it.source]||it.source)+'</span>'+
+        '<a href="'+esc(it.url)+'" target="_blank" style="color:#1a1a1a;text-decoration:none">'+esc(it.title)+'</a>';
+      if(it.date) html += '<span style="color:var(--gray);font-size:11px;margin-left:10px">'+esc(it.date)+'</span>';
+      if(summary) html += '<p style="color:#555;font-size:12px;margin:4px 0 0 0;line-height:1.5">'+esc(summary)+'</p>';
+      html += '</div>';
+    });
+    html += '</div>';
+  });
+  document.getElementById('modal-body').innerHTML = html;
+  document.getElementById('summary-modal').classList.add('show');
+}
+
+// ─── Report download ───
+function openReport(){
+  if(!activeSid){ alert('请先选择监控主体'); return; }
+  var subj = SUBJECTS.find(function(s){return s.id===activeSid});
+  if(!subj){ return; }
+  var cos = new Set(subj.companies);
+  var items = ITEMS.filter(function(it){return cos.has(it.company)});
+  var lines = [];
+  lines.push('# '+subj.name+' 竞品监控日报');
+  lines.push('');
+  var now = new Date().toISOString().slice(0,16).replace('T',' ');
+  lines.push('**生成时间**: '+now);
+  lines.push('**监控条目**: '+items.length+' 条');
+  lines.push('');
+  lines.push('---');
+  lines.push('');
+  var byCo = {};
+  items.forEach(function(r){
+    var co = r.company||'';
+    if(!byCo[co]) byCo[co]=[];
+    byCo[co].push(r);
+  });
+  Object.keys(byCo).sort(function(a,b){
+    return (byCo[a].some(function(x){return x.tier==='priority'})?0:1) - (byCo[b].some(function(x){return x.tier==='priority'})?0:1);
+  }).forEach(function(co){
+    var coItems = byCo[co];
+    var star = coItems.some(function(x){return x.tier==='priority'})?'★ ':'';
+    lines.push('## '+star+co+' ('+coItems.length+' 条)');
+    lines.push('');
+    coItems.forEach(function(it){
+      var uid = it.uid||'';
+      var summary = SUMMARIES[uid]||'';
+      lines.push('- **['+(SRC[it.source]||it.source)+']** ['+it.title+']('+it.url+')');
+      if(it.date) lines.push('  _'+it.date+'_');
+      if(summary) lines.push('  > '+summary);
+      lines.push('');
+    });
+  });
+  var blob = new Blob([lines.join('\n')], {type:'text/markdown'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'report_'+activeSid+'.md';
+  a.click();
+}
+
+// ─── Roadmap ───
+var COLS=['2026-Q3','2026-Q4','2027-H1','2027-H2','2028'];
+function _colIdx(d){
+  var y=parseInt(d.substring(0,4)), m=d.substring(5);
+  if(y===2026){
+    if(m==='07'||m==='08'||m==='09'||m==='Q3') return 0;
+    if(m==='Q4'||m==='10'||m==='11'||m==='12') return 1;
+  }
+  if(y===2027){
+    if(m==='Q1'||m==='Q2'||m==='H1'||m==='01'||m==='02'||m==='03'||m==='04'||m==='05'||m==='06') return 2;
+    if(m==='Q3'||m==='Q4'||m==='H2'||m==='07'||m==='08'||m==='09'||m==='10'||m==='11'||m==='12') return 3;
+  }
+  if(y>=2028) return 4;
+  return -1;
+}
+var LINE_COLORS = {
+  'Lyell Immunopharma':'#1F3B57','Miltenyi Biomedicine (zamto-cel)':'#C98A2C',
+  'Gilead (含Arcellx/Kite)':'#B0453A','北京艺妙神州 (Immunochina)':'#3E7CB1',
+  'Merck KGaA (M9140)':'#B0453A'
+};
+function renderOneLine(title, items){
+  if(!items.length) return '';
+  var byCo={}, coOrder=[];
+  items.forEach(function(it){
+    if(!byCo[it.company]){byCo[it.company]=[];coOrder.push(it.company);}
+    byCo[it.company].push(it);
+  });
+  coOrder.sort(function(a,b){return a.indexOf('Lyell')>=0?-1:b.indexOf('Lyell')>=0?1:0;});
+  var html='<div class="rm-line-section"><div class="rm-line-title">'+title+'</div><div class="rm-line-canvas">';
+  html+='<div class="rm-time-hdr">';
+  COLS.forEach(function(c){html+='<div class="rm-time-col">'+c+'</div>';});
+  html+='</div>';
+  coOrder.forEach(function(co){
+    var evts=byCo[co];
+    var clr = LINE_COLORS[co] || '#3E7CB1';
+    var isLyell = co.indexOf('Lyell')>=0;
+    html+='<div class="rm-axis-row"><div class="rm-co-name" style="color:'+clr+'">'+(isLyell?'★ ':'')+esc(co)+'</div><div class="rm-axis-track">';
+    html+='<div class="rm-axis-line" style="background:'+clr+'"></div>';
+    var colGroups={};
+    evts.forEach(function(it){
+      var ci=_colIdx(it.date); if(ci<0) return;
+      if(!colGroups[ci]) colGroups[ci]=[];
+      colGroups[ci].push(it);
+    });
+    for(var ci=0;ci<COLS.length;ci++){
+      var group=colGroups[ci]||[];
+      html+='<div class="rm-ev-col">';
+      group.forEach(function(it){
+        html+='<div class="rm-ev-pin"><div class="rm-ev-lbl" style="color:'+clr+'">'+esc(it.event)+'</div><div class="rm-ev-dot" style="background:'+clr+'"></div></div>';
+      });
+      html+='</div>';
+    }
+    html+='</div></div>';
+  });
+  html+='</div></div>';
+  return html;
+}
+function buildRoadmap(sid){
+  var subj = SUBJECTS.find(function(s){return s.id===sid});
+  if(!subj){ document.getElementById('roadmap-body').innerHTML='<p style="color:var(--gray)">请先选择监控主体</p>'; return; }
+  var cos = new Set(subj.companies);
+  var items = ROADMAP.filter(function(r){return cos.has(r.company)});
+  if(!items.length){ document.getElementById('roadmap-body').innerHTML='<p style="color:var(--gray)">该主体暂无路线图数据。</p>'; return; }
+  var rondecel = items.filter(function(r){return r.product_line==='ronde-cel'});
+  var lyl273 = items.filter(function(r){return r.product_line==='LYL273'});
+  var html='';
+  if(rondecel.length) html+=renderOneLine('ronde-cel 产品线', rondecel);
+  if(lyl273.length) html+=renderOneLine('LYL273 产品线', lyl273);
+  document.getElementById('roadmap-body').innerHTML = html || '<p style="color:var(--gray)">暂无路线图。</p>';
+  document.getElementById('roadmap-title').textContent = subj.name + ' 竞品路线图';
+}
+function openRoadmap(){
+  buildRoadmap(activeSid);
+  document.getElementById('roadmap-modal').classList.add('show');
+}
+function closeRoadmap(){ document.getElementById('roadmap-modal').classList.remove('show'); }
+document.getElementById('roadmap-modal').addEventListener('click', function(e){ if(e.target===this) closeRoadmap(); });
+function closeModal(){ document.getElementById('summary-modal').classList.remove('show'); }
+document.getElementById('summary-modal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+
+// ─── Helpers ───
+function esc(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtDt(iso){
+  if(!iso) return '';
+  try { return iso.slice(0,16).replace('T',' '); } catch(e){ return iso; }
+}
+</script>
+</body>
+</html>

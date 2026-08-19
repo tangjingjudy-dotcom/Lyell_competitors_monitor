@@ -113,55 +113,58 @@ def diff_new(store, source_id, items):
     return new_items
 
 
+def _sec_form_code(item):
+    """从 SEC 条目的 detail/title 提取表单代码，如 10-Q、10-K/A。"""
+    m = re.search(r"表单\s+(\S+)", item.detail or "")
+    if m:
+        return m.group(1).strip().upper()
+    m = re.search(r"^([A-Z0-9][A-Z0-9/.-]*)\s+申报", item.title or "", re.I)
+    if m:
+        return m.group(1).strip().upper()
+    return ""
+
+
+def _is_financial_sec(item, cfg):
+    """只保留年报/季报类表单。美国没有单独的月报（10-K 年报、10-Q 季报）。"""
+    allowed = {f.strip().upper() for f in (cfg.get("meaningful_sec_forms") or [])}
+    form = _sec_form_code(item)
+    return bool(form) and form in allowed
+
+
 def is_milestone(item, cfg, relaxed=False, diversified=False, product_keywords=None):
-    """判断一条 Item 是否属于"关键里程碑"（新临床数据/上市前进展/重大公司事件）。
+    """判断一条 Item 是否属于"关键里程碑"。
 
-    过滤层次（按优先级从高到低）：
-      1. Lyell Immunopharma（监控主体） → 全保留
-      2. 财务困境关键词（破产/退市/重组等） → 全保留（不论公司）
-      3. 产品关键词（product_keywords）→ 命中才继续，否则直接丢弃
-      4. clinicaltrials → 默认保留（上游已按 ct_keywords 过滤）
-      5. sec → 仅保留重大表单（8-K/10-K 等）
-      6. relaxed（重点档放宽）→ PubMed 全保留；非多元化公司新闻全保留
-      7. 兜底 → 全局 milestone_keywords 关键词匹配
-
-    关键变更：非 Lyell 公司必须命中 product_keywords（或财务困境关键词），
-    否则即使 relaxed=True 也不会保留。这确保了所有来源只推送与关注产品相关的信息。
+    1. SEC → 仅年报/季报（10-K / 10-Q / 20-F / 40-F 及修订）
+    2. 财务困境关键词 → 全保留
+    3. 监控主体的非 SEC 新闻 → 全保留
+    4. 产品关键词 → 命中才保留
+    5. relaxed / 全局关键词兜底
     """
     if not cfg or not cfg.get("enabled", True):
         return True
 
     text = f"{item.title} {item.detail}".lower()
-    # 剔除 URL（避免 product_keywords 因 URL 含公司名而误匹配所有条目）
     text = re.sub(r'https?://\S+', '', text)
 
-    # ——— 第1层：Lyell 监控主体 → 全保留 ———
-    if item.company == "Lyell Immunopharma":
-        return True
+    if item.source == "sec":
+        return _is_financial_sec(item, cfg)
 
-    # ——— 第2层：财务困境关键词（破产/退市/重组等）→ 必须保留 ———
     fin_kw = cfg.get("financial_distress_keywords") or []
     if any(kw.lower() in text for kw in fin_kw):
         return True
 
-    # ——— 第3层：产品关键词过滤（非 Lyell 公司核心规则）———
-    if product_keywords:
-        if not any(pk.lower() in text for pk in product_keywords):
-            return False  # 未命中产品关键词且非财务事件 → 直接丢弃
-        # 命中产品关键词 → 直接放行（不再检查全局关键词）
+    if (getattr(item, "category", "") or "") == "监控主体":
         return True
 
-    # ——— 第4层：来源特定规则 ———
-    if item.source == "sec":
-        forms = cfg.get("meaningful_sec_forms") or []
-        blob = f"{item.detail} {item.title}"
-        return any(f.lower() in blob.lower() for f in forms)
+    if product_keywords:
+        if not any(pk.lower() in text for pk in product_keywords):
+            return False
+        return True
 
     if relaxed:
         if not diversified:
             return True
 
-    # ——— 第5层（兜底）：全局里程碑关键词 ———
     return any(kw.lower() in text for kw in (cfg.get("keywords") or []))
 
 

@@ -530,6 +530,18 @@ def generate(settings, subjects=None):
     with open(os.path.join(out_dir, "report.css"), "w", encoding="utf-8") as f:
         f.write(_REPORT_CSS)
 
+    standalone_html = os.path.join(ROOT, "index.html")
+    if os.path.isfile(standalone_html):
+        with open(standalone_html, "r", encoding="utf-8") as sf, \
+             open(os.path.join(out_dir, "index.html"), "w", encoding="utf-8") as df:
+            df.write(sf.read())
+
+    import shutil as _shutil
+    for jsfile in ("items.json", "summaries.json", "run_log.json"):
+        src = os.path.join(ROOT, "data", jsfile)
+        if os.path.isfile(src):
+            _shutil.copyfile(src, os.path.join(out_dir, jsfile))
+
     return os.path.join(out_dir, "index.html")
 
 

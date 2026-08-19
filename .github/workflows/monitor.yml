@@ -5,6 +5,11 @@ name: competitor-monitor
 # 注意：故意避开整点(:00) —— GitHub 定时任务在整点最拥堵、经常被延迟甚至丢弃，错开几分钟更可靠。
 # 也可在 Actions 页面手动触发（可勾选 full_sweep 强制全量扫描）。
 on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "data/**"
+      - "**.md"
   schedule:
     - cron: "17 1 * * *"    # 每日（跳过摘要）
     - cron: "47 1 * * 1"   # 每周一早 09:47（含摘要）
@@ -52,16 +57,18 @@ jobs:
           MONITOR_SMTP_PASS: ${{ secrets.MONITOR_SMTP_PASS }}
           MONITOR_MAIL_TO: ${{ secrets.MONITOR_MAIL_TO }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          # 表格是“任何人有链接可查看”，直接读公开 CSV；若设置了 Secret 则覆盖。
+          GOOGLE_SHEETS_CSV_URL: ${{ secrets.GOOGLE_SHEETS_CSV_URL || 'https://docs.google.com/spreadsheets/d/19czgGX9R1Dj9QqI4ebeewQqPLNPoRus3zjFjszXDUUM/export?format=csv&gid=1330411179' }}
         run: |
           # 强制摘要：周一自动，或手动勾选 force_summary
           if [ "1" = "$(date +%u)" ] || [ "${{ github.event.inputs.force_summary }}" = "true" ]; then
             export FORCE_DS_SUMMARY=1
             echo "摘要: 强制生成（AI）"
           fi
-          if [ "${{ github.event.inputs.full_sweep }}" = "true" ]; then
-            python run.py --all
+          if [ "${{ github.event.inputs.full_sweep }}" = "true" ] || [ "${{ github.event_name }}" = "push" ]; then
+            python run.py --all --no-email
           else
-            python run.py
+            python run.py --no-email
           fi
 
       - name: Commit state snapshot

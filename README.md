@@ -3,14 +3,15 @@
 对报告中所有公司做长期自动监控：抓取多个可靠信息源 → 计算“上次运行以来的新增” → **里程碑过滤（只留新临床数据/上市前进展/重大事件）** → 更新一个可分享的静态看板 →（可选）在有新消息时发送邮件摘要。
 
 **在线看板（每天在此查看）**：https://tangjingjudy-dotcom.github.io/Lyell_competitors_monitor/
-**更新频率**：每天北京时间约 09:00 由 GitHub Actions 自动运行并部署，无需手动操作。
+**更新频率**：每天北京时间约 09:17 由 GitHub Actions 自动抓取并发布到 GitHub Pages，无需本机运行。
+**公司名单**：改 [Google 表格](https://docs.google.com/spreadsheets/d/19czgGX9R1Dj9QqI4ebeewQqPLNPoRus3zjFjszXDUUM/edit?gid=1330411179) 即可，下次 Actions 运行会自动读入。
 
 ## 只保留“关键里程碑”（里程碑过滤器）
 
 为避免刷屏，抓到的新增条目会先经过 `config.py` 中 `SETTINGS["milestone_filter"]` 过滤，只保留真正重要的进展：
 
 - **ClinicalTrials.gov**：试验状态/分期变化本身即高信号 → 全部保留（如 招募中→已完成、1期→2期、新登记试验）。
-- **SEC EDGAR**：只保留“重大事件/年报”类表单（8-K / 6-K / 20-F / 10-K 等），丢弃 Form 4（高管持股）、季报、S-8 等例行文件。
+- **SEC EDGAR**：只保留年报/季报（10-K / 10-Q，外国发行人 20-F / 40-F，含修订）。Form 4、8-K、6-K 等小申报直接丢弃。美国没有单独月报。
 - **PubMed / 新闻 / RSS**：标题命中里程碑关键词（phase、ORR/CR/PFS、topline、FDA/EMA/NMPA、BLA/IND/MAA、approval、获批、认定、收购、授权……）才保留。
 
 关键词与表单清单均可在 `config.py` 中增删、放宽或收紧。

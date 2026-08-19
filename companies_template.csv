@@ -1,0 +1,11 @@
+name,category,subject_id,sec_ticker,rss,news_pages,product_keywords
+Lyell Immunopharma,监控主体,lyell,LYEL,https://ir.lyell.com/rss/news-releases.xml,,
+Gilead (含Arcellx/Kite),竞品,lyell,GILD,,https://www.gilead.com/news/news-details,"kite-363|kite-753"
+Miltenyi Biomedicine (zamto-cel),竞品,lyell,,,https://www.miltenyibiomedicine.com/news-events/press-releases/,"zamto-cel|zamtocabtagene autoleucel"
+Merck KGaA (M9140),竞品,lyell,MKKGY,,https://www.merckgroup.com/en/news.html,M9140
+北京艺妙神州 (Immunochina),竞品,lyell,,,http://www.immunochina.com/Home/news/news.html,IM96
+Legend Biotech,竞品,lyell,LEGN,,https://investors.legendbiotech.com/news-releases,LB2501
+CARsgen (科济药业),竞品,lyell,,,https://www.carsgen.com/en/news/,CT1190B
+Parabilis Medicines,监控主体,parabilis,PBLS,,https://investors.parabilismed.com/news-events/news-releases,
+Sapience Therapeutics,竞品,parabilis,,,https://sapiencetherapeutics.com/news-events/press-releases/,ST316
+Immunome,竞品,parabilis,IMNM,,https://investors.immunome.com/news-releases/,"varegacestat|AL102"
